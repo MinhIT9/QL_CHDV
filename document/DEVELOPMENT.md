@@ -1,42 +1,62 @@
-# Hướng dẫn phát triển
+# Hướng dẫn phát triển và vận hành local
 
-## Hiện trạng
+## Thiết lập
 
-Repo mới có sườn. Chưa có lệnh chạy Flask, chưa có DB và chưa cài thư viện. Các file requirements hiện là chỗ giữ danh sách dự kiến; cài chúng chưa tạo ra ứng dụng.
+Đã kiểm thử với Python 3.11.9. Dependencies trực tiếp khóa trong requirements.txt; test dùng unittest. Lượt triển khai dùng dependencies sẵn có, không cài thêm vào Python toàn cục.
 
-Script tài liệu chỉ cần Python 3.9+ và thư viện chuẩn. Khi triển khai Flask cần chốt phiên bản Python và dependencies riêng.
+    python -m venv .venv
+    .\.venv\Scripts\python.exe -m pip install -r requirements.txt
+    Copy-Item .env.example .env
 
-## Chu trình mỗi thay đổi
+Chỉ copy mẫu khi chưa có .env; không ghi đè cấu hình đang dùng. Điền SECRET_KEY ngẫu nhiên, INITIAL_ADMIN_PASSWORD và URL database. .env.example không chứa pass thật. Có thể tạo khóa bằng Python secrets.token_hex(32).
 
-1. Đọc `STATUS.md`, `HANDOFF.md` và yêu cầu hiện tại.
-2. Thực hiện thay đổi đúng phạm vi.
-3. Chạy kiểm tra phù hợp với thay đổi.
-4. Cập nhật tiến độ, bàn giao, changelog; ghi quyết định nếu có.
-5. Sinh lại danh mục file và kiểm tra:
+    .\.venv\Scripts\python.exe -m flask --app wsgi db upgrade
+    .\.venv\Scripts\python.exe -m flask --app wsgi init-admin
+    .\.venv\Scripts\python.exe -m flask --app wsgi run --host 127.0.0.1 --port 5000
 
-```powershell
-python scripts/update_docs.py
-python scripts/update_docs.py --check
-```
+init-admin không thay mật khẩu root tồn tại. Database vận hành dùng migration, không db.create_all(). Flask dev server chỉ dùng local.
 
-`INVENTORY.md` được sinh tự động; các tài liệu nghiệp vụ cần dev/agent cập nhật có kiểm chứng theo `AGENTS.md`. Quy tắc này hướng dẫn agent và dev, không phải tiến trình nền tự theo dõi máy tính.
+## Tài khoản
 
-## Tự cập nhật trước commit (tùy chọn)
+- Root cấp tài khoản Admin và pass tạm >=8 ký tự qua menu Tài khoản.
+- Cả root bootstrap và Admin mới phải đổi pass trước khi làm việc.
+- Pass mới 8–128 ký tự, khác pass cũ, không khoảng trắng đầu/cuối; xác nhận và nhập pass hiện tại.
+- Reset bắt đổi lại, hủy phiên cũ; khóa/mở tài khoản cũng xoay token. Không xóa tài khoản để giữ liên kết điện.
+- 5 lần login sai khóa tạm 5 phút. Root reset pass xóa khóa tạm Admin. Chưa phục hồi root qua web.
+- Tên tài khoản chữ thường, 3–64 ký tự [a-z0-9_.-], bắt đầu bằng chữ/số.
 
-Repo có `.githooks/pre-commit`. Chưa thay đổi cấu hình Git cục bộ. Muốn bật trong repo này:
+## Kiểm tra và migration
 
-```powershell
-git config --local core.hooksPath .githooks
-```
+    python -m unittest discover -s tests -v
+    python -m flask --app wsgi db check
+    node --check app/static/js/app.js
+    python scripts/update_docs.py
+    python scripts/update_docs.py --check
 
-Hook chạy script sinh danh mục và chặn commit nếu `INVENTORY.md` trong vùng stage chưa khớp kết quả sinh. Khi bị chặn, xem file rồi chạy `git add document/INVENTORY.md` và commit lại. Hook không tự stage file và không tự viết tiến độ chức năng.
+Tests dùng SQLite tạm, không dữ liệu thật. Test HTML/CSRF không thay thế browser QA của HTMX/JS/responsive. Chưa có browser QA tự động.
 
-Nếu đã có hook riêng, cần ghép quy trình thay vì thay đường dẫn tùy tiện. Môi trường chạy hook cần lệnh `python` trỏ tới Python 3.9+.
+Đổi schema: sửa model → flask db migrate -m ten_thay_doi → review → backup DB → flask db upgrade. Luôn thêm --app wsgi khi dùng CLI, commit migration cùng code.
 
-## Git và dữ liệu cục bộ
+## Backup/khôi phục
 
-- `.env.example` được commit, `.env` thật bị bỏ qua.
-- DB SQLite, WAL/SHM, log, backup, upload, export và môi trường ảo bị bỏ qua.
-- Lockfile dependencies và migration tương lai phải commit.
-- `.gitignore` không gỡ file đã được Git theo dõi và không thay thế phân quyền/bảo mật.
-- Không chọn license thay chủ dự án; chưa có giấy phép phát hành.
+    python -m flask --app wsgi backup-db backups/chdv-before-change.sqlite3
+
+Đích phải mới, không ghi đè. CLI dùng SQLite Backup API để nhất quán khi DB đang hoạt động. Chưa có lịch hằng ngày hoặc đích ngoài máy.
+
+Khôi phục: dừng mọi tiến trình truy cập DB, giữ bản hiện tại để có đường quay lui, kiểm tra PRAGMA integrity_check của backup, thay DB khi mọi kết nối đã đóng. Chỉ xử lý WAL/SHM sau khi chắc chắn không còn kết nối. Chạy migration phù hợp, mở lại và kiểm tra dữ liệu/quyền. Chưa diễn tập restore vào database vận hành.
+
+## Production
+
+Cần WSGI server, HTTPS, COOKIE_SECURE=true, SECRET_KEY ổn định/bí mật, backup hằng ngày ngoài máy, diễn tập restore, quyền file DB và kiểm tra/cập nhật dependencies. DB trên volume bền vững. Không bật debugger công khai.
+
+## Tài liệu và Git
+
+Cập nhật STATUS.md, HANDOFF.md, CHANGELOG.md sau mỗi thay đổi; sửa kiến trúc/phạm vi/quyết định khi cần. Chạy sinh danh mục và --check. Agent tuân AGENTS.md, bao gồm số phiên bản cuối phản hồi.
+
+INVENTORY.md tự sinh; chức năng phải được đánh dấu dựa trên kiểm tra thực tế. Hook local tùy chọn:
+
+    git config --local core.hooksPath .githooks
+
+Chưa tự bật hook; nếu có hook riêng cần ghép. Hook không tự stage, yêu cầu review/stage danh mục khi thay đổi.
+
+.env, DB/WAL/SHM, backup, upload/export/log và venv bị ignore. Migration/requirements phải theo dõi. Ignore không gỡ file đã track. Không đưa pass/dữ liệu thật vào tài liệu. Chưa chọn license cho mã dự án; license HTMX kèm static/vendor.

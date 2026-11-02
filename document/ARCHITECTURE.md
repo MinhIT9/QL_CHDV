@@ -1,37 +1,41 @@
-# Kiến trúc dự kiến
+# Kiến trúc hiện tại
 
-Một project Flask trả HTML bằng Jinja2. HTMX cập nhật từng phần trang; Bootstrap định dạng giao diện. Chỉ thêm JavaScript/Alpine.js khi có nhu cầu tương tác cụ thể.
+Một project Flask trả HTML bằng Jinja2. CSS riêng theo thiết kế bảng; HTMX 2.0.4 tăng tốc điều hướng qua hx-boost, form POST vẫn thông thường. JS tính điện khi nhập, khóa ô khách theo trạng thái và chống bấm lặp. Chưa dùng Bootstrap/Alpine.
 
-Luồng dự kiến: trình duyệt → route/form → service nghiệp vụ → SQLAlchemy → SQLite. Route trả trang đầy đủ hoặc HTML fragment cho HTMX.
+Luồng: trình duyệt → blueprint → quyền/CSRF → service nghiệp vụ → SQLAlchemy → SQLite → redirect/HTML.
 
-## Vai trò thư mục
-
-| Đường dẫn | Vai trò dự kiến |
+| Đường dẫn | Vai trò |
 | --- | --- |
-| `app/` | Mã ứng dụng, sau này có app factory và cấu hình |
-| `app/auth/` | Route/form đăng nhập và đăng xuất |
-| `app/rooms/` | Route/form phòng và chi tiết |
-| `app/electricity/` | Route/form nhập và xem điện |
-| `app/models/` | Model SQLAlchemy, ràng buộc dữ liệu |
-| `app/services/` | Nghiệp vụ dùng chung, giao dịch chốt điện |
-| `app/templates/` | Trang Jinja2 theo module |
-| `app/templates/partials/` | HTML fragment dùng với HTMX |
-| `app/static/` | CSS, JavaScript, ảnh, thư viện frontend nội bộ |
-| `migrations/` | Alembic/Flask-Migrate; chưa được khởi tạo |
-| `tests/` | Test quyền, nghiệp vụ, ràng buộc khi triển khai |
-| `instance/` | DB và cấu hình cục bộ, không commit |
-| `logs/`, `backups/` | Dữ liệu vận hành cục bộ, không commit |
-| `scripts/` | Công cụ hỗ trợ phát triển/vận hành |
-| `.githooks/` | Hook kiểm tra tài liệu, phải bật riêng |
-| `document/` | Tài liệu trạng thái và thiết kế |
+| wsgi.py | Entrypoint create_app |
+| app/__init__.py | Factory, config, PRAGMA, middleware đổi pass, headers, CLI |
+| app/extensions.py | db, login manager, CSRF, migration |
+| app/auth/routes.py | Login/logout/đổi pass, root, tài khoản |
+| app/rooms/routes.py | Bảng, form, chi tiết, xóa/ngừng phòng |
+| app/electricity/routes.py | Bảng nhập điện theo kỳ |
+| app/services/rooms.py | Validate phòng, chuyển đợt thuê |
+| app/services/electricity.py | Chuỗi kỳ, validate số, giao dịch |
+| app/models/__init__.py | User, Room, Tenancy, Occupant, Vehicle, ElectricityReading |
+| app/templates/ | Jinja2; partials/ để mở rộng sau |
+| app/static/ | CSS/JS riêng, HTMX và license nội bộ |
+| migrations/ | Alembic schema có version control |
+| tests/test_v1.py | Tích hợp SQLite tạm và Flask test client |
+| instance/ | DB local ngoài Git/static |
+| backups/, logs/ | Runtime; chưa có scheduler/log file riêng |
+| scripts/update_docs.py | Sinh danh mục file |
+| document/, AGENTS.md | Trạng thái và quy tắc dev/agent |
 
-Các thư mục chỉ có `.gitkeep` hiện chưa phải Python package hay module hoạt động. Chưa tạo route, model, template hoặc cấu hình ứng dụng.
+## Quyền và phiên
 
-## Nguyên tắc triển khai sau này
+User.is_root cho phép tạo/khóa/reset tài khoản. Tài khoản khác là Admin quản lý phòng/điện. Không tự đăng ký/nâng quyền, không khóa root từ web.
 
-- SQLite ở ổ đĩa cục bộ máy chủ, ngoài static; bật foreign keys, cấu hình WAL và thời gian chờ ghi phù hợp.
-- Giao dịch ghi ngắn; ràng buộc mã phòng và kỳ chốt ở DB.
-- Bảo vệ route phía máy chủ, CSRF, hash mật khẩu và cấu hình session phù hợp môi trường.
-- Chỉ số hiện tại lấy từ lịch sử hợp lệ, tránh nhiều nguồn dữ liệu lệch nhau.
-- Dùng migration; SQLAlchemy hỗ trợ chuyển DB nhưng không bảo đảm chuyển PostgreSQL tự động.
-- Backup nhất quán và kiểm tra khôi phục; thư mục `backups/` chưa phải giải pháp backup ngoài máy chủ.
+must_change_password kiểm tra mọi request đã đăng nhập; khi còn bật chỉ được đổi pass/logout/static. Hash Werkzeug scrypt. session_token xoay khi đổi/reset pass hoặc khóa/mở để hủy phiên cũ. CSRF mọi POST; cookie HttpOnly/SameSite Lax, Secure theo môi trường.
+
+## Dữ liệu
+
+- SQLite ổ đĩa cục bộ, WAL, foreign keys, busy timeout 5 giây. URL tương đối dưới instance/.
+- Một bản điện/phòng/kỳ, nguyên không âm, DB check cuối >= đầu. Đầu kỳ nối tháng trước; không chèn lùi.
+- BEGIN IMMEDIATE khi chốt SQLite để tuần tự hóa ghi và đọc lại lịch sử; sai một dòng rollback cả đợt.
+- Unique index tối đa một tenancy mở/phòng.
+- Ngừng phòng kết thúc đợt thuê, giữ lịch sử. Xóa hẳn chỉ khi chưa có thuê/điện.
+- Backup dùng SQLite Backup API, đích mới. Chưa tự lập lịch hoặc lưu ngoài máy.
+- UTC lưu DB, ngày hiển thị UTC+7 (Asia/Saigon). Chưa tính tiền.

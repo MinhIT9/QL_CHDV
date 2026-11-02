@@ -1,23 +1,24 @@
-# Mô hình dữ liệu đề xuất
+# Mô hình dữ liệu V1
 
-**Chưa có model/schema/migration.** Tên và quan hệ dưới đây phục vụ thảo luận trước triển khai.
+Đã triển khai tại app/models/__init__.py; migration đầu: e9329a770fe9.
 
-| Thực thể | Dữ liệu chính | Quan hệ / ràng buộc dự kiến |
+| Bảng | Dữ liệu chính | Ràng buộc / quan hệ |
 | --- | --- | --- |
-| Admin | Tài khoản, password hash, trạng thái | Tài khoản duy nhất; không lưu mật khẩu thô |
-| Room | ID, mã phòng, trạng thái sử dụng, ghi chú | Mã duy nhất; không xóa khi có lịch sử |
-| Tenancy | Phòng, khách chính, ngày vào/ra | Một đợt thuê đang hoạt động mỗi phòng |
-| Occupant | Đợt thuê, tên người ở cùng | Nhiều người mỗi đợt thuê |
-| Vehicle | Đợt thuê, biển số | Nhiều xe mỗi đợt thuê |
-| ElectricityReading | Phòng, kỳ, ngày ghi, đầu/cuối kỳ | Một bản có hiệu lực mỗi phòng/kỳ |
-| ReadingRevision | Bản chốt, giá trị cũ/mới, lý do, Admin, thời điểm | Lưu dấu vết điều chỉnh |
+| user | username, password_hash, is_root, enabled, must_change_password, session_token, failed_logins, locked_until | Username/token duy nhất; scrypt hash |
+| room | code, active, note | Code chữ hoa, duy nhất |
+| tenancy | room_id, tenant_name, started_at, ended_at | Partial unique index: một đợt mở mỗi phòng |
+| occupant | tenancy_id, name | Nhiều người/đợt, không gồm khách chính |
+| vehicle | tenancy_id, plate | Nhiều xe/đợt |
+| electricity_reading | room_id, period, start_value, end_value, created_by, created_at | Unique phòng/kỳ, check 0 <= đầu <= cuối |
 
-## Cần giải quyết khi thiết kế schema
+## Quy ước
 
-- Tách trạng thái ngừng sử dụng khỏi trạng thái có khách để tránh hai nguồn thông tin mâu thuẫn.
-- Xác định độ chính xác số điện trước khi chọn kiểu dữ liệu; nếu có thập phân, không dùng float cho tính toán cần chính xác.
-- Khi sửa kỳ trước, kiểm tra ảnh hưởng tới đầu kỳ sau; giữ lịch sử cũ.
-- Mã phòng đổi không làm mất liên kết: quan hệ dùng ID nội bộ.
-- Ngày giờ lưu và hiển thị cần quy ước thống nhất; giao diện dùng Asia/Saigon.
-- Thay đồng hồ có thể cần thực thể đồng hồ và các đoạn tiêu thụ riêng; chưa chốt trong V1.
-- Đổi khách giữa tháng chưa bao gồm tính/chia tiền điện.
+- Quan hệ dùng ID nội bộ; đổi mã phòng không mất lịch sử.
+- active=false là ngừng sử dụng. Active + tenancy mở là đang thuê, không có là trống.
+- Số người = 1 khách chính + occupant; không lưu số người độc lập.
+- Chọn đổi khách mới kết thúc tenancy cũ; sửa chính tả thông thường sửa đợt đang mở.
+- Người/xe mỗi dòng; bỏ trống/trùng hoàn toàn, tối đa 30 dòng mỗi danh sách. Biển số chữ hoa, chưa kiểm định pháp lý.
+- Kỳ YYYY-MM; chỉ số nguyên kWh trong khoảng 0–2.147.483.647.
+- Phòng trống vẫn chốt điện. Đầu kỳ lần đầu nhập tay, sau đó nối tháng liền trước.
+- Chưa có bảng revision hoặc meter: không sửa điện cũ/thay đồng hồ.
+- Thời gian lưu UTC, ngày giao diện UTC+7. Chưa chia tiền/điện theo đợt thuê.

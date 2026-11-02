@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'Sửa phòng' if room else 'Thêm phòng' }} · CHDV Manager{% endblock %}
+{% block content %}
+<header class="page-header"><div><a class="back-link" href="{{ url_for('rooms.index') }}">← Danh sách phòng</a><h1>{{ 'Sửa phòng ' ~ room.code if room else 'Thêm phòng mới' }}</h1><p class="muted">Thông tin phòng, người ở và phương tiện.</p></div></header>
+<section class="card form-card"><form method="post" class="stack">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<div class="form-grid"><label>Mã phòng <span class="required">*</span><input name="code" required maxlength="30" value="{{ values.get('code', '') }}" placeholder="P101"></label>
+<label>Trạng thái<select name="status" id="room-status">{% for value, text in [('vacant', 'Trống'), ('occupied', 'Đang thuê'), ('inactive', 'Ngừng sử dụng')] %}<option value="{{ value }}" {{ 'selected' if values.get('status') == value }}>{{ text }}</option>{% endfor %}</select></label></div>
+<fieldset id="tenant-fields"><legend>Khách thuê hiện tại</legend>
+<p class="muted small">Chỉ nhập khách khi phòng đang thuê. Số người được tính bằng khách chính + người ở cùng.</p>
+<label>Tên khách thuê chính<input name="tenant_name" maxlength="120" value="{{ values.get('tenant_name', '') }}" placeholder="Họ và tên"></label>
+<div class="form-grid"><label>Người ở cùng<textarea name="occupants" rows="4" placeholder="Mỗi người một dòng">{{ values.get('occupants', '') }}</textarea><small>Không bao gồm khách thuê chính.</small></label>
+<label>Biển số xe<textarea name="vehicles" rows="4" placeholder="Mỗi biển số một dòng">{{ values.get('vehicles', '') }}</textarea><small>Có thể để trống nếu không có xe.</small></label></div>
+{% if room and room.current_tenancy %}<label class="checkbox"><input type="checkbox" name="new_tenancy" {{ 'checked' if values.get('new_tenancy') == 'on' }}> Đổi sang khách mới (kết thúc đợt thuê cũ và giữ lịch sử)</label>{% endif %}
+</fieldset>
+<label>Ghi chú<textarea name="note" maxlength="2000" rows="3">{{ values.get('note', '') }}</textarea></label>
+<p class="notice">Chỉ số điện được nhập ở màn hình Chỉ số điện. Chuyển sang trống/ngừng sử dụng sẽ kết thúc đợt thuê hiện tại và giữ lịch sử. Nếu không bật JavaScript, hãy xóa các ô khách trước khi lưu trạng thái này.</p>
+<div class="form-actions"><a class="button secondary" href="{{ url_for('rooms.index') }}">Hủy</a><button class="button primary" type="submit">Lưu phòng</button></div>
+</form></section>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Đăng nhập · CHDV Manager{% endblock %}
+{% block content %}
+<section class="login-shell">
+  <div class="login-brand"><span class="building">▥</span><h1>CHDV Manager</h1><p>Quản lý căn hộ dịch vụ</p></div>
+  <div class="card login-card"><h2>Đăng nhập</h2><p class="muted">Chào bạn, hãy đăng nhập để quản lý phòng.</p>
+    <form method="post" class="stack">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label>Tài khoản<input name="username" autocomplete="username" required maxlength="64" autofocus value="{{ request.form.get('username', '') }}"></label>
+      <label>Mật khẩu<input type="password" name="password" autocomplete="current-password" required maxlength="128"></label>
+      <button class="button primary full" type="submit">Đăng nhập →</button>
+    </form>
+  </div>
+  <p class="muted small">Chỉ dành cho quản trị viên được cấp tài khoản.</p>
+</section>
+{% endblock %}

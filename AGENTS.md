@@ -3,7 +3,7 @@
 ## Trước khi thay đổi
 
 - Đọc `document/STATUS.md`, `document/HANDOFF.md` và tài liệu liên quan.
-- Chỉ triển khai trong phạm vi được người dùng yêu cầu. Hiện tại chỉ tạo sườn, chưa triển khai nghiệp vụ.
+- Chỉ triển khai trong phạm vi được người dùng yêu cầu. Người dùng đã cho phép triển khai V1 Flask + SQLite và quản lý tài khoản bởi root.
 - Không ghi đè thay đổi của người khác. Không đưa bí mật hoặc dữ liệu khách thật vào repo/tài liệu.
 
 ## Khi kết thúc mỗi thay đổi

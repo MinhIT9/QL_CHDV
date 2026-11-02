@@ -1,0 +1,2 @@
+{% extends 'base.html' %}
+{% block content %}<section class="card empty"><p class="eyebrow">LỖI {{ code }}</p><h1>{{ message }}</h1><a class="button secondary" href="{{ url_for('rooms.index') if current_user.is_authenticated else url_for('auth.login') }}">Quay lại</a></section>{% endblock %}

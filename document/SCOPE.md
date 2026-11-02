@@ -22,15 +22,16 @@ Quản lý CHDV ban đầu khoảng 7 phòng, một Admin, ưu tiên bảng và 
 - Không chấp nhận cuối kỳ nhỏ hơn đầu kỳ. Thay đồng hồ là trường hợp riêng.
 - Giữ lịch sử từng kỳ, không ghi đè lịch sử cũ.
 
-## Đề xuất cần chốt trước triển khai
+## Quy tắc đã chọn khi triển khai V1 (2026-11-02)
 
 - Ba trạng thái: trống, đang thuê, ngừng sử dụng.
 - Số người tự tính từ khách chính và người ở cùng.
 - Lưu đợt thuê để không mất khách cũ khi đổi khách.
-- Một bản chốt có hiệu lực cho mỗi phòng/kỳ; sửa sai phải giữ dấu vết.
+- Một bản chốt cho mỗi phòng/kỳ; V1 chưa mở sửa/xóa bản chốt, chưa có audit điều chỉnh.
 - Cho lưu một phần danh sách phòng; phòng trống vẫn được ghi điện.
 - Khi thiếu kỳ trước, yêu cầu xử lý rõ thay vì coi tiêu thụ nhiều tháng là một tháng.
-- Thay đồng hồ: triển khai luồng riêng hay tạm hoãn trong V1.
-- Chỉ số điện nhận số nguyên hay có phần thập phân.
+- Thay đồng hồ tạm hoãn trong V1; không chèn lùi khi đã có kỳ sau.
+- Chỉ số điện nguyên kWh. Người/xe mỗi dòng; số người tự tính; đợt thuê giữ khách cũ.
+- Root quản lý tài khoản; tài khoản mới và root bootstrap bắt đổi pass lần đầu, ít nhất 8 ký tự.
 
-Các đề xuất này chưa phải chức năng đã triển khai. Chi tiết xem `DECISIONS.md`.
+Trạng thái và giới hạn thực tế xem `STATUS.md`; quyết định xem `DECISIONS.md`.

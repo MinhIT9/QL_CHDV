@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}CHDV Manager{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+  <meta name="htmx-config" content='{"allowEval":false,"allowScriptTags":false,"historyCacheSize":0}'>
+  <script src="{{ url_for('static', filename='vendor/htmx.min.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+</head>
+<body class="{% if not current_user.is_authenticated %}guest{% endif %}" hx-boost="true">
+{% if current_user.is_authenticated %}
+<aside class="sidebar">
+  <a class="brand" href="{{ url_for('rooms.index') }}"><span class="brand-icon">▥</span> CHDV Manager <small>BASIC · QUẢN LÝ CĂN HỘ</small></a>
+  <nav aria-label="Điều hướng chính">
+    <a class="{{ 'selected' if request.blueprint == 'rooms' }}" href="{{ url_for('rooms.index') }}">▦ <span>Phòng</span></a>
+    <a class="{{ 'selected' if request.blueprint == 'electricity' }}" href="{{ url_for('electricity.index') }}">ϟ <span>Chỉ số điện</span></a>
+    {% if current_user.is_root %}<a class="{{ 'selected' if request.endpoint == 'auth.accounts' }}" href="{{ url_for('auth.accounts') }}">♙ <span>Tài khoản</span></a>{% endif %}
+  </nav>
+  <div class="profile"><strong>{{ current_user.username }}</strong><small>{{ 'Root · Quản trị hệ thống' if current_user.is_root else 'Admin · Quản lý phòng' }}</small>
+    <a href="{{ url_for('auth.change_password') }}">Đổi mật khẩu</a>
+    <form action="{{ url_for('auth.logout') }}" method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="logout" type="submit">Đăng xuất →</button></form>
+  </div>
+</aside>
+{% endif %}
+<main id="main" class="main">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  <div class="messages" aria-live="polite">{% for category, message in messages %}<div class="alert {{ category }}">{{ message }}</div>{% endfor %}</div>
+  {% endwith %}
+  {% block content %}{% endblock %}
+  <footer>CHDV Manager Basic <span>Quản lý gọn gàng, thông tin rõ ràng.</span></footer>
+</main>
+</body>
+</html>
