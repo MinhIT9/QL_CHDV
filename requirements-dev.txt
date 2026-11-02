@@ -1,0 +1,2 @@
+-r requirements.txt
+# Development dependencies will be selected when checks/tests are implemented.

@@ -1,0 +1,2 @@
+# Runtime dependencies will be selected and pinned when implementation starts.
+# Planned: Flask, Flask-SQLAlchemy, Flask-Migrate, Flask-Login, Flask-WTF.

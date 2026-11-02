@@ -1,0 +1,11 @@
+#!/bin/sh
+set -eu
+python scripts/update_docs.py
+python scripts/update_docs.py --check
+# Compare generated content to the staged version, including untracked output.
+working_hash=$(git hash-object document/INVENTORY.md)
+staged_hash=$(git rev-parse --verify :document/INVENTORY.md 2>/dev/null || true)
+if [ "$working_hash" != "$staged_hash" ]; then
+    echo "Review and stage document/INVENTORY.md, then commit again."
+    exit 1
+fi
