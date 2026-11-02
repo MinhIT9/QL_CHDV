@@ -9,8 +9,21 @@ if (status && !status.dataset.bound) {
     const occupied = status.value === "occupied";
     document.querySelector("#tenant-fields").disabled = !occupied;
     document.querySelector("input[name='tenant_name']").required = occupied;
+    const newTenant = document.querySelector("input[name='new_tenancy']");
+    const hasCurrent = Boolean(document.querySelector("input[name='tenancy_id']").value);
+    const isNew = !hasCurrent || Boolean(newTenant?.checked);
+    document.querySelectorAll("[data-new-required]").forEach((input) => {
+      input.required = occupied && isNew;
+    });
+    const moveOut = document.querySelector("input[name='move_out_date']");
+    if (moveOut) {
+      moveOut.required = !occupied || Boolean(newTenant?.checked);
+      document.querySelector("#move-out-field").hidden = !moveOut.required;
+      moveOut.disabled = !moveOut.required;
+    }
   };
   status.addEventListener("change", updateTenantFields);
+  document.querySelector("input[name='new_tenancy']")?.addEventListener("change", updateTenantFields);
   updateTenantFields();
 }
 document.querySelectorAll("form[data-confirm]:not([data-confirm-bound])").forEach((form) => {
@@ -54,6 +67,14 @@ document.querySelectorAll("form[method='post']:not([data-submit-bound])").forEac
   form.dataset.submitBound = "true";
   form.addEventListener("submit", (event) => {
     if (event.defaultPrevented) return;
+    // Disabled submitters are omitted by browsers; preserve named actions (renewal preview/confirm).
+    if (event.submitter?.name) {
+      const action = document.createElement("input");
+      action.type = "hidden";
+      action.name = event.submitter.name;
+      action.value = event.submitter.value;
+      form.appendChild(action);
+    }
     form.querySelectorAll("button[type='submit']").forEach((button) => {
       button.disabled = true;
       button.textContent = "Đang lưu…";

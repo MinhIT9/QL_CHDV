@@ -1,5 +1,6 @@
 from app.extensions import db
-from app.models import Occupant, Room, Tenancy, Vehicle, utcnow
+from app.models import Occupant, Room, Tenancy, Vehicle
+from app.services.contracts import check_version, contract_values, end_tenancy
 
 
 def lines(value, max_length, label):
@@ -27,14 +28,24 @@ def save_room(room, data):
     if status != "occupied" and (tenant_name or people or plates):
         raise ValueError("Phòng trống/ngừng sử dụng không nhận thông tin khách mới. Xóa các ô khách hoặc chọn Đang thuê.")
 
+    current = room.current_tenancy if room else None
+    if current:
+        check_version(current, data)
+    elif data.get("tenancy_id"):
+        raise ValueError("Đợt thuê đã kết thúc. Hãy tải lại trang.")
+    new_tenancy = data.get("new_tenancy") == "on"
+    terms = contract_values(data, None if new_tenancy else current) if status == "occupied" else None
+    if current and (status != "occupied" or new_tenancy):
+        end_tenancy(current, data.get("move_out_date", ""))
+    if terms and room and (current is None or new_tenancy):
+        past_dates = [item.move_out_date for item in room.tenancies if item.move_out_date]
+        if past_dates and terms["contract_start"] < max(past_dates):
+            raise ValueError("Ngày bắt đầu hợp đồng mới không được trước ngày khách cũ trả phòng.")
     if room is None:
         room = Room()
         db.session.add(room)
     room.code, room.note, room.active = code, note, status != "inactive"
-    current = room.current_tenancy
-    new_tenancy = data.get("new_tenancy") == "on"
     if current and (status != "occupied" or new_tenancy):
-        current.ended_at = utcnow()
         # End the old tenancy before creating the next one (unique active tenancy).
         db.session.flush()
         current = None
@@ -43,6 +54,14 @@ def save_room(room, data):
             current = Tenancy(room=room, tenant_name=tenant_name)
             db.session.add(current)
         current.tenant_name = tenant_name
+        if current.id is not None:
+            current.version += 1
+        for key, value in terms.items():
+            if key == "contract_end" and value != current.contract_end:
+                current.contract_anchor_day = value.day if value else None
+            setattr(current, key, value)
+        # Retained legacy DB column; never a separate editable business date.
+        current.move_in_date = current.contract_start
         current.occupants = [Occupant(name=name) for name in people]
         current.vehicles = [Vehicle(plate=plate) for plate in plates]
     return room

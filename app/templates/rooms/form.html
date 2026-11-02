@@ -4,6 +4,8 @@
 <header class="page-header"><div><a class="back-link" href="{{ url_for('rooms.index') }}">← Danh sách phòng</a><h1>{{ 'Sửa phòng ' ~ room.code if room else 'Thêm phòng mới' }}</h1><p class="muted">Thông tin phòng, người ở và phương tiện.</p></div></header>
 <section class="card form-card"><form method="post" class="stack">
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<input type="hidden" name="tenancy_id" value="{{ values.get('tenancy_id', '') }}">
+<input type="hidden" name="tenancy_version" value="{{ values.get('tenancy_version', '') }}">
 <div class="form-grid"><label>Mã phòng <span class="required">*</span><input name="code" required maxlength="30" value="{{ values.get('code', '') }}" placeholder="P101"></label>
 <label>Trạng thái<select name="status" id="room-status">{% for value, text in [('vacant', 'Trống'), ('occupied', 'Đang thuê'), ('inactive', 'Ngừng sử dụng')] %}<option value="{{ value }}" {{ 'selected' if values.get('status') == value }}>{{ text }}</option>{% endfor %}</select></label></div>
 <fieldset id="tenant-fields"><legend>Khách thuê hiện tại</legend>
@@ -12,9 +14,21 @@
 <div class="form-grid"><label>Người ở cùng<textarea name="occupants" rows="4" placeholder="Mỗi người một dòng">{{ values.get('occupants', '') }}</textarea><small>Không bao gồm khách thuê chính.</small></label>
 <label>Biển số xe<textarea name="vehicles" rows="4" placeholder="Mỗi biển số một dòng">{{ values.get('vehicles', '') }}</textarea><small>Có thể để trống nếu không có xe.</small></label></div>
 {% if room and room.current_tenancy %}<label class="checkbox"><input type="checkbox" name="new_tenancy" {{ 'checked' if values.get('new_tenancy') == 'on' }}> Đổi sang khách mới (kết thúc đợt thuê cũ và giữ lịch sử)</label>{% endif %}
+<h2>Hợp đồng và phí hằng tháng</h2>
+<p class="muted small">Đợt thuê mới cần nhập đủ các mục dưới đây. Dữ liệu cũ có thể bổ sung dần; nhập 0 nếu miễn phí. Không tự chia phí giữa tháng.</p>
+<div class="form-grid">
+<label>Ngày bắt đầu hợp đồng<input type="date" name="contract_start" max="{{ today }}" value="{{ values.get('contract_start', '') }}" data-new-required></label>
+<label>Ngày hết hạn hợp đồng<input type="date" name="contract_end" value="{{ values.get('contract_end', '') }}" data-new-required><small>Hết hạn không tự chuyển phòng thành trống. Gia hạn bằng nút riêng trong chi tiết phòng.</small></label>
+<label>Ngày đóng tiền hằng tháng<input type="number" name="payment_day" min="1" max="31" step="1" value="{{ values.get('payment_day', '') }}" placeholder="1–31" data-new-required><small>Là ngày đến hạn, chưa phải ngày thực thu. Tháng thiếu ngày dùng ngày cuối tháng.</small></label>
+<label>Giá nước (đ/người/tháng)<input type="number" name="water_price" min="0" max="2147483647" step="1" value="{{ values.get('water_price', '') }}" placeholder="Ví dụ: 100000" data-new-required></label>
+<label>Phí dịch vụ (đ/phòng/tháng)<input type="number" name="service_price" min="0" max="2147483647" step="1" value="{{ values.get('service_price', '') }}" placeholder="Ví dụ: 150000" data-new-required></label>
+<label>Tiền phòng (đ/tháng)<input type="number" name="rent_price" min="0" max="2147483647" step="1" value="{{ values.get('rent_price', '') }}" placeholder="Ví dụ: 3000000" data-new-required></label>
+<label>Tiền cọc (đ)<input type="number" name="deposit_amount" min="0" max="2147483647" step="1" value="{{ values.get('deposit_amount', '') }}" placeholder="Nhập 0 nếu không có cọc" data-new-required><small>Theo đợt thuê, không cộng vào phí hằng tháng; chưa ghi nhận thực thu/hoàn cọc.</small></label>
+</div>
 </fieldset>
+{% if room and room.current_tenancy %}<label id="move-out-field">Ngày trả phòng của khách hiện tại<input type="date" name="move_out_date" max="{{ today }}" value="{{ values.get('move_out_date', '') }}"><small>Bắt buộc khi chuyển phòng sang trống/ngừng sử dụng hoặc đổi khách mới.</small></label>{% endif %}
 <label>Ghi chú<textarea name="note" maxlength="2000" rows="3">{{ values.get('note', '') }}</textarea></label>
-<p class="notice">Chỉ số điện được nhập ở màn hình Chỉ số điện. Chuyển sang trống/ngừng sử dụng sẽ kết thúc đợt thuê hiện tại và giữ lịch sử. Nếu không bật JavaScript, hãy xóa các ô khách trước khi lưu trạng thái này.</p>
+<p class="notice">Chỉ số điện nhập ở màn hình Chỉ số điện. Đổi khách mới cần nhập lại ngày và phí của khách mới; khách cũ giữ lịch sử. Nếu không bật JavaScript, hãy xóa các ô khách trước khi lưu trạng thái trống/ngừng sử dụng.</p>
 <div class="form-actions"><a class="button secondary" href="{{ url_for('rooms.index') }}">Hủy</a><button class="button primary" type="submit">Lưu phòng</button></div>
 </form></section>
 {% endblock %}

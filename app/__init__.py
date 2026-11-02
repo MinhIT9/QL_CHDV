@@ -94,6 +94,14 @@ def create_app(test_config=None):
             value = value.replace(tzinfo=timezone.utc)
         return value.astimezone(timezone(timedelta(hours=7))).strftime("%d/%m/%Y")
 
+    @app.template_filter("business_date")
+    def business_date(value):
+        return value.strftime("%d/%m/%Y") if value else "Chưa cập nhật"
+
+    @app.template_filter("vnd")
+    def vnd(value):
+        return f"{value:,}".replace(",", ".") + " đ" if value is not None else "Chưa cập nhật"
+
     @app.errorhandler(HTTPException)
     def http_error(error):
         return render_template("error.html", code=error.code, message={

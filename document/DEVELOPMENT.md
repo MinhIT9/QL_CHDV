@@ -39,11 +39,26 @@ Tests dùng SQLite tạm, không dữ liệu thật. Test HTML/CSRF không thay 
 
 ## Backup/khôi phục
 
+Migration mới nhất dd7493777e83 đã được áp dụng trên máy hiện tại sau backup trong backups/pre-fees-contracts-*.sqlite3. Migration thêm nullable, giữ nguyên dữ liệu cũ. Downgrade dùng native DROP COLUMN nên yêu cầu SQLite >=3.35 và sẽ mất các thông tin phí/hợp đồng mới; không chạy trên dữ liệu vận hành khi chưa có kế hoạch khôi phục.
+
     python -m flask --app wsgi backup-db backups/chdv-before-change.sqlite3
 
 Đích phải mới, không ghi đè. CLI dùng SQLite Backup API để nhất quán khi DB đang hoạt động. Chưa có lịch hằng ngày hoặc đích ngoài máy.
 
 Khôi phục: dừng mọi tiến trình truy cập DB, giữ bản hiện tại để có đường quay lui, kiểm tra PRAGMA integrity_check của backup, thay DB khi mọi kết nối đã đóng. Chỉ xử lý WAL/SHM sau khi chắc chắn không còn kết nối. Chạy migration phù hợp, mở lại và kiểm tra dữ liệu/quyền. Chưa diễn tập restore vào database vận hành.
+
+## Phí, hợp đồng và thao tác phòng
+
+V1.1.6 thêm tiền phòng/tháng (rent_price); đợt mới bắt buộc nhập, cho phép 0, legacy NULL chưa cập nhật. Giá giữ qua gia hạn và lưu theo lịch sử khách. Tổng dự tính phòng+nước+dịch vụ chưa điện/cọc/chia ngày. Migration mới nhất b71c430e92ad đã backup/upgrade local.
+
+Từ V1.1.5 chỉ nhập Ngày bắt đầu hợp đồng, đồng thời là ngày vào ở. Tiền cọc nhập số nguyên VND (0 nếu không cọc); dữ liệu cũ NULL là chưa cập nhật. Không cộng cọc vào phí tháng hoặc hiểu là đã thu/hoàn. Migration mới nhất a65b2f9c018e đã backup và áp dụng local; khởi động lại Flask để nạp code mới.
+
+- Khi tạo đợt thuê mới: nhập đủ giá nước/người/tháng, dịch vụ/phòng/tháng (0 nếu miễn phí), ngày vào thực tế, bắt đầu/hết hạn hợp đồng và ngày đóng 1–31.
+- Bản cũ có thể bổ sung dần; trường đã có không được xóa về trống. Hết hạn không tự trả phòng. Không nhận ngày vào/bắt đầu tương lai trong luồng thuê hiện tại.
+- Chi tiết phòng có nút Gia hạn: nhập số tháng/ghi chú, xem trước rồi xác nhận; hợp đồng quá hạn phải xác nhận mốc cũ. Giữ khách/phí/lịch đóng; lưu lịch sử. Tháng ngắn giữ ngày neo, không cộng x30 ngày.
+- Form có ID/version đợt thuê; thông báo biểu mẫu cũ cần tải lại khi có người sửa/gia hạn trước. Không tự bỏ kiểm tra này bằng cách xóa trường ẩn.
+- Đổi khách, chuyển trống hoặc ngừng phòng có khách phải nhập ngày trả thực tế; ngày trả không trước ngày vào hoặc sau hôm nay.
+- Giá và lịch đóng ở bảng là thông tin hiện tại. Dự tính tháng đủ chưa chia ngày, chưa ghi nhận khoản phải thu/thực thu. Không dùng để kết luận nợ hoặc đã thanh toán.
 
 ## Production
 

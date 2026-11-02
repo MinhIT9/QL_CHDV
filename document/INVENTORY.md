@@ -28,6 +28,7 @@ app/rooms/__init__.py
 app/rooms/routes.py
 app/services/.gitkeep
 app/services/__init__.py
+app/services/contracts.py
 app/services/electricity.py
 app/services/rooms.py
 app/static/css/.gitkeep
@@ -51,12 +52,15 @@ app/templates/rooms/.gitkeep
 app/templates/rooms/detail.html
 app/templates/rooms/form.html
 app/templates/rooms/index.html
+app/templates/rooms/remove.html
+app/templates/rooms/renew.html
 backups/.gitkeep
 document/ARCHITECTURE.md
 document/CHANGELOG.md
 document/DATA_MODEL.md
 document/DECISIONS.md
 document/DEVELOPMENT.md
+document/FEES_CONTRACTS_PROPOSAL.md
 document/HANDOFF.md
 document/INVENTORY.md
 document/README.md
@@ -68,13 +72,17 @@ migrations/README
 migrations/alembic.ini
 migrations/env.py
 migrations/script.py.mako
+migrations/versions/a65b2f9c018e_deposit_and_unified_start.py
+migrations/versions/b71c430e92ad_tenancy_rent.py
+migrations/versions/dd7493777e83_fees_and_contracts.py
 migrations/versions/e9329a770fe9_initial_schema.py
 requirements-dev.txt
 requirements.txt
 scripts/update_docs.py
 tests/.gitkeep
+tests/test_contracts.py
 tests/test_v1.py
 wsgi.py
 ```
 
-Tổng: 68 file (bao gồm file danh mục này).
+Tổng: 76 file (bao gồm file danh mục này).

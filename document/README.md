@@ -11,6 +11,7 @@
 | [DATA_MODEL.md](DATA_MODEL.md) | Mô hình dữ liệu đề xuất | Trước và khi làm model/migration |
 | [DEVELOPMENT.md](DEVELOPMENT.md) | Quy trình phát triển và cập nhật tài liệu | Khi công cụ/quy trình đổi |
 | [DECISIONS.md](DECISIONS.md) | Quyết định và vấn đề cần chốt | Khi có quyết định mới |
+| [FEES_CONTRACTS_PROPOSAL.md](FEES_CONTRACTS_PROPOSAL.md) | Phân tích phí/hợp đồng và phạm vi đã triển khai | Khi đổi quy tắc hoặc mở rộng tính tiền |
 | [CHANGELOG.md](CHANGELOG.md) | Lịch sử thay đổi có ý nghĩa | Sau mỗi thay đổi |
 | [INVENTORY.md](INVENTORY.md) | Danh mục file hiện có | Tự sinh bằng script |
 

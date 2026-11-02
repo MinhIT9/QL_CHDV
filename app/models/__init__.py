@@ -63,9 +63,43 @@ class Tenancy(db.Model):
     tenant_name = db.Column(db.String(120), nullable=False)
     started_at = db.Column(db.DateTime, nullable=False, default=utcnow)
     ended_at = db.Column(db.DateTime)
+    move_in_date = db.Column(db.Date)
+    move_out_date = db.Column(db.Date)
+    contract_start = db.Column(db.Date)
+    contract_end = db.Column(db.Date)
+    contract_anchor_day = db.Column(db.Integer)
+    water_price = db.Column(db.Integer)
+    service_price = db.Column(db.Integer)
+    deposit_amount = db.Column(db.Integer)
+    rent_price = db.Column(db.Integer)
+    payment_day = db.Column(db.Integer)
+    version = db.Column(db.Integer, nullable=False, default=1, server_default="1")
     room = db.relationship("Room", back_populates="tenancies")
     occupants = db.relationship("Occupant", cascade="all, delete-orphan", order_by="Occupant.id")
     vehicles = db.relationship("Vehicle", cascade="all, delete-orphan", order_by="Vehicle.id")
+    renewals = db.relationship("ContractRenewal", order_by="ContractRenewal.id", back_populates="tenancy")
+    __mapper_args__ = {"version_id_col": version}
+    __table_args__ = (
+        db.CheckConstraint("water_price IS NULL OR water_price BETWEEN 0 AND 2147483647", name="ck_water_price"),
+        db.CheckConstraint("service_price IS NULL OR service_price BETWEEN 0 AND 2147483647", name="ck_service_price"),
+        db.CheckConstraint("deposit_amount IS NULL OR deposit_amount BETWEEN 0 AND 2147483647", name="ck_deposit_amount"),
+        db.CheckConstraint("rent_price IS NULL OR rent_price BETWEEN 0 AND 2147483647", name="ck_rent_price"),
+        db.CheckConstraint("payment_day IS NULL OR payment_day BETWEEN 1 AND 31", name="ck_payment_day"),
+        db.CheckConstraint("contract_anchor_day IS NULL OR contract_anchor_day BETWEEN 1 AND 31", name="ck_contract_anchor"),
+        db.CheckConstraint("contract_end IS NULL OR contract_start IS NULL OR contract_end >= contract_start", name="ck_contract_dates"),
+        db.CheckConstraint("move_out_date IS NULL OR move_in_date IS NULL OR move_out_date >= move_in_date", name="ck_move_dates"),
+    )
+
+    @property
+    def monthly_fees(self):
+        if self.water_price is None or self.service_price is None:
+            return None
+        return self.water_price * self.people_count + self.service_price
+
+    @property
+    def monthly_total(self):
+        fees = self.monthly_fees
+        return self.rent_price + fees if self.rent_price is not None and fees is not None else None
 
     @property
     def people_count(self):
@@ -73,6 +107,23 @@ class Tenancy(db.Model):
 
 
 db.Index("uq_room_open_tenancy", Tenancy.room_id, unique=True, sqlite_where=Tenancy.ended_at.is_(None), postgresql_where=Tenancy.ended_at.is_(None))
+
+
+class ContractRenewal(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    tenancy_id = db.Column(db.Integer, db.ForeignKey("tenancy.id", ondelete="RESTRICT"), nullable=False)
+    old_end = db.Column(db.Date, nullable=False)
+    new_end = db.Column(db.Date, nullable=False)
+    months = db.Column(db.Integer, nullable=False)
+    note = db.Column(db.String(1000), nullable=False, default="")
+    created_by = db.Column(db.Integer, db.ForeignKey("user.id", ondelete="RESTRICT"), nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=utcnow)
+    tenancy = db.relationship("Tenancy", back_populates="renewals")
+    author = db.relationship("User")
+    __table_args__ = (
+        db.UniqueConstraint("tenancy_id", "old_end", name="uq_renewal_old_end"),
+        db.CheckConstraint("months BETWEEN 1 AND 120 AND new_end > old_end", name="ck_renewal"),
+    )
 
 
 class Occupant(db.Model):

@@ -35,3 +35,20 @@ Quản lý CHDV ban đầu khoảng 7 phòng, một Admin, ưu tiên bảng và 
 - Root quản lý tài khoản; tài khoản mới và root bootstrap bắt đổi pass lần đầu, ít nhất 8 ký tự.
 
 Trạng thái và giới hạn thực tế xem `STATUS.md`; quyết định xem `DECISIONS.md`.
+
+## Mở rộng đã triển khai — V1.1.4
+
+- Đơn giá nước/người/tháng và dịch vụ/phòng/tháng theo đợt thuê; cho phép 0. Không tự áp giá ví dụ cho dữ liệu cũ.
+- Ngày vào thực tế, bắt đầu/hết hạn hợp đồng, trả phòng thực tế; lịch đóng tiền ngày 1–31 hằng tháng, tháng ngắn lấy ngày cuối tháng.
+- Gia hạn hợp đồng đang thuê, 1–120 tháng từ hạn cũ; giữ ngày neo, xem trước/xác nhận, lịch sử Admin/thời điểm/hạn cũ-mới; chặn stale form và ghi đồng thời.
+- Hợp đồng hết hạn không tự trả phòng. Đổi khách/ngừng sử dụng có khách phải xác nhận ngày trả thực tế.
+- Chỉ lưu đơn giá và lịch nhắc; dự tính tháng đủ theo người hiện tại không phải hóa đơn. Chưa chia ngày, chốt số người tính phí, snapshot khoản phải thu hoặc ghi nhận thực thu.
+
+## Điều chỉnh V1.1.5
+
+- Ngày vào ở và ngày bắt đầu gộp thành Ngày bắt đầu hợp đồng; không nhập hai ngày độc lập.
+- Tiền cọc theo đợt thuê, cho phép 0; hiển thị trong bảng/form/chi tiết/lịch sử, không tính vào phí tháng và chưa quản lý thực thu/hoàn cọc.
+
+## Điều chỉnh V1.1.6
+
+- Tiền phòng/tháng theo đợt thuê, cho phép 0, hiển thị form/bảng/chi tiết/lịch sử. Tổng dự tính gồm phòng+nước+dịch vụ, không gồm điện/cọc; chưa chia ngày hoặc tạo hóa đơn.
