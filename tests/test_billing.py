@@ -1,12 +1,26 @@
 from datetime import date
+from types import SimpleNamespace
 
 from app.extensions import db
 from app.models import ElectricityReading, MonthlyBill, ReadingRevision
 from app.services.billing import reading_stamp
+from app.services.electricity import reading_cost
 from test_v1 import AppTestCase
 
 
 class BillingTests(AppTestCase):
+    def test_shared_reading_cost_preserves_price_sources(self):
+        reading = SimpleNamespace(electricity_price=3600, consumption=100)
+        bill = SimpleNamespace(electricity_price=0)
+        self.assertEqual(reading_cost(reading)["amount"], 360000)
+        self.assertEqual(reading_cost(reading, bill)["amount"], 0)
+        reading.electricity_price = None
+        self.assertIsNone(reading_cost(reading)["amount"])
+        estimate = reading_cost(reading, fallback_price=4000)
+        self.assertEqual(estimate["amount"], 400000)
+        self.assertTrue(estimate["estimated"] and estimate["current_price"])
+        self.assertIsNone(reading_cost(None, fallback_price=4000)["amount"])
+
     def setUp(self):
         super().setUp()
         self.login()

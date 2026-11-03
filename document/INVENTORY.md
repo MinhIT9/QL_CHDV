@@ -32,6 +32,7 @@ app/services/__init__.py
 app/services/billing.py
 app/services/contracts.py
 app/services/electricity.py
+app/services/queries.py
 app/services/rooms.py
 app/static/css/.gitkeep
 app/static/css/app.css
@@ -110,4 +111,4 @@ tests/test_v1.py
 wsgi.py
 ```
 
-Tổng: 101 file (bao gồm file danh mục này).
+Tổng: 102 file (bao gồm file danh mục này).

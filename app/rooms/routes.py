@@ -5,20 +5,13 @@ from sqlalchemy.orm import selectinload
 from sqlalchemy.orm.exc import StaleDataError
 
 from app.extensions import db
-from app.models import MonthlyBill, Room, Tenancy
+from app.models import MonthlyBill, Room
 from app.services.rooms import save_room
-from app.services.electricity import current_period, valid_period
+from app.services.electricity import current_period, reading_cost, valid_period
+from app.services.queries import active_bill_query, room_query
 from app.services.contracts import check_version, due_date, end_tenancy, local_today, renewal_preview, renew_contract
 
 bp = Blueprint("rooms", __name__)
-
-
-def room_query():
-    return db.select(Room).options(
-        selectinload(Room.tenancies).selectinload(Tenancy.occupants),
-        selectinload(Room.tenancies).selectinload(Tenancy.vehicles),
-        selectinload(Room.readings),
-    ).order_by(Room.code)
 
 
 @bp.get("/")
@@ -31,7 +24,7 @@ def index():
     q = request.args.get("q", "").strip().lower()
     if q:
         rooms = [r for r in rooms if q in r.code.lower() or (r.current_tenancy and q in r.current_tenancy.tenant_name.lower())]
-    bills = {b.room_id: b for b in db.session.scalars(db.select(MonthlyBill).options(selectinload(MonthlyBill.receipts)).where(MonthlyBill.period == period, MonthlyBill.cancelled_at.is_(None)))}
+    bills = {b.room_id: b for b in db.session.scalars(active_bill_query().options(selectinload(MonthlyBill.receipts)).where(MonthlyBill.period == period))}
     payment = request.args.get("payment", "all")
     if payment not in {"all", "paid", "unpaid", "unbilled"}:
         payment = "all"
@@ -85,13 +78,11 @@ def detail(room_id):
     bills = {
         bill.period: bill
         for bill in db.session.scalars(
-            db.select(MonthlyBill).where(
-                MonthlyBill.room_id == room.id, MonthlyBill.cancelled_at.is_(None)
-            )
+            active_bill_query().where(MonthlyBill.room_id == room.id)
         )
     }
     return render_template("rooms/detail.html", room=room, today=local_today(), period=period,
-                           bills=bills,
+                           costs={r.id: reading_cost(r, bills.get(r.period)) for r in room.readings},
                            payment_due=due_date(room.current_tenancy, period) if room.current_tenancy else None)
 
 

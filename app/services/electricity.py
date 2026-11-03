@@ -7,6 +7,20 @@ from app.models import ElectricityReading, Room
 MAX_READING = 2_147_483_647
 
 
+def reading_cost(reading, bill=None, fallback_price=None):
+    """Prefer bill/saved prices; current-rate estimates must be explicit."""
+    price = bill.electricity_price if bill else reading.electricity_price if reading else None
+    current_price = price is None
+    if current_price:
+        price = fallback_price
+    return {
+        "price": price,
+        "amount": reading.consumption * price if reading and price is not None else None,
+        "estimated": bill is None,
+        "current_price": current_price,
+    }
+
+
 def current_period():
     return datetime.now(timezone(timedelta(hours=7))).strftime("%Y-%m")
 

@@ -1,6 +1,8 @@
 # Tiến độ thực tế
 
-Cập nhật: 2026-11-03 (Asia/Saigon). Phiên bản hội thoại: V1.2.1.
+Cập nhật: 2026-11-03 (Asia/Saigon). Phiên bản hội thoại: V1.2.2.
+
+V1.2.2: 47 test suite pass; 12 test_billing pass sau khi th?m test helper. gom reading_cost cho chọn nguồn giá/tính tiền điện ở lịch sử phòng và màn điện. room_query/active_bill_query vào services/queries.py, bỏ import giữa các route. Template lịch sử chỉ trình bày. Thêm test giá snapshot/phiếu 0/thiếu giá/fallback/chưa nhập, ghi quy ước tái sử dụng. Không đổi DB/nghiệp vụ; chưa rà hết template lặp hoặc browser QA.
 
 V1.2.1: 14 test_contracts pass. form thêm/sửa phòng dùng Bootstrap mw-100/w-100 bỏ giới hạn 1000px, nhóm hợp đồng/phí dùng grid 1/2/3 cột theo màn hình, thanh lưu position-static để không phủ nội dung khi cuộn. Ô khách bị khóa khi trạng thái Trống là hành vi hiện có, giữ nguyên. Chưa browser QA; không đổi DB/nghiệp vụ.
 

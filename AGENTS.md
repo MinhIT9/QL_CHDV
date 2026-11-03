@@ -34,6 +34,8 @@
 
 ### Phong cách mã nguồn
 
+- Ưu tiên tái sử dụng logic nghiệp vụ lớn: đặt xử lý dùng chung trong service, query dùng chung trong lớp dịch vụ đọc; route không import helper từ route khác. Template chỉ trình bày, tránh tính lại quy tắc giá/tiền. Chỉ gom khi có cùng quy tắc, giữ rõ các khác biệt nghiệp vụ và test các nguồn giá/giá 0/thiếu dữ liệu.
+
 - Ưu tiên Bootstrap 5 cho nút/form/bảng/thông báo và tiện ích bố cục; chỉ viết CSS khi Bootstrap không đáp ứng. CDN ghim phiên bản/SRI và cập nhật CSP phù hợp.
 
 - Ưu tiên code cực gọn, ngắn và đúng chuẩn; bỏ lặp, biến/thành phần không cần thiết. Tính đúng, bảo mật và khả năng đọc hiểu được ưu tiên hơn việc giảm số ký tự.

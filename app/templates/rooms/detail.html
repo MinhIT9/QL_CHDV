@@ -28,15 +28,14 @@
       <thead><tr><th>Kỳ</th><th class="number text-end text-nowrap">Đầu kỳ</th><th class="number text-end text-nowrap">Cuối kỳ</th><th class="number text-end text-nowrap">kWh</th><th class="number text-end text-nowrap">Đơn giá<small>đ/kWh</small></th><th class="number text-end text-nowrap">Tiền điện</th></tr></thead>
       <tbody>
         {% for reading in room.readings|reverse %}
-        {% set bill = bills.get(reading.period) %}
-        {% set price = bill.electricity_price if bill else reading.electricity_price %}
+        {% set cost = costs[reading.id] %}
         <tr>
           <td>{{ reading.period }}</td>
           <td class="number text-end text-nowrap">{{ reading.start_value }}</td>
           <td class="number text-end text-nowrap">{{ reading.end_value }}</td>
           <td class="number text-end text-nowrap">{{ reading.consumption }}</td>
-          <td class="number text-end text-nowrap">{{ price|vnd }}</td>
-          <td class="number text-end text-nowrap"><strong>{{ (reading.consumption * price if price is not none else none)|vnd }}</strong><small>{{ 'Đã chốt tiền' if bill else 'Tạm tính' if price is not none else 'Chưa có giá đã lưu' }}</small></td>
+          <td class="number text-end text-nowrap">{{ cost.price|vnd }}</td>
+          <td class="number text-end text-nowrap"><strong>{{ cost.amount|vnd }}</strong><small>{{ 'Đã chốt tiền' if bill else 'Tạm tính' if price is not none else 'Chưa có giá đã lưu' }}</small></td>
         </tr>
         {% else %}<tr><td colspan="6" class="empty">Chưa có lịch sử chốt điện.</td></tr>{% endfor %}
       </tbody>

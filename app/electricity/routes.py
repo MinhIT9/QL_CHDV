@@ -4,8 +4,8 @@ from sqlalchemy.exc import IntegrityError, OperationalError
 
 from app.extensions import db
 from app.models import ElectricityReading, MonthlyBill, ReadingRevision, Room
-from app.rooms.routes import room_query
-from app.services.electricity import current_period, reading_context, save_readings, valid_period
+from app.services.queries import active_bill_query, room_query
+from app.services.electricity import current_period, reading_context, reading_cost, save_readings, valid_period
 
 bp = Blueprint("electricity", __name__, url_prefix="/electricity")
 
@@ -30,16 +30,12 @@ def index():
             return redirect(url_for("electricity.index", period=period))
     rooms = db.session.scalars(room_query().where(Room.active.is_(True))).all()
     contexts = [reading_context(room, period) for room in rooms]
-    bills = {bill.room_id: bill for bill in db.session.scalars(db.select(MonthlyBill).where(MonthlyBill.period == period, MonthlyBill.cancelled_at.is_(None)))}
+    bills = {bill.room_id: bill for bill in db.session.scalars(active_bill_query().where(MonthlyBill.period == period))}
     updated = dict(db.session.execute(db.select(ReadingRevision.reading_id, db.func.max(ReadingRevision.created_at)).join(ElectricityReading, ReadingRevision.reading_id == ElectricityReading.id).where(ElectricityReading.period == period).group_by(ReadingRevision.reading_id)).all())
     for row in contexts:
         reading, tenant = row["existing"], row["room"].current_tenancy
         bill = bills.get(row["room"].id)
-        price = bill.electricity_price if bill else reading.electricity_price if reading else None
-        row["estimated"] = bill is None
-        row["current_price"] = price is None
-        row["price"] = price if price is not None else tenant.electricity_price if tenant else None
-        row["amount"] = reading.consumption * row["price"] if reading and row["price"] is not None else None
+        row.update(reading_cost(reading, bill, tenant.electricity_price if tenant else None))
         row["updated_at"] = updated.get(reading.id) if reading else None
     return render_template("electricity/index.html", contexts=contexts, period=period,
                            done=sum(bool(item["existing"]) for item in contexts),

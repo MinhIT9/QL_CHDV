@@ -4,9 +4,9 @@ Cập nhật: 2026-11-03 (Asia/Saigon).
 
 ## Phiên bản hội thoại
 
-- Phiên bản phản hồi gần nhất: V1.2.1.
-- Nội dung: Sửa khoảng trống và thanh lưu che nội dung trong form phòng bằng Bootstrap.
-- Phản hồi tiếp theo tối thiểu V1.2.2; có thể tăng minor/major theo quy tắc mới trong AGENTS.md.
+- Phiên bản phản hồi gần nhất: V1.2.2.
+- Nội dung: Gom logic tiền điện và query dùng chung vào service; quy ước tái sử dụng.
+- Phản hồi tiếp theo tối thiểu V1.2.3; có thể tăng minor/major theo quy tắc mới trong AGENTS.md.
 - Quy tắc đầy đủ ở AGENTS.md, mục “Phiên bản ở cuối phản hồi”.
 
 ## Đã làm
@@ -31,6 +31,8 @@ Cập nhật: 2026-11-03 (Asia/Saigon).
 - Chỉ chốt tiền một đợt thuê xác định đủ tháng; thiếu điện, ngày không rõ, vào/trả giữa tháng hoặc đổi khách cùng kỳ bị chặn. Không có engine lịch giá tự động: giá trên form là gợi ý, Admin xác nhận cho từng kỳ.
 
 ## Kiểm tra
+
+- V1.2.2: 47 test suite pass; 12 test_billing pass sau khi th?m test helper. refactor giá điện và query đọc, không DB. Lịch sử không fallback giá hiện tại; màn nhập vẫn fallback có nhãn. Không gom validation kỳ vì cách báo lỗi khác nhau. Bước tiếp nếu cần: rà macro trường giá form phòng/phiếu; không gom khác biệt nghiệp vụ. Chưa browser QA.
 
 - V1.2.1: 14 test_contracts pass. template form phòng đổi utility Bootstrap để rộng theo khung, phí 1/2/3 cột, thanh lưu trong luồng bình thường. Chưa browser QA. Bước tiếp kiểm tra thực tế desktop/mobile và chọn Đang thuê để mở ô khách; không thay logic disabled.
 
