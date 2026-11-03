@@ -2,6 +2,8 @@
 
 ## 2026-11-03
 
+- V1.1.21: bỏ dòng số lượng xe trong bảng phòng, giữ từng biển số một dòng; không xe hiển thị dấu —.
+
 - V1.1.20: tách tiền nước/dịch vụ trong chi tiết; bảng phòng thêm số xe/biển số từng dòng, tiền nước tổng theo người, tiền dịch vụ riêng; căn chỉnh số tiền/nhãn xe/dòng bảng. Giữ nguyên phiếu đã chốt.
 
 - V1.1.19: nút ẩn/hiện sidebar và nhớ lựa chọn trên trình duyệt; header tên trang/tài khoản, footer gọn đồng bộ. Không đổi nghiệp vụ.

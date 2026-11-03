@@ -4,9 +4,9 @@ Cập nhật: 2026-11-03 (Asia/Saigon).
 
 ## Phiên bản hội thoại
 
-- Phiên bản phản hồi gần nhất: V1.1.20.
-- Nội dung: Tách nước/dịch vụ, thêm số xe/biển số từng dòng và căn chỉnh bảng phòng.
-- Phản hồi tiếp theo dùng V1.1.21. V1.1.13 là lượt phân tích không sửa file theo yêu cầu người dùng.
+- Phiên bản phản hồi gần nhất: V1.1.21.
+- Nội dung: Bỏ dòng đếm xe, giữ biển số từng dòng trong bảng phòng.
+- Phản hồi tiếp theo dùng V1.1.22. V1.1.13 là lượt phân tích không sửa file theo yêu cầu người dùng.
 - Quy tắc đầy đủ ở AGENTS.md, mục “Phiên bản ở cuối phản hồi”.
 
 ## Đã làm
@@ -31,6 +31,8 @@ Cập nhật: 2026-11-03 (Asia/Saigon).
 - Chỉ chốt tiền một đợt thuê xác định đủ tháng; thiếu điện, ngày không rõ, vào/trả giữa tháng hoặc đổi khách cùng kỳ bị chặn. Không có engine lịch giá tự động: giá trên form là gợi ý, Admin xác nhận cho từng kỳ.
 
 ## Kiểm tra
+
+- V1.1.21: render partial vehicle_cell với 2 xe/không xe/không khách; bỏ số đếm, không xe dùng dấu —. Chỉ template/CSS, không chạy lại suite nghiệp vụ; chưa browser QA. Tiếp theo kiểm tra trực quan nếu cần.
 
 - V1.1.20: 5 test_receipts và smoke render bảng gọn/đầy đủ/chi tiết pass với DB tạm: 2 xe, nước 2 × 100.000 = 200.000, dịch vụ 150.000. Partial water_cell giữ NULL là chưa có giá, 0 là miễn phí; vehicle_cell dùng chung hai bảng. Không đổi schema/backend/phiếu cũ. Chưa browser QA; bước tiếp kiểm tra bảng nhiều xe, cuộn ngang/mobile và căn cột thực tế.
 

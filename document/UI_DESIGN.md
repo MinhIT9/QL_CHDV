@@ -1,5 +1,7 @@
 # Giao diện V1.1.7
 
+V1.1.21: cột Xe / biển số chỉ hiển thị biển số từng dòng, bỏ dòng đếm xe theo yêu cầu; không có xe dùng dấu —.
+
 V1.1.20: bảng phòng gọn 13 cột, thêm Xe / biển số (đếm xe, mỗi biển một nhãn/dòng), tiền dịch vụ và tổng tiền nước kèm phép tính theo người. Bảng đầy đủ cũng dùng hai partial vehicle_cell/water_cell. Đây là dự tính theo giá phòng hiện tại, không thay snapshot tiền kỳ. Chi tiết tách nước/dịch vụ thay dòng cộng gộp; giữ tổng dự tính cũ. Tiền căn phải, số người căn giữa, màu dòng xen kẽ/hover; màn hẹp cuộn ngang, giữ sticky phòng/thao tác.
 
 V1.1.19: header có nút menu điều khiển sidebar bằng hidden/aria-expanded, nội dung mở rộng khi ẩn. Nhớ lựa chọn localStorage, khôi phục khi điều hướng HTMX; không lưu dữ liệu cá nhân. Mobile giữ điều hướng ngang hiện có khi mở. Header hai cấp tên sản phẩm/trang, tài khoản bên phải; footer biểu tượng và tên sản phẩm cùng mô tả ngắn. Không thêm dependency.

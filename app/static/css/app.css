@@ -175,7 +175,6 @@ tbody tr:hover > td { background: #f7faff; }
 .room-table .fee-cell { color: #365b68; }
 .room-table .fee-cell small { margin-left: auto; color: #8b99a8; white-space: nowrap; }
 .vehicle-list { display: grid; justify-items: start; gap: 5px; padding: 3px 0; }
-.vehicle-count { font-size: 10px; color: #658292; font-weight: 650; }
 .vehicle-plate { display: block; white-space: nowrap; font-variant-numeric: tabular-nums; font-size: 11px; letter-spacing: .3px; padding: 3px 7px; border: 1px solid #dfe8ee; background: white; border-radius: 5px; }
 .billing-table { min-width: 1150px; }
 .billing-table td { padding-top: 14px; padding-bottom: 14px; }

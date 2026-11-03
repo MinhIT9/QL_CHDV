@@ -1,6 +1,8 @@
 # Tiến độ thực tế
 
-Cập nhật: 2026-11-03 (Asia/Saigon). Phiên bản hội thoại: V1.1.20.
+Cập nhật: 2026-11-03 (Asia/Saigon). Phiên bản hội thoại: V1.1.21.
+
+V1.1.21: bỏ dòng đếm xe trong hai bảng phòng, chỉ giữ biển số từng dòng; không có xe hiển thị dấu —. Xóa CSS vehicle-count không dùng. Kiểm tra render partial với 2 xe/không xe/không khách; không đổi nghiệp vụ/DB, chưa browser QA.
 
 V1.1.20: tách dự tính tiền nước/dịch vụ ở chi tiết; bảng phòng gọn và đầy đủ có số xe/biển số từng dòng, tổng tiền nước theo người và tiền dịch vụ riêng. Giá hiện tại không thay phiếu snapshot. Căn phải tiền, căn giữa số người, biển số dạng nhãn, dòng xen kẽ/hover; giữ cuộn ngang và cột sticky. 5 test receipts và 3 render smoke pass (2 xe, nước 200.000, dịch vụ 150.000); chưa browser QA. Không đổi DB/nghiệp vụ.
 

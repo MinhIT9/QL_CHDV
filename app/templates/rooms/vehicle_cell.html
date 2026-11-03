@@ -1,1 +1,1 @@
-<div class="vehicle-list"><span class="vehicle-count">{{ tenant.vehicles|length if tenant else 0 }} xe</span>{% if tenant %}{% for vehicle in tenant.vehicles %}<span class="vehicle-plate">{{ vehicle.plate }}</span>{% endfor %}{% endif %}</div>
+<div class="vehicle-list">{% if tenant and tenant.vehicles %}{% for vehicle in tenant.vehicles %}<span class="vehicle-plate">{{ vehicle.plate }}</span>{% endfor %}{% else %}<span class="muted">—</span>{% endif %}</div>
