@@ -1,25 +1,25 @@
 # Tiến độ thực tế
 
-Cập nhật: 2026-11-03 (Asia/Saigon). Phiên bản hội thoại: V1.1.12.
+Cập nhật: 2026-11-03 (Asia/Saigon). Phiên bản hội thoại: V1.1.14.
 
-V1.1.12 chỉ chỉnh layout chốt tiền full-width và preview hai cột desktop; không đổi nghiệp vụ/DB. Kiểm tra render module billing, chưa browser QA cho layout mới.
+V1.1.14 thêm ghi nhận thu đủ/hoàn tác có lịch sử, sort phiếu và bảng Phòng gọn/lọc theo thu từng kỳ. Chưa thu một phần, kết nối ngân hàng hoặc hoàn tiền tự động.
 
-Đã triển khai sửa điện có audit và chốt tiền từng kỳ theo phương án gọn: phòng/điện cùng tháng, không thực thu/công nợ/chia ngày.
+Đã có sửa điện, chốt tiền và xác nhận nhận đủ từng phiếu; phòng/điện cùng tháng, chưa chia ngày hoặc thu một phần.
 
-Đã triển khai phần phí/hợp đồng theo FEES_CONTRACTS_PROPOSAL.md: lưu đơn giá, ngày và lịch nhắc; chưa chia phí giữa tháng hoặc ghi nhận thực thu.
+Đã có đơn giá/hợp đồng/lịch nhắc; thu tiền là xác nhận thủ công bởi Admin, không tự kiểm chứng tiền vào ngân hàng.
 
 **Đã triển khai V1 chạy local bằng Flask + SQLite. Chưa triển khai production.**
 
 | Hạng mục | Trạng thái | Bằng chứng / giới hạn |
 | --- | --- | --- |
 | Flask factory, cấu hình .env | Đã có | app/__init__.py, wsgi.py; SECRET_KEY bắt buộc |
-| Database, migrations | Đã có | Migration d94f512a37b1 đã áp dụng local sau backup; WAL/FK/busy timeout |
+| Database, migrations | Đã có | Migration 41eb1b88b816 đã áp dụng local sau backup; WAL/FK/busy timeout |
 | Root ban đầu | Đã tạo local | init-admin; mật khẩu ngoài Git, phải đổi lần đầu |
 | Login/logout/đổi mật khẩu | Đã có | CSRF, scrypt, chặn nghiệp vụ khi chưa đổi pass |
 | Quản lý tài khoản | Đã có | Chỉ root tạo/khóa/reset Admin; không khóa/reset root qua danh sách |
 | Vô hiệu hóa phiên cũ | Đã có | Xoay token khi đổi/reset pass, khóa/mở tài khoản |
 | Khóa tạm đăng nhập | Đã có | 5 lần sai khóa 5 phút; chưa rate limit theo IP ở proxy |
-| Danh sách phòng | Đã có | Tìm mã/tên khách, xem điện theo kỳ, bảng cuộn ngang |
+| Danh sách phòng | Đã nâng cấp | Mặc định gọn, giữ mã phòng; lọc đã thu/chưa thu/chưa chốt theo kỳ; tùy chọn đủ cột |
 | Thêm/sửa phòng | Đã có | Mã duy nhất, nhiều người/xe mỗi dòng, đếm người tự động |
 | Lịch sử khách thuê | Đã có | Chọn đổi khách mới để giữ đợt thuê cũ |
 | Xóa/ngừng sử dụng phòng | Đã có | Có đợt thuê/điện thì ngừng sử dụng, giữ lịch sử |
@@ -39,7 +39,8 @@ V1.1.12 chỉ chỉnh layout chốt tiền full-width và preview hai cột desk
 | Giá điện theo phòng | Đã có | Theo đợt thuê, cho phép 0; phiếu mới lấy giá hiện tại, phiếu cũ giữ snapshot |
 | Ngày chốt/cập nhật điện | Đã có | Thời điểm tạo và revision gần nhất, hiển thị ngày giờ UTC+7 |
 | Tiền điện ngay trên bảng | Đã có | Tính khi nhập; lưu snapshot giá; ưu tiên giá phiếu đã chốt; legacy thiếu giá có nhãn tạm tính |
-| Kiểm thử | 41 test pass | unittest, migration và Node smoke test tính tiền live |
+| Thu đủ tiền | Đã có | Dropdown, ngày/người/số tiền; chống đúp; root hoàn tác giữ audit; phiếu đã thu xuống dưới |
+| Kiểm thử | 46 test pass | unittest nghiệp vụ/permission/filter/sort/migration; Node syntax pass |
 | Model/migration khớp nhau | Đã kiểm tra | flask db check không có schema drift |
 | Browser/production | Có kiểm tra hình ảnh / chưa production | Edge headless với HTML dữ liệu giả ở desktop và root rộng 390px; chưa kiểm tra tương tác E2E, HTTPS, proxy, job backup |
 
@@ -49,7 +50,7 @@ V1.1.12 chỉ chỉnh layout chốt tiền full-width và preview hai cột desk
 - Không chèn kỳ trước khi đã có kỳ sau. Nếu có lịch sử, chỉ chốt nối tiếp kỳ liền trước.
 - Phòng trống vẫn ghi điện. Phòng ngừng sử dụng không có trong bảng nhập.
 - Chỉ số nguyên 0–2.147.483.647. Không chia tiền theo đợt thuê giữa tháng.
-- Chưa dashboard, thực thu/công nợ, nhiều tòa hoặc tài khoản chỉ xem. Phiếu tiền là bảng tính nội bộ, không phải hóa đơn thuế.
+- Đã ghi nhận thu đủ thủ công; chưa thu một phần, sổ công nợ chi tiết, dashboard, nhiều tòa hoặc tài khoản chỉ xem. Phiếu là bảng tính nội bộ, không phải hóa đơn thuế.
 - Phiếu đã chốt giữ snapshot giá/người/chỉ số; giá phiếu mới lấy từ thông tin phòng hiện tại. Form cũ bị chặn khi version đổi. Lập bù/lập lại kỳ cũ cũng gợi ý giá hiện tại; cần kiểm tra giá kỳ. Chưa lịch giá tự động hoặc điện khác tháng tiền phòng.
 - Chưa lưu nháp dài hạn: màn hình xem trước rồi chốt trong một phiên. Kỳ vào/trả giữa tháng hoặc đổi khách bị chặn; chưa chia điện theo khách. Root hủy phiếu không có nghĩa hoàn tiền đã thu ngoài hệ thống.
 - Gia hạn 1–120 tháng từ hạn cũ; hợp đồng quá hạn cần xác nhận. Hết hạn không tự trả phòng; đợt đã trả không gia hạn. Dữ liệu cũ có thể bổ sung dần; đợt mới cần đủ phí/ngày/lịch đóng.

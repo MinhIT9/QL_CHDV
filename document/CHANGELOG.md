@@ -2,6 +2,10 @@
 
 ## 2026-11-03
 
+- V1.1.14: triển khai phân tích V1.1.13 — dropdown ghi nhận thu đủ, ngày/người/số tiền và lịch sử; root hoàn tác có lý do. Chặn hủy phiếu đã thu và gửi lại form cũ sau hoàn tác.
+- Phiếu chưa thu ở trên/đã thu ở dưới/hủy cuối; bảng Phòng gọn mặc định, tiền kỳ từ snapshot, bộ lọc thu và chế độ đầy đủ giữ cột cũ.
+- Migration 41eb1b88b816 đã backup/upgrade; 46 test pass. Chưa thu một phần/browser E2E cho UI mới.
+
 - V1.1.12: bỏ giới hạn1000px riêng form chốt tiền; dùng chiều ngang còn lại, desktop chia input/preview hai cột, mobile xếp dọc. Không đổi chức năng.
 
 - V1.1.11: thêm ngày giờ chốt, cập nhật lần cuối nếu có revision, đơn giá và tiền điện trong bảng. Nhập chỉ số tự hiện tiền/draft total, xử lý 0 và thiếu giá.

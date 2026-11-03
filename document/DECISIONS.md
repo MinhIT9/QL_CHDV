@@ -1,5 +1,12 @@
 # Quyết định và vấn đề cần chốt
 
+## 2026-11-03 — Thu tiền và bảng Phòng (V1.1.14)
+
+- Triển khai phân tích V1.1.13: tách chốt phiếu khỏi đã thu. Admin được xác nhận thu đủ; root hoàn tác có lý do/audit, không xóa receipt hoặc tự hoàn tiền.
+- Chưa thu một phần. Phiếu0đ có thao tác xác nhận hoàn tất riêng, amount0. Ngày thu không ở tương lai; số tiền luôn từ snapshot bill.total.
+- Chặn hủy phiếu có thu hiệu lực. Unique receipt/bill và version lịch sử chặn double-submit/form cũ sau hoàn tác.
+- Sort ở màn Chốt tiền, không làm xáo trộn mã phòng. Phòng mặc định gọn, có lọc theo phiếu của tháng và view đầy đủ giữ dữ liệu cũ; không gán “tiền kỳ” từ giá dự tính.
+
 ## 2026-11-03 — Ngày và tiền trên bảng điện (V1.1.11)
 
 - Ngày chốt là thời điểm lưu ban đầu (tự động), lần cập nhật lấy audit gần nhất; hiển thị UTC+7 đến giây, không sửa ngày chốt khi sửa chỉ số.

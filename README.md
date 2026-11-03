@@ -1,5 +1,7 @@
 # CHDV Manager Basic
 
+Có dropdown ghi nhận thu đủ từng phiếu, lưu ngày/người thu, root hoàn tác có lý do; đã thu tự xuống dưới. Bảng Phòng gọn mặc định, có lọc thu theo kỳ và chế độ đầy đủ. Chưa hỗ trợ thu một phần hoặc hoàn tiền tự động.
+
 Bảng điện có ngày giờ chốt/sửa gần nhất, đơn giá và tiền tự tính. Tiền trước chốt phiếu là dự tính; khi có phiếu hiệu lực thì dùng giá trên phiếu.
 
 Giá điện có trong thông tin phòng cùng tiền phòng/nước. Thay giá áp dụng mặc định cho phiếu lập sau, phiếu đã chốt giữ nguyên. Phiếu lập bù tháng cũ cần kiểm tra lại giá trên form.
@@ -45,4 +47,4 @@ Với bản clone mới: copy .env.example thành .env, tạo SECRET_KEY ngẫu 
 
 Đọc [tiến độ](document/STATUS.md), [hướng dẫn dev](document/DEVELOPMENT.md), [bàn giao](document/HANDOFF.md) hoặc [mục lục](document/README.md).
 
-V1 dùng chỉ số nguyên kWh; chưa thay đồng hồ, thực thu/công nợ hoặc báo cáo. Phiếu tiền chỉ hỗ trợ phòng/điện cùng kỳ và đợt thuê đủ tháng; chưa chia ngày hoặc lập lịch giá tự động. Chốt tiền không xác nhận đã thu. Backup ngoài máy chủ và HTTPS production cần cấu hình khi triển khai. Đã review ảnh tĩnh FE; module billing chưa kiểm tra browser end-to-end.
+V1 dùng chỉ số nguyên kWh; chưa thay đồng hồ, thu một phần/công nợ chi tiết hoặc báo cáo. Phiếu tiền chỉ hỗ trợ phòng/điện cùng kỳ và đợt thuê đủ tháng; chưa chia ngày hoặc lập lịch giá tự động. Chốt tiền không xác nhận đã thu; dùng thao tác Thu tiền riêng khi đã nhận đủ. Backup ngoài máy chủ và HTTPS production cần cấu hình khi triển khai. Đã review ảnh tĩnh FE; module billing chưa kiểm tra browser end-to-end.

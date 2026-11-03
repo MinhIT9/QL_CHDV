@@ -4,7 +4,9 @@ from sqlalchemy.exc import IntegrityError, OperationalError
 
 from app.auth.routes import root_required
 from app.extensions import db
-from app.models import ElectricityReading, MonthlyBill, ReadingRevision, Room, utcnow
+from app.models import ElectricityReading, MonthlyBill, ReadingRevision, Receipt, Room, utcnow
+from app.services.contracts import local_today, parse_date
+from sqlalchemy.orm import selectinload
 from app.services.billing import bill_tenancy, bill_values, correction, lock_writes, reading_pair, reading_stamp
 from app.services.electricity import current_period, valid_period
 
@@ -42,8 +44,10 @@ def index():
     period = request.args.get("period", current_period())
     if not valid_period(period):
         period = current_period()
-    bills = db.session.scalars(db.select(MonthlyBill).where(MonthlyBill.period == period).order_by(MonthlyBill.id.desc())).all()
-    return render_template("billing/index.html", period=period, bills=bills, rooms=db.session.scalars(db.select(Room).order_by(Room.code)).all())
+    bills = db.session.scalars(db.select(MonthlyBill).options(selectinload(MonthlyBill.receipts)).where(MonthlyBill.period == period)).all()
+    today = local_today()
+    bills.sort(key=lambda b: (3 if b.cancelled_at else 2 if b.paid_receipt else 0 if b.due_date < today else 1, b.room_code, b.id))
+    return render_template("billing/index.html", period=period, bills=bills, rooms=db.session.scalars(db.select(Room).order_by(Room.code)).all(), today=today)
 
 
 @bp.route("/rooms/<int:room_id>/bill", methods=["GET", "POST"])
@@ -82,9 +86,50 @@ def cancel(bill_id):
         reason = request.form.get("reason", "").strip()
         if bill.cancelled_at or not reason or len(reason) > 500:
             raise ValueError("Phiếu đã hủy hoặc thiếu lý do hợp lệ (tối đa 500 ký tự).")
+        if bill.paid_receipt:
+            raise ValueError("Phiếu đã thu tiền. Root cần hoàn tác ghi nhận thu có lý do trước khi hủy phiếu.")
         bill.cancelled_at, bill.cancelled_by, bill.cancel_reason = utcnow(), current_user.id, reason
         db.session.commit()
         flash("Đã hủy hiệu lực phiếu và giữ nguyên bản cũ. Có thể sửa điện rồi lập phiếu mới.", "success")
     except WRITE_ERRORS as error:
         report(error)
     return redirect(url_for("billing.index", period=db.get_or_404(MonthlyBill, bill_id).period))
+
+
+@bp.post("/bills/<int:bill_id>/receive")
+@login_required
+def receive(bill_id):
+    try:
+        lock_writes()
+        bill = db.get_or_404(MonthlyBill, bill_id)
+        paid_date = parse_date(request.form.get("paid_date", ""), "Ngày thu", required=True)
+        note = request.form.get("note", "").strip()
+        if bill.cancelled_at or bill.paid_receipt:
+            raise ValueError("Phiếu đã hủy hoặc đã được ghi nhận thu đủ.")
+        if request.form.get("receipt_version") != str(bill.receipts[-1].id if bill.receipts else 0):
+            raise ValueError("Lịch sử thu đã thay đổi. Hãy tải lại trang trước khi xác nhận.")
+        if paid_date > local_today() or len(note) > 500:
+            raise ValueError("Ngày thu không được trong tương lai; ghi chú tối đa 500 ký tự.")
+        db.session.add(Receipt(bill=bill, amount=bill.total, paid_date=paid_date, note=note, created_by=current_user.id))
+        db.session.commit()
+        flash("Đã ghi nhận thu đủ. Phiếu được chuyển xuống nhóm Đã thu.", "success")
+    except WRITE_ERRORS as error:
+        report(error)
+    return redirect(url_for("billing.index", period=db.get_or_404(MonthlyBill, bill_id).period))
+
+
+@bp.post("/receipts/<int:receipt_id>/reverse")
+@root_required
+def reverse_receipt(receipt_id):
+    try:
+        lock_writes()
+        receipt = db.get_or_404(Receipt, receipt_id)
+        reason = request.form.get("reason", "").strip()
+        if receipt.reversed_at or not reason or len(reason) > 500:
+            raise ValueError("Ghi nhận đã hoàn tác hoặc thiếu lý do hợp lệ (tối đa 500 ký tự).")
+        receipt.reversed_at, receipt.reversed_by, receipt.reverse_reason = utcnow(), current_user.id, reason
+        db.session.commit()
+        flash("Đã hoàn tác ghi nhận thu và giữ lịch sử. Đây không phải thao tác hoàn tiền thực tế.", "success")
+    except WRITE_ERRORS as error:
+        report(error)
+    return redirect(url_for("billing.index", period=db.get_or_404(Receipt, receipt_id).bill.period))

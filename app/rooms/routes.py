@@ -5,7 +5,7 @@ from sqlalchemy.orm import selectinload
 from sqlalchemy.orm.exc import StaleDataError
 
 from app.extensions import db
-from app.models import Room, Tenancy
+from app.models import MonthlyBill, Room, Tenancy
 from app.services.rooms import save_room
 from app.services.electricity import current_period, valid_period
 from app.services.contracts import check_version, due_date, end_tenancy, local_today, renewal_preview, renew_contract
@@ -31,8 +31,14 @@ def index():
     q = request.args.get("q", "").strip().lower()
     if q:
         rooms = [r for r in rooms if q in r.code.lower() or (r.current_tenancy and q in r.current_tenancy.tenant_name.lower())]
+    bills = {b.room_id: b for b in db.session.scalars(db.select(MonthlyBill).options(selectinload(MonthlyBill.receipts)).where(MonthlyBill.period == period, MonthlyBill.cancelled_at.is_(None)))}
+    payment = request.args.get("payment", "all")
+    if payment not in {"all", "paid", "unpaid", "unbilled"}:
+        payment = "all"
+    if payment != "all":
+        rooms = [r for r in rooms if ("unbilled" if r.id not in bills else "paid" if bills[r.id].paid_receipt else "unpaid") == payment]
     readings = {r.id: next((item for item in r.readings if item.period == period), None) for r in rooms}
-    return render_template("rooms/index.html", rooms=rooms, period=period, readings=readings, q=q,
+    return render_template("rooms/index.html", rooms=rooms, period=period, readings=readings, q=q, bills=bills, payment=payment, full_view=request.args.get("view") == "full",
                            total_consumption=sum(item.consumption for item in readings.values() if item),
                            due_dates={r.id: due_date(r.current_tenancy, period) if r.current_tenancy else None for r in rooms}, today=local_today())
 

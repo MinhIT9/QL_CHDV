@@ -167,6 +167,18 @@ td small { max-width: 185px; font-size: 10px; line-height: 1.6; }
 tbody tr:last-child td { border-bottom: 0; }
 tbody tr:hover > td { background: #f7faff; }
 .room-table { min-width: 2080px; }
+.compact-room-table { min-width: 1100px; }
+.payment-menu { margin-top: 10px; }
+.payment-menu > summary { list-style: none; cursor: pointer; }
+.payment-panel { min-width: 235px; max-width: 330px; padding: 16px; margin-top: 9px; border: 1px solid var(--line); border-radius: 8px; background: #f8fafc; }
+.payment-panel .stack { gap: 13px; }
+.payment-panel p { margin-bottom: 12px; font-size: 11px; }
+.payment-panel details { margin-top: 14px; }
+.payment-panel summary, .receipt-history summary { cursor: pointer; font-size: 11px; color: #587697; }
+.receipt-history { margin-top: 10px; }
+.receipt-history p { font-size: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.bill-paid > td { background: #f6fbf8; }
+.bill-cancelled > td { color: #8a97a8; }
 .room-table td, .room-table th { padding-left: 18px; padding-right: 18px; }
 .room-table td { min-width: 100px; }
 .room-table td:first-child, .room-table th:first-child { min-width: 45px; width: 45px; text-align: center; font-size: 10px; color: #93a2b5; }

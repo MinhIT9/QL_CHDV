@@ -50,6 +50,7 @@ app/templates/auth/login.html
 app/templates/base.html
 app/templates/billing/form.html
 app/templates/billing/index.html
+app/templates/billing/payment.html
 app/templates/electricity/.gitkeep
 app/templates/electricity/correct.html
 app/templates/electricity/index.html
@@ -58,11 +59,14 @@ app/templates/error.html
 app/templates/partials/.gitkeep
 app/templates/partials/icons.html
 app/templates/rooms/.gitkeep
+app/templates/rooms/compact_table.html
 app/templates/rooms/detail.html
 app/templates/rooms/form.html
+app/templates/rooms/full_table.html
 app/templates/rooms/index.html
 app/templates/rooms/remove.html
 app/templates/rooms/renew.html
+app/templates/rooms/table_filters.html
 backups/.gitkeep
 document/ARCHITECTURE.md
 document/BILLING_CORRECTIONS_PROPOSAL.md
@@ -84,6 +88,7 @@ migrations/alembic.ini
 migrations/env.py
 migrations/script.py.mako
 migrations/versions/0fecdf9f864b_monthly_bills_and_reading_revisions.py
+migrations/versions/41eb1b88b816_full_payment_receipts.py
 migrations/versions/a65b2f9c018e_deposit_and_unified_start.py
 migrations/versions/b71c430e92ad_tenancy_rent.py
 migrations/versions/c83e4d16b2a0_tenancy_electricity_price.py
@@ -96,8 +101,9 @@ scripts/update_docs.py
 tests/.gitkeep
 tests/test_billing.py
 tests/test_contracts.py
+tests/test_receipts.py
 tests/test_v1.py
 wsgi.py
 ```
 
-Tổng: 91 file (bao gồm file danh mục này).
+Tổng: 97 file (bao gồm file danh mục này).

@@ -1,5 +1,7 @@
 # Phạm vi V1
 
+V1.1.14: xác nhận thu đủ từng phiếu, ngày/người/số tiền và root hoàn tác có lịch sử; phiếu đã thu xuống dưới. Bảng Phòng gọn, lọc thu theo tháng, chế độ đầy đủ. Chưa thu một phần/hoàn tiền tự động/đối soát ngân hàng; không thêm công nợ phức tạp.
+
 V1.1.11 thêm ngày giờ chốt/cập nhật lần cuối và tự tính tiền điện trên bảng. Không tự tạo phiếu, không đổi chức năng thực thu; tiền trước chốt phiếu chỉ là dự tính theo giá lưu (hoặc giá hiện tại có nhãn khi legacy chưa biết).
 
 V1.1.10 bổ sung giá điện trong phòng/đợt thuê. Giá điện/nước/phòng mới gợi ý cho phiếu lập sau; phiếu đã chốt giữ nguyên, form mở trước thay đổi cần tải lại. Không tự tra giá theo lịch tháng khi lập bù.

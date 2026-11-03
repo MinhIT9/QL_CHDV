@@ -4,9 +4,9 @@ Cập nhật: 2026-11-03 (Asia/Saigon).
 
 ## Phiên bản hội thoại
 
-- Phiên bản phản hồi gần nhất: V1.1.12.
-- Nội dung: sửa khoảng trống trang chốt tiền, dùng hết chiều ngang và preview hai cột trên desktop.
-- Phản hồi tiếp theo dùng V1.1.13. Tăng số cuối sau mỗi final; đây không phải phiên bản phát hành.
+- Phiên bản phản hồi gần nhất: V1.1.14.
+- Nội dung: thu đủ tiền qua dropdown, tự xếp phiếu đã thu xuống dưới, root hoàn tác có lịch sử; bảng Phòng gọn/lọc thu theo kỳ.
+- Phản hồi tiếp theo dùng V1.1.15. V1.1.13 là lượt phân tích không sửa file theo yêu cầu người dùng, đã có trong hội thoại.
 - Quy tắc đầy đủ ở AGENTS.md, mục “Phiên bản ở cuối phản hồi”.
 
 ## Đã làm
@@ -32,6 +32,9 @@ Cập nhật: 2026-11-03 (Asia/Saigon).
 
 ## Kiểm tra
 
+- V1.1.14: 46 unittest pass; receive đủ tiền không tin amount gửi từ client, ngày hợp lệ, chống đúp/stale sau hoàn tác, quyền Admin/root, chặn hủy phiếu đã thu, root hoàn tác giữ audit và thu lại, 0 đồng, sort đã thu xuống dưới, bộ lọc phòng theo từng tháng. db check khớp schema, node syntax pass. Chưa browser E2E cho dropdown/compact table mới.
+- Migration mới nhất 41eb1b88b816 đã backup/upgrade local (backups/pre-receipts-*.sqlite3). Receipt mới không tự coi phiếu cũ là đã thu; các phiếu cũ vẫn chưa thu đến khi Admin xác nhận.
+
 - V1.1.12: chỉnh template/CSS trang chốt tiền, bỏ max-width 1000px riêng trang này; desktop từ1200px đặt input/preview cạnh nhau, trước preview 3 cột input; mobile giữ một luồng dọc. Không đổi nghiệp vụ/DB. Kiểm tra render qua test_billing.py; chưa chụp browser cho thay đổi bố cục này.
 
 - V1.1.11: 41 unittest pass, kiểm tra thời điểm sửa từ revision, số tiền sau sửa/chốt phiếu, snapshot đơn giá và giá 0. Node smoke test live tiền 445 kWh × 4.000 = 1.780.000 đ, thiếu/0 giá, số sai; node syntax pass. Migration d94f512a37b1 đã backup/upgrade local (backups/pre-reading-dates-money-*.sqlite3), db check khớp. Chưa browser E2E cho bảng mới.
@@ -52,6 +55,10 @@ Cập nhật: 2026-11-03 (Asia/Saigon).
 Mở http://127.0.0.1:5000, đăng nhập root bằng pass bootstrap đã cung cấp rồi đổi pass. Clone mới làm theo README.md để tạo môi trường, .env, migration, root.
 
 ## Việc tiếp theo
+
+- Dropdown Thu tiền trên phiếu: xác nhận nhận đủ bill.total, nhập paid_date/ghi chú. Lưu Receipt gồm amount/ngày/người/thời điểm; chỉ root hoàn tác có lý do. Hoàn tác ghi nhận không thực hiện hoàn tiền thật. Chưa thu một phần.
+- Không hủy phiếu đang có receipt hiệu lực; root cần hoàn tác trước, rồi mới hủy/lập lại. Một receipt hiệu lực/phiếu, version lịch sử chặn form thu cũ sau hoàn tác.
+- Chốt tiền xếp chưa thu quá hạn → chưa thu còn hạn → đã thu → hủy; cùng nhóm theo mã phòng/id. Bảng Phòng giữ mã phòng, mặc định 10 cột gọn (tiền kỳ từ phiếu, không dự tính), có filter thu và view đầy đủ giữ toàn bộ cột cũ.
 
 - Bảng điện có Ngày chốt = created_at và Cập nhật lần cuối = max ReadingRevision.created_at, UTC hiển thị Asia/Saigon cả giờ/phút/giây. Chưa sửa thì hiện dấu gạch, không đoán ngày.
 - Lưu điện mới chụp Tenancy.electricity_price vào reading. Tiền bảng: ưu tiên giá phiếu hiệu lực, sau đó giá lúc lưu điện; legacy thiếu giá dùng giá phòng hiện tại với nhãn tạm tính. Migration chỉ backfill giá từ phiếu hiệu lực cùng kỳ, không đoán giá cũ từ phòng.

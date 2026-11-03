@@ -71,8 +71,8 @@ class ContractTests(AppTestCase):
         room = self.room(status="occupied", tenant_name="Example", rent_price="4500000")
         tenant = room.current_tenancy
         self.assertEqual(tenant.rent_price, 4500000)
-        self.assertIn("4.500.000 đ", self.client.get("/").get_data(as_text=True))
-        self.assertIn("<th>Tiền phòng", self.client.get("/").get_data(as_text=True))
+        self.assertIn("4.500.000 đ", self.client.get("/?view=full").get_data(as_text=True))
+        self.assertIn("<th>Tiền phòng", self.client.get("/?view=full").get_data(as_text=True))
         for value in ("", "-1", "1.5", "3000k", "2147483648"):
             self.assertEqual(self.post(f"/rooms/{room.id}/edit", self.edit_data(room, rent_price=value)).status_code, 400)
         self.assertEqual(self.post(f"/rooms/{room.id}/edit", self.edit_data(room, rent_price="0")).status_code, 302)
@@ -89,7 +89,7 @@ class ContractTests(AppTestCase):
         page = self.client.get(f"/rooms/{room.id}/edit").get_data(as_text=True)
         self.assertNotIn('name="move_in_date"', page)
         self.assertEqual(page.count('name="contract_start"'), 1)
-        self.assertIn("2.500.000 đ", self.client.get("/").get_data(as_text=True))
+        self.assertIn("2.500.000 đ", self.client.get("/?view=full").get_data(as_text=True))
         for value in ("-1", "1.5", "2147483648"):
             self.assertEqual(self.post(f"/rooms/{room.id}/edit", self.edit_data(room, deposit_amount=value)).status_code, 400)
         self.assertEqual(self.post(f"/rooms/{room.id}/edit", self.edit_data(room, deposit_amount="0")).status_code, 302)
@@ -184,7 +184,7 @@ class ContractTests(AppTestCase):
         room = self.room(status="occupied", tenant_name="Example")
         for path in ("/", f"/rooms/{room.id}", f"/rooms/{room.id}/edit", f"/rooms/{room.id}/renew", f"/rooms/{room.id}/remove"):
             self.assertEqual(self.client.get(path).status_code, 200, path)
-        self.assertIn("chưa xác nhận thu", self.client.get("/").get_data(as_text=True))
+        self.assertIn("Chưa chốt", self.client.get("/?view=full").get_data(as_text=True))
 
     def test_upgrade_preserves_legacy_tenant_children_and_checks(self):
         migrated = create_app({"TESTING": True, "SECRET_KEY": "migration-contract-test", "SQLALCHEMY_DATABASE_URI": "sqlite:///" + (Path(self.temp.name) / "legacy.sqlite3").as_posix()})

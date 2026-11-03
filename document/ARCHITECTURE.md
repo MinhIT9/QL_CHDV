@@ -1,5 +1,7 @@
 # Kiến trúc hiện tại
 
+V1.1.14: route receive/reverse trong billing_routes.py, cùng transaction BEGIN IMMEDIATE và unique index để chống thu đúp. Receipt tách khỏi snapshot phiếu. Rooms route join phiếu hiệu lực/kỳ + receipt để lọc, giữ thứ tự mã phòng. Template compact_table/full_table chia hai cách xem; payment.html dùng details/summary làm dropdown không cần JS mới.
+
 V1.1.11: electricity/routes.py lấy phiếu hiệu lực và max audit cho kỳ để bổ sung metadata bảng; template electricity/reading_meta.html dùng chung cho mỗi dòng. Live tiền ở app.js, kết quả server theo snapshot. local_datetime filter hiển thị UTC+7. Migration chỉ thêm giá đọc nullable, không thêm updated_at trùng lịch sử.
 
 V1.1.10: đơn giá điện nằm trong Tenancy.electricity_price, được validate/lưu cùng giá phòng/nước, form chốt tiền lấy cùng nguồn điều khoản hiện tại. Không đổi cấu trúc snapshot MonthlyBill; sửa giá không cập nhật phiếu cũ. Dùng tenancy version đã có để chặn form cũ; chưa thêm engine lịch giá.

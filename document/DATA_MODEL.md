@@ -1,6 +1,13 @@
 # Mô hình dữ liệu V1
 
-Đã triển khai tại app/models/__init__.py; migration mới nhất d94f512a37b1 (đơn giá dự tính theo bản ghi điện).
+Đã triển khai tại app/models/__init__.py; migration mới nhất 41eb1b88b816 (ghi nhận thu đủ).
+
+## Receipt — V1.1.14
+
+- bill_id, amount (BigInteger VND), paid_date, note, created_by/at; reversed_at/by/reason khi root hoàn tác. Không xóa bản ghi.
+- Partial unique index một receipt chưa hoàn tác mỗi phiếu. Amount lấy bill.total ở server, không tin client; 0 hợp lệ khi phiếu0đ.
+- MonthlyBill.paid_receipt suy ra từ receipt hiệu lực, không có cờ paid ở Room. Thu tháng trước không làm tháng sau thành đã thu.
+- Phiếu đã thu không được hủy; root cần hoàn tác receipt trước. Hoàn tác không đồng nghĩa hoàn tiền thật. Chưa hỗ trợ thu một phần/khớp ngân hàng.
 
 ElectricityReading.electricity_price nullable là giá chụp lúc lưu số mới; không thay giá phiếu. Migration backfill từ MonthlyBill hiệu lực cùng phòng/kỳ khi có. Ngày chốt là created_at; cập nhật gần nhất lấy từ max ReadingRevision.created_at nên không cần cột updated_at trùng lặp. Bảng hiển thị tiền theo giá phiếu hiệu lực nếu có, rồi giá đọc lưu, cuối cùng giá phòng hiện tại với nhãn tạm tính khi legacy thiếu giá.
 

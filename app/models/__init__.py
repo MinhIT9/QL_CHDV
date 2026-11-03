@@ -194,6 +194,7 @@ class MonthlyBill(db.Model):
     cancelled_at = db.Column(db.DateTime)
     cancelled_by = db.Column(db.Integer, db.ForeignKey("user.id", ondelete="RESTRICT"))
     cancel_reason = db.Column(db.String(500))
+    receipts = db.relationship("Receipt", back_populates="bill", order_by="Receipt.id")
     __table_args__ = (
         db.CheckConstraint("start_value >= 0 AND end_value >= start_value AND rent_price >= 0 AND water_price >= 0 AND service_price >= 0 AND electricity_price >= 0 AND people_count BETWEEN 1 AND 31", name="ck_bill_values"),
     )
@@ -201,6 +202,31 @@ class MonthlyBill(db.Model):
     @property
     def total(self):
         return self.rent_price + self.water_price * self.people_count + self.service_price + (self.end_value - self.start_value) * self.electricity_price
+
+    @property
+    def paid_receipt(self):
+        return next((r for r in self.receipts if r.reversed_at is None), None)
+
+
+class Receipt(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    bill_id = db.Column(db.Integer, db.ForeignKey("monthly_bill.id", ondelete="RESTRICT"), nullable=False)
+    amount = db.Column(db.BigInteger, nullable=False)
+    paid_date = db.Column(db.Date, nullable=False)
+    note = db.Column(db.String(500), nullable=False, default="")
+    created_by = db.Column(db.Integer, db.ForeignKey("user.id", ondelete="RESTRICT"), nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=utcnow)
+    reversed_at = db.Column(db.DateTime)
+    reversed_by = db.Column(db.Integer, db.ForeignKey("user.id", ondelete="RESTRICT"))
+    reverse_reason = db.Column(db.String(500))
+    bill = db.relationship("MonthlyBill", back_populates="receipts")
+    author = db.relationship("User", foreign_keys=[created_by])
+    reverser = db.relationship("User", foreign_keys=[reversed_by])
+    __table_args__ = (db.CheckConstraint("amount >= 0", name="ck_receipt_amount"),)
+
+
+db.Index("uq_active_receipt", Receipt.bill_id, unique=True,
+         sqlite_where=Receipt.reversed_at.is_(None), postgresql_where=Receipt.reversed_at.is_(None))
 
 
 db.Index("uq_active_bill", MonthlyBill.room_id, MonthlyBill.period, unique=True,
