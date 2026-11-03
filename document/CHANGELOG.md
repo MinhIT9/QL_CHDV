@@ -2,6 +2,12 @@
 
 ## 2026-11-03
 
+- V1.1.11: thêm ngày giờ chốt, cập nhật lần cuối nếu có revision, đơn giá và tiền điện trong bảng. Nhập chỉ số tự hiện tiền/draft total, xử lý 0 và thiếu giá.
+- Snapshot giá khi lưu điện mới; kỳ đã chốt tiền ưu tiên giá phiếu, legacy chưa có giá được ghi rõ tạm tính. Migration d94f512a37b1 đã backup/upgrade; 41 test và Node smoke test pass.
+
+- V1.1.10: thêm giá điện trong thông tin phòng/đợt thuê và bảng/chi tiết/lịch sử. Phiếu mới lấy giá điện/nước/phòng hiện tại, không hồi tố phiếu đã chốt, chặn version cũ.
+- Migration c83e4d16b2a0 giữ NULL legacy, đã backup/upgrade local. 39 test pass.
+
 - V1.1.9: sửa điện preview/confirm, audit trước/sau, đồng bộ kỳ kế tiếp và chống ghi đè dữ liệu vừa thay đổi.
 - Chốt tiền từng kỳ, snapshot giá/người/điện, chống trùng; root hủy hiệu lực có lý do và giữ bản cũ. Không mở rộng thực thu/công nợ/chia ngày.
 - Migration 0fecdf9f864b đã backup/upgrade local; 38 test pass và schema khớp model.

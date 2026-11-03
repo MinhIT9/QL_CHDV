@@ -38,7 +38,7 @@ def contract_values(data, current=None):
     for key, label in (("contract_start", "Ngày bắt đầu hợp đồng"), ("contract_end", "Ngày hết hạn hợp đồng")):
         required = current is None or getattr(current, key) is not None
         result[key] = parse_date(data.get(key, "").strip(), label, required)
-    for key, label in (("rent_price", "Tiền phòng"), ("water_price", "Giá nước"), ("service_price", "Phí dịch vụ"), ("deposit_amount", "Tiền cọc"), ("payment_day", "Ngày đóng tiền")):
+    for key, label in (("electricity_price", "Giá điện"), ("rent_price", "Tiền phòng"), ("water_price", "Giá nước"), ("service_price", "Phí dịch vụ"), ("deposit_amount", "Tiền cọc"), ("payment_day", "Ngày đóng tiền")):
         required = current is None or getattr(current, key) is not None
         result[key] = parse_integer(data.get(key, "").strip(), label, 1 if key == "payment_day" else 0, 31 if key == "payment_day" else 2147483647, required)
     start, end = result["contract_start"], result["contract_end"]

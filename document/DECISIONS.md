@@ -1,5 +1,17 @@
 # Quyết định và vấn đề cần chốt
 
+## 2026-11-03 — Ngày và tiền trên bảng điện (V1.1.11)
+
+- Ngày chốt là thời điểm lưu ban đầu (tự động), lần cập nhật lấy audit gần nhất; hiển thị UTC+7 đến giây, không sửa ngày chốt khi sửa chỉ số.
+- Tự tính tiền điện = kWh × đơn giá trên server và live JS (BigInt để tránh mất chính xác tiền nguyên). Thiếu giá không coi là0.
+- Chụp giá vào bản ghi điện mới; không đổi phiếu đã chốt. Giá phiếu hiệu lực luôn là nguồn hiển thị ưu tiên, còn tiền trước chốt chỉ dự tính. Legacy thiếu giá được đánh dấu tạm tính theo giá hiện tại.
+
+## 2026-11-03 — Giá điện trong thông tin phòng (V1.1.10)
+
+- Lưu Tenancy.electricity_price (VND/kWh nguyên >=0, NULL legacy) cùng các giá khác. Không tự gán từ phiếu cũ khi migration.
+- Thay giá điện/nước/phòng chỉ làm thay giá gợi ý cho phiếu lập sau; phiếu đã chốt giữ snapshot. Version chống chốt từ form mở trước khi sửa.
+- Mốc áp dụng là lúc lập phiếu, chưa có lịch giá theo ngày/tháng; khi lập bù/lập lại kỳ cũ, Admin đối chiếu và điều chỉnh giá trên form trước khi chốt.
+
 ## 2026-11-02 — Sườn dự án
 
 - Yêu cầu hiện tại: chỉ dựng folder, tài liệu và file cấu hình nền; chưa code chính.

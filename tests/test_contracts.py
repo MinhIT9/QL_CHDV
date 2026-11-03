@@ -25,7 +25,7 @@ class ContractTests(AppTestCase):
         tenant = room.current_tenancy
         data = {"code": room.code, "status": "occupied", "tenant_name": tenant.tenant_name,
                 "tenancy_id": str(tenant.id), "tenancy_version": str(tenant.version)}
-        for key in ("contract_start", "contract_end", "water_price", "service_price", "rent_price", "deposit_amount", "payment_day"):
+        for key in ("contract_start", "contract_end", "electricity_price", "water_price", "service_price", "rent_price", "deposit_amount", "payment_day"):
             value = getattr(tenant, key)
             data[key] = value.isoformat() if hasattr(value, "isoformat") else str(value) if value is not None else ""
         return {**data, **extra}
@@ -49,8 +49,8 @@ class ContractTests(AppTestCase):
         self.assertIsNone(legacy.current_tenancy.water_price)
 
     def test_new_tenancy_requires_terms_and_valid_amounts(self):
-        base = {"code": "NEW", "status": "occupied", "tenant_name": "Example", "contract_start": "2020-01-01", "contract_end": "2027-01-31", "payment_day": "31", "deposit_amount": "0", "rent_price": "3000000", "water_price": "0", "service_price": "0"}
-        for field in ("water_price", "service_price", "rent_price", "deposit_amount", "payment_day", "contract_start", "contract_end"):
+        base = {"code": "NEW", "status": "occupied", "tenant_name": "Example", "contract_start": "2020-01-01", "contract_end": "2027-01-31", "payment_day": "31", "deposit_amount": "0", "rent_price": "3000000", "electricity_price": "4000", "water_price": "0", "service_price": "0"}
+        for field in ("electricity_price", "water_price", "service_price", "rent_price", "deposit_amount", "payment_day", "contract_start", "contract_end"):
             self.assertEqual(self.post("/rooms/new", {**base, field: ""}).status_code, 400, field)
         for field, values in (("water_price", ("-1", "1.5", "100k", "2147483648")), ("service_price", ("-1", "1.5")), ("payment_day", ("0", "32", "1.5")), ("contract_start", ("2020-02-30", "2999-01-01")), ("contract_end", ("2019-12-31",))):
             for value in values:

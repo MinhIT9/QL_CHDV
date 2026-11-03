@@ -1,5 +1,9 @@
 # Kiến trúc hiện tại
 
+V1.1.11: electricity/routes.py lấy phiếu hiệu lực và max audit cho kỳ để bổ sung metadata bảng; template electricity/reading_meta.html dùng chung cho mỗi dòng. Live tiền ở app.js, kết quả server theo snapshot. local_datetime filter hiển thị UTC+7. Migration chỉ thêm giá đọc nullable, không thêm updated_at trùng lịch sử.
+
+V1.1.10: đơn giá điện nằm trong Tenancy.electricity_price, được validate/lưu cùng giá phòng/nước, form chốt tiền lấy cùng nguồn điều khoản hiện tại. Không đổi cấu trúc snapshot MonthlyBill; sửa giá không cập nhật phiếu cũ. Dùng tenancy version đã có để chặn form cũ; chưa thêm engine lịch giá.
+
 Một project Flask trả HTML bằng Jinja2. CSS riêng theo thiết kế bảng; HTMX 2.0.4 tăng tốc điều hướng qua hx-boost, form POST vẫn thông thường. JS tính điện khi nhập, khóa ô khách theo trạng thái và chống bấm lặp. Chưa dùng Bootstrap/Alpine.
 
 Luồng: trình duyệt → blueprint → quyền/CSRF → service nghiệp vụ → SQLAlchemy → SQLite → redirect/HTML.

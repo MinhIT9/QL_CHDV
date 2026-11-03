@@ -188,6 +188,7 @@ tbody tr:hover > td { background: #f7faff; }
 .scroll-hint { display: flex; align-items: center; gap: 6px; font-size: 10px; color: #96a3b5; padding: 0 25px 15px; }
 .scroll-hint .icon { width: 13px; height: 13px; }
 .meter-input { max-width: 175px; min-width: 118px !important; font-variant-numeric: tabular-nums; }
+.meter-table { min-width: 1400px; }
 .end-value { border-color: #c6d6f1 !important; background: #fcfdff !important; font-weight: 600; }
 .consumption { color: #2d7196; font-weight: 650; }
 .warning-text { color: #ac8640; font-size: 11px; max-width: 300px; }

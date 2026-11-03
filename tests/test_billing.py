@@ -58,6 +58,22 @@ class BillingTests(AppTestCase):
         self.assertEqual(first.total, 3750000)
         self.assertEqual(self.post(path, self.bill_data()).status_code, 400)
 
+    def test_room_price_change_updates_new_forms_not_existing_bills(self):
+        from test_contracts import ContractTests
+        path = f"/rooms/{self.room_obj.id}/bill"
+        data = self.bill_data(self.next)
+        self.assertEqual(self.post(path, self.bill_data()).status_code, 302)
+        bill = db.session.scalar(db.select(MonthlyBill))
+        payload = ContractTests.edit_data(self, self.room_obj, electricity_price="5000", water_price="120000", rent_price="3500000")
+        self.assertEqual(self.post(f"/rooms/{self.room_obj.id}/edit", payload).status_code, 302)
+        self.assertEqual((bill.electricity_price, bill.water_price, bill.rent_price, bill.total), (4000, 100000, 3000000, 3750000))
+        self.assertEqual(self.post(path, data).status_code, 400)
+        page = self.client.get(path + "?period=2026-02").get_data(as_text=True)
+        for key, value in (("electricity_price", "5000"), ("water_price", "120000"), ("rent_price", "3500000")):
+            self.assertRegex(page, 'name="' + key + '" value="' + value + '"')
+        self.assertEqual(self.post(path, self.bill_data(self.next, electricity_price="5000", water_price="120000", rent_price="3500000")).status_code, 302)
+        self.assertEqual(bill.total, 3750000)
+
     def test_billed_readings_require_root_cancel_and_keep_old_bill(self):
         path = f"/rooms/{self.room_obj.id}/bill"
         self.post(path, self.bill_data(self.next))
@@ -92,3 +108,35 @@ class BillingTests(AppTestCase):
         for path in ("/bills", "/bills?period=bad", f"/rooms/{self.room_obj.id}/bill?period=2026-01", f"/electricity/{self.first.id}/correct"):
             self.assertEqual(self.client.get(path).status_code, 200, path)
             self.assertEqual(self.app.test_client().get(path).status_code, 302)
+
+    def test_reading_dates_and_amount_follow_correction_and_bill(self):
+        page = self.client.get('/electricity/?period=2026-01').get_data(as_text=True)
+        self.assertIn('Ngày chốt', page)
+        self.assertIn('Cập nhật lần cuối', page)
+        self.assertIn('400.000 đ', page)
+        self.assertEqual(self.post(f'/electricity/{self.first.id}/correct', self.correction_data()).status_code, 302)
+        page = self.client.get('/electricity/?period=2026-01').get_data(as_text=True)
+        self.assertIn('200.000 đ', page)
+        self.assertIn('Tạm tính', page)
+        revision = db.session.scalar(db.select(ReadingRevision).where(ReadingRevision.reading_id == self.first.id))
+        self.assertIn(self.app.jinja_env.filters['local_datetime'](revision.created_at), page)
+        self.post(f'/rooms/{self.room_obj.id}/bill', self.bill_data(electricity_price='5000'))
+        page = self.client.get('/electricity/?period=2026-01').get_data(as_text=True)
+        self.assertIn('250.000 đ', page)
+        self.assertIn('Đã chốt tiền', page)
+
+    def test_saved_reading_keeps_rate_and_zero_is_valid(self):
+        tenant = self.room_obj.current_tenancy
+        self.assertEqual(self.post('/electricity/', {'period':'2026-03', f'end_{self.room_obj.id}':'1500'}).status_code, 302)
+        reading = db.session.scalar(db.select(ElectricityReading).where(ElectricityReading.period == '2026-03'))
+        self.assertEqual(reading.electricity_price, 4000)
+        tenant.electricity_price = 6000
+        db.session.commit()
+        page = self.client.get('/electricity/?period=2026-03').get_data(as_text=True)
+        self.assertIn('400.000 đ', page)
+        self.assertNotIn('600.000 đ', page)
+        tenant.electricity_price = 0
+        db.session.commit()
+        self.post('/electricity/', {'period':'2026-04', f'end_{self.room_obj.id}':'1600'})
+        reading = db.session.scalar(db.select(ElectricityReading).where(ElectricityReading.period == '2026-04'))
+        self.assertEqual(reading.electricity_price, 0)

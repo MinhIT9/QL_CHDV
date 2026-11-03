@@ -69,6 +69,7 @@ class Tenancy(db.Model):
     contract_end = db.Column(db.Date)
     contract_anchor_day = db.Column(db.Integer)
     water_price = db.Column(db.Integer)
+    electricity_price = db.Column(db.Integer)
     service_price = db.Column(db.Integer)
     deposit_amount = db.Column(db.Integer)
     rent_price = db.Column(db.Integer)
@@ -81,6 +82,7 @@ class Tenancy(db.Model):
     __mapper_args__ = {"version_id_col": version}
     __table_args__ = (
         db.CheckConstraint("water_price IS NULL OR water_price BETWEEN 0 AND 2147483647", name="ck_water_price"),
+        db.CheckConstraint("electricity_price IS NULL OR electricity_price BETWEEN 0 AND 2147483647", name="ck_electricity_price"),
         db.CheckConstraint("service_price IS NULL OR service_price BETWEEN 0 AND 2147483647", name="ck_service_price"),
         db.CheckConstraint("deposit_amount IS NULL OR deposit_amount BETWEEN 0 AND 2147483647", name="ck_deposit_amount"),
         db.CheckConstraint("rent_price IS NULL OR rent_price BETWEEN 0 AND 2147483647", name="ck_rent_price"),
@@ -144,12 +146,14 @@ class ElectricityReading(db.Model):
     period = db.Column(db.String(7), nullable=False)
     start_value = db.Column(db.Integer, nullable=False)
     end_value = db.Column(db.Integer, nullable=False)
+    electricity_price = db.Column(db.Integer)
     created_by = db.Column(db.Integer, db.ForeignKey("user.id", ondelete="RESTRICT"), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=utcnow)
     room = db.relationship("Room", back_populates="readings")
     __table_args__ = (
         db.UniqueConstraint("room_id", "period", name="uq_room_period"),
         db.CheckConstraint("start_value >= 0 AND end_value >= start_value", name="ck_valid_reading"),
+        db.CheckConstraint("electricity_price IS NULL OR electricity_price BETWEEN 0 AND 2147483647", name="ck_reading_price"),
     )
 
     @property

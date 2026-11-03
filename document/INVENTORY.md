@@ -53,6 +53,7 @@ app/templates/billing/index.html
 app/templates/electricity/.gitkeep
 app/templates/electricity/correct.html
 app/templates/electricity/index.html
+app/templates/electricity/reading_meta.html
 app/templates/error.html
 app/templates/partials/.gitkeep
 app/templates/partials/icons.html
@@ -85,6 +86,8 @@ migrations/script.py.mako
 migrations/versions/0fecdf9f864b_monthly_bills_and_reading_revisions.py
 migrations/versions/a65b2f9c018e_deposit_and_unified_start.py
 migrations/versions/b71c430e92ad_tenancy_rent.py
+migrations/versions/c83e4d16b2a0_tenancy_electricity_price.py
+migrations/versions/d94f512a37b1_reading_price.py
 migrations/versions/dd7493777e83_fees_and_contracts.py
 migrations/versions/e9329a770fe9_initial_schema.py
 requirements-dev.txt
@@ -97,4 +100,4 @@ tests/test_v1.py
 wsgi.py
 ```
 
-Tổng: 88 file (bao gồm file danh mục này).
+Tổng: 91 file (bao gồm file danh mục này).

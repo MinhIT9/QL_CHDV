@@ -43,26 +43,40 @@ if (meterForm && !meterForm.dataset.bound) {
   meterForm.dataset.bound = "true";
   const updateConsumption = () => {
     let total = 0;
+    let money = 0n;
+    let missingPrice = false;
     meterForm.querySelectorAll(".reading-row").forEach((row) => {
       const start = row.querySelector(".start-value");
       const end = row.querySelector(".end-value");
       const output = row.querySelector(".consumption");
+      const amount = row.querySelector(".reading-amount");
       if (!start || !end || !output) return;
       const startRaw = start.dataset.value ?? start.value;
       const endRaw = end.value;
       end.setCustomValidity("");
       if (start.tagName === "INPUT") start.required = endRaw !== "";
+      if (amount) amount.textContent = "—";
       if (startRaw === "" || endRaw === "") { output.textContent = "—"; return; }
       const consumption = Number(endRaw) - Number(startRaw);
-      if (consumption < 0) {
-        end.setCustomValidity("Chỉ số cuối không được nhỏ hơn chỉ số đầu.");
+      if (consumption < 0 || !Number.isInteger(Number(startRaw)) || !Number.isInteger(Number(endRaw))) {
+        end.setCustomValidity("Chỉ số phải là số nguyên; cuối không được nhỏ hơn đầu.");
         output.textContent = "Không hợp lệ";
       } else {
         output.textContent = consumption.toLocaleString("vi-VN");
         total += consumption;
+        if (row.dataset.price === "") {
+          missingPrice = true;
+          if (amount) amount.textContent = "Chưa có giá";
+        } else {
+          const cost = BigInt(consumption) * BigInt(row.dataset.price);
+          money += cost;
+          if (amount) amount.textContent = `${cost.toLocaleString("vi-VN")} đ`;
+        }
       }
     });
     document.querySelector("#draft-total").textContent = `${total.toLocaleString("vi-VN")} kWh`;
+    const draftMoney = document.querySelector("#draft-money");
+    if (draftMoney) draftMoney.textContent = missingPrice ? "Chưa đủ đơn giá" : `${money.toLocaleString("vi-VN")} đ`;
   };
   meterForm.addEventListener("input", updateConsumption);
   updateConsumption();

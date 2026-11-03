@@ -1,5 +1,9 @@
 # Phạm vi V1
 
+V1.1.11 thêm ngày giờ chốt/cập nhật lần cuối và tự tính tiền điện trên bảng. Không tự tạo phiếu, không đổi chức năng thực thu; tiền trước chốt phiếu chỉ là dự tính theo giá lưu (hoặc giá hiện tại có nhãn khi legacy chưa biết).
+
+V1.1.10 bổ sung giá điện trong phòng/đợt thuê. Giá điện/nước/phòng mới gợi ý cho phiếu lập sau; phiếu đã chốt giữ nguyên, form mở trước thay đổi cần tải lại. Không tự tra giá theo lịch tháng khi lập bù.
+
 ## Mở rộng V1.1.9
 
 - Sửa số điện có preview, lý do và lịch sử; đồng bộ đầu kỳ kế tiếp khi cần. Phiếu tiền hiệu lực khóa các kỳ bị ảnh hưởng cho đến khi root hủy có lý do.

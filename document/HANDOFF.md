@@ -4,9 +4,9 @@ Cập nhật: 2026-11-03 (Asia/Saigon).
 
 ## Phiên bản hội thoại
 
-- Phiên bản phản hồi gần nhất: V1.1.9.
-- Nội dung: sửa điện có lịch sử và chốt tiền riêng từng tháng; triển khai gọn, chưa thực thu/chia ngày.
-- Phản hồi tiếp theo dùng V1.1.10. Tăng số cuối sau mỗi final; đây không phải phiên bản phát hành.
+- Phiên bản phản hồi gần nhất: V1.1.11.
+- Nội dung: ngày giờ chốt/sửa gần nhất và tiền điện tự tính ngay trên bảng điện.
+- Phản hồi tiếp theo dùng V1.1.12. Tăng số cuối sau mỗi final; đây không phải phiên bản phát hành.
 - Quy tắc đầy đủ ở AGENTS.md, mục “Phiên bản ở cuối phản hồi”.
 
 ## Đã làm
@@ -32,6 +32,10 @@ Cập nhật: 2026-11-03 (Asia/Saigon).
 
 ## Kiểm tra
 
+- V1.1.11: 41 unittest pass, kiểm tra thời điểm sửa từ revision, số tiền sau sửa/chốt phiếu, snapshot đơn giá và giá 0. Node smoke test live tiền 445 kWh × 4.000 = 1.780.000 đ, thiếu/0 giá, số sai; node syntax pass. Migration d94f512a37b1 đã backup/upgrade local (backups/pre-reading-dates-money-*.sqlite3), db check khớp. Chưa browser E2E cho bảng mới.
+
+- V1.1.10: 39 unittest pass; sửa giá điện/nước/phòng giữ nguyên tổng phiếu cũ, form mới lấy giá mới, form version cũ bị chặn. Migration c83e4d16b2a0 đã backup/upgrade local (backups/pre-room-electricity-price-*.sqlite3), db check không drift. Chưa browser E2E cho thay đổi này.
+
 - 38 unittest pass: bộ 31 cũ và 7 test sửa điện/ảnh hưởng kỳ sau/audit/stale, snapshot giá độc lập tháng, chống trùng, quyền root hủy, giá 0/âm/thiếu, chặn giữa tháng/thiếu điện và render/quyền trang mới.
 - flask db check: không schema drift. node --check app/static/js/app.js: hợp lệ.
 - Test client trên app local: /login trả HTTP 200; chưa đổi mật khẩu root thật khi test.
@@ -46,6 +50,13 @@ Cập nhật: 2026-11-03 (Asia/Saigon).
 Mở http://127.0.0.1:5000, đăng nhập root bằng pass bootstrap đã cung cấp rồi đổi pass. Clone mới làm theo README.md để tạo môi trường, .env, migration, root.
 
 ## Việc tiếp theo
+
+- Bảng điện có Ngày chốt = created_at và Cập nhật lần cuối = max ReadingRevision.created_at, UTC hiển thị Asia/Saigon cả giờ/phút/giây. Chưa sửa thì hiện dấu gạch, không đoán ngày.
+- Lưu điện mới chụp Tenancy.electricity_price vào reading. Tiền bảng: ưu tiên giá phiếu hiệu lực, sau đó giá lúc lưu điện; legacy thiếu giá dùng giá phòng hiện tại với nhãn tạm tính. Migration chỉ backfill giá từ phiếu hiệu lực cùng kỳ, không đoán giá cũ từ phòng.
+- Phiếu lập mới vẫn lấy giá phòng hiện tại theo V1.1.10. Tiền trên bảng trước chốt phiếu là dự tính, không tự lập phiếu/thực thu. Giá phiếu có thể khác giá dự tính lúc lưu điện; khi đã chốt thì bảng ưu tiên giá phiếu.
+
+- Tenancy.electricity_price nhập ở form phòng, có trên bảng/chi tiết/lịch sử. Tất cả giá của phiếu mới lấy từ điều khoản hiện tại; không lấy giá điện phiếu cũ nữa. Phiếu đã chốt giữ snapshot.
+- “Sau lúc sửa” tính theo lúc lập phiếu: lập bù/lập lại tháng cũ cũng gợi ý giá hiện tại, Admin kiểm tra giá kỳ trước khi chốt. Chưa có lịch giá theo ngày/tháng.
 
 - Đã triển khai phương án gọn trong BILLING_CORRECTIONS_PROPOSAL.md: cùng kỳ phòng/điện, form preview tạm (không lưu nháp), snapshot chốt, hủy/lập lại khi sai. Phần thực thu, công nợ, điện khác kỳ, chia ngày, lịch giá tự động chưa làm.
 

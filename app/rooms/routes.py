@@ -63,7 +63,7 @@ def edit(room_id=None):
         "tenancy_id": str(current.id) if current else "",
         "tenancy_version": str(current.version) if current else "",
     }
-    for key in ("contract_start", "contract_end", "rent_price", "water_price", "service_price", "deposit_amount", "payment_day"):
+    for key in ("contract_start", "contract_end", "rent_price", "electricity_price", "water_price", "service_price", "deposit_amount", "payment_day"):
         value = getattr(current, key) if current else None
         values[key] = value.isoformat() if hasattr(value, "isoformat") else value if value is not None else ""
     return render_template("rooms/form.html", room=room, values=values, today=local_today())

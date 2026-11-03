@@ -65,7 +65,7 @@ class AppTestCase(unittest.TestCase):
 
     def room(self, code="P101", **extra):
         if extra.get("status") == "occupied":
-            extra = {"contract_start": "2020-01-01", "contract_end": "2027-01-31", "water_price": "100000", "service_price": "150000", "payment_day": "31", "deposit_amount": "0", "rent_price": "3000000", **extra}
+            extra = {"contract_start": "2020-01-01", "contract_end": "2027-01-31", "electricity_price": "4000", "water_price": "100000", "service_price": "150000", "payment_day": "31", "deposit_amount": "0", "rent_price": "3000000", **extra}
         response = self.post("/rooms/new", {"code": code, "status": "vacant", **extra})
         self.assertEqual(response.status_code, 302)
         return db.session.scalar(db.select(Room).where(Room.code == code))
@@ -149,7 +149,7 @@ class V1Tests(AppTestCase):
         self.assertEqual(len(room.current_tenancy.vehicles), 2)
         self.assertIn("&lt;script&gt;", self.client.get(f"/rooms/{room.id}").get_data(as_text=True))
         self.assertEqual(self.post("/rooms/new", {"code": "p101", "status": "vacant"}).status_code, 400)
-        self.post(f"/rooms/{room.id}/edit", {"code": "P101", "status": "occupied", "tenant_name": "New tenant", "new_tenancy": "on", "tenancy_id": str(room.current_tenancy.id), "tenancy_version": str(room.current_tenancy.version), "move_out_date": "2020-02-01", "contract_start": "2020-02-01", "contract_end": "2027-01-31", "water_price": "0", "service_price": "0", "payment_day": "1", "deposit_amount": "0", "rent_price": "3000000"})
+        self.post(f"/rooms/{room.id}/edit", {"code": "P101", "status": "occupied", "tenant_name": "New tenant", "new_tenancy": "on", "tenancy_id": str(room.current_tenancy.id), "tenancy_version": str(room.current_tenancy.version), "move_out_date": "2020-02-01", "contract_start": "2020-02-01", "contract_end": "2027-01-31", "electricity_price": "4000", "water_price": "0", "service_price": "0", "payment_day": "1", "deposit_amount": "0", "rent_price": "3000000"})
         db.session.expire_all()
         self.assertEqual(len(room.tenancies), 2)
         self.assertIsNotNone(room.tenancies[0].ended_at)
@@ -245,7 +245,7 @@ class V1Tests(AppTestCase):
             result = migrated.test_cli_runner().invoke(args=["db", "upgrade"])
             self.assertEqual(result.exit_code, 0, f"{result.output}\n{result.exception}")
             self.assertEqual(db.session.scalar(db.select(db.func.count()).select_from(Room)), 0)
-            self.assertEqual(db.session.execute(db.text("SELECT version_num FROM alembic_version")).scalar(), "0fecdf9f864b")
+            self.assertEqual(db.session.execute(db.text("SELECT version_num FROM alembic_version")).scalar(), "d94f512a37b1")
             db.session.remove()
             db.engine.dispose()
 

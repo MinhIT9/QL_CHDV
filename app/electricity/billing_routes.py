@@ -63,9 +63,8 @@ def create(room_id):
             reading = db.session.scalar(db.select(ElectricityReading).where(ElectricityReading.room_id == room.id, ElectricityReading.period == period))
             if not reading:
                 raise ValueError("Cần lưu số điện kỳ này trước khi tính tiền.")
-            prior = db.session.scalar(db.select(MonthlyBill).where(MonthlyBill.tenancy_id == tenant.id, MonthlyBill.period <= period).order_by(MonthlyBill.period.desc(), MonthlyBill.id.desc()))
-            values = {key: getattr(tenant, key) if getattr(tenant, key) is not None else "" for key in ("rent_price", "water_price", "service_price", "payment_day")}
-            values.update(period=period, people_count=tenant.people_count, electricity_price=prior.electricity_price if prior else "", tenancy_id=tenant.id, tenancy_version=tenant.version, stamp=reading_stamp(reading))
+            values = {key: getattr(tenant, key) if getattr(tenant, key) is not None else "" for key in ("rent_price", "electricity_price", "water_price", "service_price", "payment_day")}
+            values.update(period=period, people_count=tenant.people_count, tenancy_id=tenant.id, tenancy_version=tenant.version, stamp=reading_stamp(reading))
     except WRITE_ERRORS as error:
         report(error)
         if request.method == "GET":

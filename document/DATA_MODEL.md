@@ -1,6 +1,8 @@
 # Mô hình dữ liệu V1
 
-Đã triển khai tại app/models/__init__.py; migration mới nhất 0fecdf9f864b (phiếu tiền và lịch sử sửa điện).
+Đã triển khai tại app/models/__init__.py; migration mới nhất d94f512a37b1 (đơn giá dự tính theo bản ghi điện).
+
+ElectricityReading.electricity_price nullable là giá chụp lúc lưu số mới; không thay giá phiếu. Migration backfill từ MonthlyBill hiệu lực cùng phòng/kỳ khi có. Ngày chốt là created_at; cập nhật gần nhất lấy từ max ReadingRevision.created_at nên không cần cột updated_at trùng lặp. Bảng hiển thị tiền theo giá phiếu hiệu lực nếu có, rồi giá đọc lưu, cuối cùng giá phòng hiện tại với nhãn tạm tính khi legacy thiếu giá.
 
 | Bảng | Dữ liệu chính | Ràng buộc / quan hệ |
 | --- | --- | --- |

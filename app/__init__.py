@@ -100,6 +100,14 @@ def create_app(test_config=None):
     def business_date(value):
         return value.strftime("%d/%m/%Y") if value else "Chưa cập nhật"
 
+    @app.template_filter("local_datetime")
+    def local_datetime(value):
+        if value is None:
+            return "—"
+        if value.tzinfo is None:
+            value = value.replace(tzinfo=timezone.utc)
+        return value.astimezone(timezone(timedelta(hours=7))).strftime("%d/%m/%Y %H:%M:%S")
+
     @app.template_filter("vnd")
     def vnd(value):
         return f"{value:,}".replace(",", ".") + " đ" if value is not None else "Chưa cập nhật"

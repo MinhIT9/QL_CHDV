@@ -1,5 +1,9 @@
 # CHDV Manager Basic
 
+Bảng điện có ngày giờ chốt/sửa gần nhất, đơn giá và tiền tự tính. Tiền trước chốt phiếu là dự tính; khi có phiếu hiệu lực thì dùng giá trên phiếu.
+
+Giá điện có trong thông tin phòng cùng tiền phòng/nước. Thay giá áp dụng mặc định cho phiếu lập sau, phiếu đã chốt giữ nguyên. Phiếu lập bù tháng cũ cần kiểm tra lại giá trên form.
+
 Ứng dụng Flask quản lý căn hộ dịch vụ bằng bảng, một project và SQLite cục bộ.
 
 ## V1 đã có

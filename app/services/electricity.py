@@ -65,7 +65,9 @@ def save_readings(period, data, user_id):
         end = integer_reading(raw, f"Cuối kỳ phòng {room.code}")
         if end < start:
             raise ValueError(f"Phòng {room.code}: cuối kỳ không được nhỏ hơn đầu kỳ. V1 chưa hỗ trợ thay đồng hồ.")
-        submitted.append(ElectricityReading(room_id=room.id, period=period, start_value=start, end_value=end, created_by=user_id))
+        tenant = room.current_tenancy
+        submitted.append(ElectricityReading(room_id=room.id, period=period, start_value=start, end_value=end,
+                                           electricity_price=tenant.electricity_price if tenant else None, created_by=user_id))
     if not submitted:
         raise ValueError("Hãy nhập chỉ số cuối cho ít nhất một phòng chưa chốt.")
     db.session.add_all(submitted)

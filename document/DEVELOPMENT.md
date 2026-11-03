@@ -1,5 +1,9 @@
 # Hướng dẫn phát triển và vận hành local
 
+V1.1.11: migration mới nhất d94f512a37b1 đã backup/upgrade local. Bảng điện hiển thị ngày giờ lưu/sửa gần nhất và tự tính tiền; đơn giá được chụp khi lưu điện mới. Bản cũ chưa biết giá được ghi tạm tính, phiếu hiệu lực luôn ưu tiên hơn dự tính. Ctrl+F5 sau khởi động lại để nạp CSS/JS mới.
+
+V1.1.10: migration mới nhất c83e4d16b2a0 đã backup/upgrade local. Giá điện nhập trong form phòng, cho phép 0. Sửa giá chỉ đổi gợi ý phiếu lập sau; phiếu đã chốt giữ nguyên. Nếu form chốt tiền báo dữ liệu đã đổi, tải lại để nhận giá mới. Khi lập bù/lập lại kỳ cũ cần xác nhận đúng giá vì mặc định vẫn là giá hiện tại.
+
 ## Thiết lập
 
 Đã kiểm thử với Python 3.11.9. Dependencies trực tiếp khóa trong requirements.txt; test dùng unittest. Lượt triển khai dùng dependencies sẵn có, không cài thêm vào Python toàn cục.
