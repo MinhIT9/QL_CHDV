@@ -4,9 +4,9 @@ Cập nhật: 2026-11-03 (Asia/Saigon).
 
 ## Phiên bản hội thoại
 
-- Phiên bản phản hồi gần nhất: V1.1.14.
-- Nội dung: thu đủ tiền qua dropdown, tự xếp phiếu đã thu xuống dưới, root hoàn tác có lịch sử; bảng Phòng gọn/lọc thu theo kỳ.
-- Phản hồi tiếp theo dùng V1.1.15. V1.1.13 là lượt phân tích không sửa file theo yêu cầu người dùng, đã có trong hội thoại.
+- Phiên bản phản hồi gần nhất: V1.1.15.
+- Nội dung: sửa dropdown thu tiền/history làm giãn bảng, chuyển sang popover nổi tự định vị.
+- Phản hồi tiếp theo dùng V1.1.16. V1.1.13 là lượt phân tích không sửa file theo yêu cầu người dùng.
 - Quy tắc đầy đủ ở AGENTS.md, mục “Phiên bản ở cuối phản hồi”.
 
 ## Đã làm
@@ -31,6 +31,9 @@ Cập nhật: 2026-11-03 (Asia/Saigon).
 - Chỉ chốt tiền một đợt thuê xác định đủ tháng; thiếu điện, ngày không rõ, vào/trả giữa tháng hoặc đổi khách cùng kỳ bị chặn. Không có engine lịch giá tự động: giá trên form là gợi ý, Admin xác nhận cho từng kỳ.
 
 ## Kiểm tra
+
+- V1.1.15: 5 test_receipts pass, node syntax pass. Edge headless trên HTML fixture/DB tạm xác nhận row height trước/sau mở =128px, popover hiện và nằm trong viewport đo; đã xem screenshot instance/payment-layout.png. Không sửa backend/schema/DB; không chạy lại toàn bộ suite cho thay đổi UI này.
+- Payment menu/history dùng native Popover API top layer thay details nằm trong ô bảng; CSS fixed, max-height theo viewport, scroll nội bộ. JS neo theo nút, tránh mép, đổi vị trí khi resize/scroll/mở mục hủy. Escape/click ngoài/nút đóng do native popover xử lý. Cần browser hiện đại hỗ trợ Popover API.
 
 - V1.1.14: 46 unittest pass; receive đủ tiền không tin amount gửi từ client, ngày hợp lệ, chống đúp/stale sau hoàn tác, quyền Admin/root, chặn hủy phiếu đã thu, root hoàn tác giữ audit và thu lại, 0 đồng, sort đã thu xuống dưới, bộ lọc phòng theo từng tháng. db check khớp schema, node syntax pass. Chưa browser E2E cho dropdown/compact table mới.
 - Migration mới nhất 41eb1b88b816 đã backup/upgrade local (backups/pre-receipts-*.sqlite3). Receipt mới không tự coi phiếu cũ là đã thu; các phiếu cũ vẫn chưa thu đến khi Admin xác nhận.

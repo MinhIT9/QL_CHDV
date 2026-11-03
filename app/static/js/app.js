@@ -1,6 +1,43 @@
 "use strict";
 
+function positionPaymentPanel(panel) {
+  const anchor = document.querySelector(`button[popovertarget="${panel.id}"]`);
+  if (!anchor) return;
+  const rect = anchor.getBoundingClientRect();
+  if (rect.bottom < 0 || rect.top > innerHeight || rect.right < 0 || rect.left > innerWidth) {
+    panel.hidePopover();
+    return;
+  }
+  const gap = 8, edge = 12;
+  const height = panel.offsetHeight, width = panel.offsetWidth;
+  const below = rect.bottom + gap;
+  const top = below + height <= innerHeight - edge ? below : rect.top - height - gap;
+  panel.style.left = `${Math.max(edge, Math.min(rect.right - width, innerWidth - width - edge))}px`;
+  panel.style.top = `${Math.max(edge, Math.min(top, innerHeight - height - edge))}px`;
+}
+
+function repositionPaymentPanels() {
+  document.querySelectorAll(".payment-panel:popover-open").forEach(positionPaymentPanel);
+}
+window.addEventListener("resize", repositionPaymentPanels);
+window.addEventListener("scroll", repositionPaymentPanels, true);
+
 function enhancePage() {
+document.querySelectorAll(".payment-panel[popover]:not([data-bound])").forEach((panel) => {
+  panel.dataset.bound = "true";
+  panel.addEventListener("beforetoggle", (event) => {
+    if (event.newState === "open") panel.style.visibility = "hidden";
+  });
+  panel.addEventListener("toggle", (event) => {
+    if (event.newState === "open") {
+      positionPaymentPanel(panel);
+      panel.style.visibility = "visible";
+    }
+  });
+  panel.addEventListener("toggle", (event) => {
+    if (event.target !== panel && panel.matches(":popover-open")) positionPaymentPanel(panel);
+  }, true);
+});
 const billRoom = document.querySelector("#bill-room");
 if (billRoom && !billRoom.dataset.bound) {
   billRoom.dataset.bound = "true";

@@ -2,6 +2,9 @@
 
 ## 2026-11-03
 
+- V1.1.15: sửa dropdown thu tiền/history kéo cao dòng và xô cột. Native popover top layer + fixed/JS tự neo, tránh clipping/vượt viewport; Escape/click ngoài/nút đóng. Giữ chức năng thu/hoàn tác/hủy.
+- 5 test receipt pass, Node syntax pass; Edge fixture xác nhận dòng128px trước/sau mở, đã xem ảnh. Không thay database.
+
 - V1.1.14: triển khai phân tích V1.1.13 — dropdown ghi nhận thu đủ, ngày/người/số tiền và lịch sử; root hoàn tác có lý do. Chặn hủy phiếu đã thu và gửi lại form cũ sau hoàn tác.
 - Phiếu chưa thu ở trên/đã thu ở dưới/hủy cuối; bảng Phòng gọn mặc định, tiền kỳ từ snapshot, bộ lọc thu và chế độ đầy đủ giữ cột cũ.
 - Migration 41eb1b88b816 đã backup/upgrade; 46 test pass. Chưa thu một phần/browser E2E cho UI mới.

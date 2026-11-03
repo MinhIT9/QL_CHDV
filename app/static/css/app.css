@@ -169,8 +169,10 @@ tbody tr:hover > td { background: #f7faff; }
 .room-table { min-width: 2080px; }
 .compact-room-table { min-width: 1100px; }
 .payment-menu { margin-top: 10px; }
-.payment-menu > summary { list-style: none; cursor: pointer; }
-.payment-panel { min-width: 235px; max-width: 330px; padding: 16px; margin-top: 9px; border: 1px solid var(--line); border-radius: 8px; background: #f8fafc; }
+.payment-panel { position: fixed; inset: auto; margin: 0; width: min(350px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); overflow-y: auto; padding: 32px 20px 20px; border: 1px solid var(--line); border-radius: 12px; background: white; color: var(--ink); box-shadow: 0 14px 50px #102a3630; }
+.payment-panel::backdrop { background: transparent; }
+.popover-close { position: absolute; top: 5px; right: 8px; width: 28px; height: 28px; border: 0; border-radius: 6px; background: transparent; color: var(--muted); cursor: pointer; font-size: 22px; }
+.popover-close:hover { background: #edf2f8; }
 .payment-panel .stack { gap: 13px; }
 .payment-panel p { margin-bottom: 12px; font-size: 11px; }
 .payment-panel details { margin-top: 14px; }
