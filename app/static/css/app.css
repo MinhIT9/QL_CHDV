@@ -451,6 +451,29 @@ footer { display: flex; justify-content: space-between; align-items: center; gap
   .workspace-account > span { display: none; }
   .workspace-user .mini-avatar { width: 30px; height: 30px; }
 }
+/* Short motion cues; opacity keeps sticky table cells and form actions stable. */
+@keyframes surface-enter {
+  from { opacity: .35; }
+  to { opacity: 1; }
+}
+@keyframes sidebar-enter {
+  from { opacity: .3; transform: translateX(-18px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .main > .page-header, .main > .card, .main > .detail-grid,
+  .main > .overview-strip, .login-shell { animation: surface-enter .24s ease-out; }
+  .sidebar { animation: sidebar-enter .22s ease-out; }
+  .alert { animation: surface-enter .2s ease-out; }
+  .payment-panel:popover-open { animation: surface-enter .16s ease-out; }
+  .sidebar nav a { transition: background .18s, color .18s, padding-left .18s; }
+  .sidebar nav a:hover { padding-left: 19px; }
+  .sidebar-toggle { transition: background .16s, border-color .16s, transform .16s; }
+  .sidebar-toggle:active { transform: scale(.94); }
+  .overview-item { transition: box-shadow .18s, border-color .18s; }
+  .overview-item:hover { border-color: #c5ddd5; box-shadow: 0 4px 15px #102a3609; }
+  tbody td { transition: background-color .14s; }
+}
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
 }

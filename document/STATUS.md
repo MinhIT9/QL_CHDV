@@ -1,6 +1,8 @@
 # Tiến độ thực tế
 
-Cập nhật: 2026-11-03 (Asia/Saigon). Phiên bản hội thoại: V1.1.23.
+Cập nhật: 2026-11-03 (Asia/Saigon). Phiên bản hội thoại: V1.1.24.
+
+V1.1.24: thêm animation CSS ngắn 140–240ms cho trang/card, sidebar lúc hiện, thông báo/popover và phản hồi hover/nhấn. Không transform nội dung chứa sticky table/form; tôn trọng prefers-reduced-motion. Chỉ CSS/cache asset, không đổi nghiệp vụ/JS/DB. Kiểm tra tài liệu/diff; chưa browser QA hoặc chạy lại test nghiệp vụ.
 
 V1.1.23: lịch sử điện chi tiết phòng thêm đơn giá và tiền điện tự tính; ưu tiên phiếu hiệu lực, sau đó giá snapshot của lần chốt điện. Dữ liệu cũ thiếu giá hiển thị chưa có giá đã lưu, không tự áp giá hiện tại vào lịch sử. Tài khoản chuyển cuối menu sidebar, trên hồ sơ. 11 test billing pass, có test giá snapshot/phiếu/0/thiếu giá; chưa browser QA. Không đổi schema.
 

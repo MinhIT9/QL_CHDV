@@ -2,6 +2,8 @@
 
 ## 2026-11-03
 
+- V1.1.24: thêm chuyển động nhẹ khi hiện trang/sidebar/popover/thông báo, phản hồi hover/nhấn; tắt animation khi người dùng chọn giảm chuyển động.
+
 - V1.1.23: lịch sử điện phòng thêm đơn giá/tiền điện tự tính từ giá đã lưu hoặc phiếu hiệu lực; Tài khoản đặt cuối sidebar trên hồ sơ.
 
 - V1.1.22: cho agent tự tăng phiên bản theo mức thay đổi; bổ sung quy ước code ngắn gọn, chuẩn, format nhất quán và giữ phạm vi thay đổi.

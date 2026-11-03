@@ -1,5 +1,7 @@
 # Giao diện V1.1.7
 
+V1.1.24: motion CSS 140–240ms, opacity khi hiện surface/thông báo/popover; sidebar trượt nhẹ khi hiện, ẩn ngay như trước. Hover menu, nút menu, thẻ tổng quan và dòng bảng có transition. Tránh transform container nội dung để giữ sticky; không delay nhập liệu, không stagger hàng bảng. Tôn trọng prefers-reduced-motion, không thêm dependency.
+
 V1.1.23: lịch sử điện chi tiết phòng có 6 cột, thêm đơn giá và tiền điện; nhãn Đã chốt tiền/Tạm tính/Chưa có giá đã lưu. Ưu tiên giá phiếu hiệu lực, nếu chưa có phiếu dùng snapshot lần chốt điện, không suy giá hiện tại cho dữ liệu cũ. Nav Tài khoản dành root đặt cuối sidebar trên hồ sơ, tách menu nghiệp vụ.
 
 V1.1.21: cột Xe / biển số chỉ hiển thị biển số từng dòng, bỏ dòng đếm xe theo yêu cầu; không có xe dùng dấu —.

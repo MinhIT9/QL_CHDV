@@ -4,9 +4,9 @@ Cập nhật: 2026-11-03 (Asia/Saigon).
 
 ## Phiên bản hội thoại
 
-- Phiên bản phản hồi gần nhất: V1.1.23.
-- Nội dung: Hiển thị đơn giá/tiền điện trong lịch sử phòng, chuyển Tài khoản cuối sidebar.
-- Phản hồi tiếp theo tối thiểu V1.1.24; có thể tăng minor/major theo quy tắc mới trong AGENTS.md. V1.1.13 là lượt phân tích không sửa file theo yêu cầu người dùng.
+- Phiên bản phản hồi gần nhất: V1.1.24.
+- Nội dung: Thêm animation nhẹ bằng CSS và phản hồi tương tác, hỗ trợ giảm chuyển động.
+- Phản hồi tiếp theo tối thiểu V1.1.25; có thể tăng minor/major theo quy tắc mới trong AGENTS.md. V1.1.13 là lượt phân tích không sửa file theo yêu cầu người dùng.
 - Quy tắc đầy đủ ở AGENTS.md, mục “Phiên bản ở cuối phản hồi”.
 
 ## Đã làm
@@ -31,6 +31,8 @@ Cập nhật: 2026-11-03 (Asia/Saigon).
 - Chỉ chốt tiền một đợt thuê xác định đủ tháng; thiếu điện, ngày không rõ, vào/trả giữa tháng hoặc đổi khách cùng kỳ bị chặn. Không có engine lịch giá tự động: giá trên form là gợi ý, Admin xác nhận cho từng kỳ.
 
 ## Kiểm tra
+
+- V1.1.24: chỉ CSS/cache asset, kiểm tra tài liệu/diff; không chạy lại suite nghiệp vụ, chưa browser QA. Animation opacity cho surface/popover, slide nhẹ lúc sidebar hiện, hover/nhấn; không có hiệu ứng thoát khi sidebar ẩn. Không thêm JS/thư viện. Bước tiếp: kiểm tra chuyển trang HTMX, sticky table, popover và chế độ giảm chuyển động trên browser.
 
 - V1.1.23: 11 test_billing pass, test mới kiểm tra tiền điện lịch sử theo snapshot, không đổi theo giá hiện tại, ưu tiên phiếu hiệu lực, giá 0/thiếu giá. Không đổi DB hoặc quyền root; Tài khoản nằm nav riêng trên profile. Chưa browser QA; bước tiếp kiểm tra vị trí sidebar trên màn thấp/mobile và cuộn ngang bảng lịch sử 6 cột.
 
