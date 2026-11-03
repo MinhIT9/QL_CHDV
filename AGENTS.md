@@ -34,6 +34,8 @@
 
 ### Phong cách mã nguồn
 
+- Ưu tiên Bootstrap 5 cho nút/form/bảng/thông báo và tiện ích bố cục; chỉ viết CSS khi Bootstrap không đáp ứng. CDN ghim phiên bản/SRI và cập nhật CSP phù hợp.
+
 - Ưu tiên code cực gọn, ngắn và đúng chuẩn; bỏ lặp, biến/thành phần không cần thiết. Tính đúng, bảo mật và khả năng đọc hiểu được ưu tiên hơn việc giảm số ký tự.
 - Khi sửa code, định dạng đẹp và nhất quán trong phần đang chỉnh: thụt lề chuẩn, tên rõ nghĩa, xuống dòng hợp lý. Không nén nhiều câu lệnh hoặc cả template thành một dòng để làm ngắn giả tạo.
 - Tái sử dụng helper/partial khi giảm lặp có ý nghĩa; không thêm abstraction, thư viện hoặc cấu trúc phức tạp chỉ cho một thao tác đơn giản.

@@ -4,11 +4,11 @@
 <section class="login-shell">
   <div class="login-showcase"><a class="brand" href="{{ url_for('auth.login') }}"><span class="brand-icon">{{ icon('building') }}</span><span>CHDV<span class="brand-light"> Manager</span><small>QUẢN LÝ CĂN HỘ DỊCH VỤ</small></span></a><div class="showcase-copy"><p class="eyebrow">GỌN GÀNG HƠN MỖI NGÀY</p><h2>Mọi căn phòng.<br><em>Trong tầm tay.</em></h2><p>Từ thông tin khách thuê đến chỉ số điện.<br>Một nơi để bạn quản lý thật nhẹ nhàng.</p></div><img class="residence-art" src="{{ url_for('static', filename='images/residence.svg') }}" alt="" width="560" height="410"><div class="showcase-tags"><span>{{ icon('rooms') }} Phòng</span><span>{{ icon('users') }} Khách thuê</span><span>{{ icon('bolt') }} Điện năng</span></div></div>
   <div class="login-content"><div class="login-mobile-brand">{{ icon('building') }} CHDV Manager</div><div class="card login-card"><span class="login-symbol">{{ icon('lock') }}</span><p class="eyebrow">CHÀO MỪNG BẠN TRỞ LẠI</p><h1>Đăng nhập</h1><p class="muted">Tiếp tục quản lý không gian của bạn.</p>
-    <form method="post" class="stack">
+    <form method="post" class="stack d-grid">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-      <label>Tài khoản<input name="username" autocomplete="username" required maxlength="64" autofocus value="{{ request.form.get('username', '') }}"></label>
-      <label>Mật khẩu<input type="password" name="password" autocomplete="current-password" required maxlength="128"></label>
-      <button class="button primary full" type="submit">Đăng nhập {{ icon('arrow') }}</button>
+      <label>Tài khoản<input class="form-control" name="username" autocomplete="username" required maxlength="64" autofocus value="{{ request.form.get('username', '') }}"></label>
+      <label>Mật khẩu<input class="form-control" type="password" name="password" autocomplete="current-password" required maxlength="128"></label>
+      <button class="button primary full btn btn-primary w-100" type="submit">Đăng nhập {{ icon('arrow') }}</button>
     </form>
   </div><p class="login-security">{{ icon('shield') }} Chỉ dành cho quản trị viên được cấp tài khoản.</p></div>
 </section>

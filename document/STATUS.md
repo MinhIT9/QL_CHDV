@@ -1,6 +1,8 @@
 # Tiến độ thực tế
 
-Cập nhật: 2026-11-03 (Asia/Saigon). Phiên bản hội thoại: V1.1.24.
+Cập nhật: 2026-11-03 (Asia/Saigon). Phiên bản hội thoại: V1.2.0.
+
+V1.2.0: Bootstrap 5.3.8 CSS/bundle CDN có SRI; CSP cho phép jsDelivr. Chuyển nút/form/bảng/alert và tiện ích bố cục sang Bootstrap, bỏ CSS trùng. Sidebar bỏ animation lặp, khôi phục trạng thái lên html trước paint để tránh flash khi tải/chuyển HTMX. 47 test pass, Node syntax và 4 kiểm tra trạng thái trước paint pass. Chưa browser QA/CDN runtime; cần mạng cho Bootstrap. Không đổi DB/nghiệp vụ.
 
 V1.1.24: thêm animation CSS ngắn 140–240ms cho trang/card, sidebar lúc hiện, thông báo/popover và phản hồi hover/nhấn. Không transform nội dung chứa sticky table/form; tôn trọng prefers-reduced-motion. Chỉ CSS/cache asset, không đổi nghiệp vụ/JS/DB. Kiểm tra tài liệu/diff; chưa browser QA hoặc chạy lại test nghiệp vụ.
 

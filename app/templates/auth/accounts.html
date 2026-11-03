@@ -4,15 +4,15 @@
 <header class="page-header"><div><p class="eyebrow">QUẢN TRỊ HỆ THỐNG</p><h1>Tài khoản</h1><p class="muted">Chỉ root được tạo, khóa và đặt lại mật khẩu cho Admin.</p></div></header>
 <section class="card"><h2>Tạo tài khoản Admin</h2><form method="post" class="inline-form">
   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-  <label>Tài khoản<input name="username" required minlength="3" maxlength="64" autocomplete="off" placeholder="vd: quanly01"></label>
-  <label>Mật khẩu tạm<input name="password" type="password" required minlength="8" maxlength="128" autocomplete="new-password" placeholder="Ít nhất 8 ký tự"></label>
-  <button class="button primary" type="submit">+ Tạo Admin</button>
+  <label>Tài khoản<input class="form-control" name="username" required minlength="3" maxlength="64" autocomplete="off" placeholder="vd: quanly01"></label>
+  <label>Mật khẩu tạm<input class="form-control" name="password" type="password" required minlength="8" maxlength="128" autocomplete="new-password" placeholder="Ít nhất 8 ký tự"></label>
+  <button class="button primary btn btn-primary" type="submit">+ Tạo Admin</button>
 </form><p class="muted small">Gửi mật khẩu tạm trực tiếp cho người dùng. Lần đăng nhập đầu sẽ bắt buộc đổi mật khẩu.</p></section>
-<section class="card table-card"><div class="section-heading"><h2>Danh sách tài khoản</h2><span class="muted">{{ users|length }} tài khoản</span></div><div class="table-scroll"><table>
+<section class="card table-card"><div class="section-heading"><h2>Danh sách tài khoản</h2><span class="muted">{{ users|length }} tài khoản</span></div><div class="table-scroll"><table class="table table-striped table-hover align-middle mb-0">
   <thead><tr><th>Tài khoản</th><th>Quyền</th><th>Trạng thái</th><th>Mật khẩu</th><th>Thao tác</th></tr></thead>
   <tbody>{% for user in users %}<tr><td><strong>{{ user.username }}</strong></td><td>{{ 'Root' if user.is_root else 'Admin' }}</td><td><span class="badge {{ 'occupied' if user.enabled else 'inactive' }}">{{ 'Hoạt động' if user.enabled else 'Đã khóa' }}</span></td><td>{{ 'Cần đổi khi đăng nhập' if user.must_change_password else 'Đã đổi' }}</td><td>{% if not user.is_root %}
-    <div class="account-actions"><form action="{{ url_for('auth.toggle_account', user_id=user.id) }}" method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="button secondary small" type="submit">{{ 'Khóa' if user.enabled else 'Mở khóa' }}</button></form>
-    <details><summary>Đặt lại mật khẩu</summary><form action="{{ url_for('auth.reset_password', user_id=user.id) }}" method="post" class="reset-form"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><label>Mật khẩu tạm mới<input type="password" name="password" required minlength="8" maxlength="128" autocomplete="new-password"></label><button class="button secondary small" type="submit">Đặt lại</button></form></details></div>
+    <div class="account-actions d-flex align-items-center flex-wrap gap-3"><form action="{{ url_for('auth.toggle_account', user_id=user.id) }}" method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="button secondary small btn btn-outline-secondary btn-sm" type="submit">{{ 'Khóa' if user.enabled else 'Mở khóa' }}</button></form>
+    <details><summary>Đặt lại mật khẩu</summary><form action="{{ url_for('auth.reset_password', user_id=user.id) }}" method="post" class="reset-form"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><label>Mật khẩu tạm mới<input class="form-control" type="password" name="password" required minlength="8" maxlength="128" autocomplete="new-password"></label><button class="button secondary small btn btn-outline-secondary btn-sm" type="submit">Đặt lại</button></form></details></div>
   {% else %}<span class="muted">Tài khoản hệ thống</span>{% endif %}</td></tr>{% endfor %}</tbody>
 </table></div></section>
 {% endblock %}

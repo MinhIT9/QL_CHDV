@@ -28,7 +28,7 @@ const sidebarToggle = document.querySelector(".sidebar-toggle");
 if (sidebar && sidebarToggle && !sidebarToggle.dataset.bound) {
   sidebarToggle.dataset.bound = "true";
   const setSidebar = (collapsed) => {
-    document.body.classList.toggle("sidebar-collapsed", collapsed);
+    document.documentElement.classList.toggle("sidebar-collapsed", collapsed);
     sidebar.hidden = collapsed;
     sidebarToggle.setAttribute("aria-expanded", String(!collapsed));
     sidebarToggle.title = sidebarToggle.ariaLabel = collapsed ? "Hiện thanh điều hướng" : "Ẩn thanh điều hướng";

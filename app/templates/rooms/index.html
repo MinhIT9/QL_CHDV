@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
 {% block title %}Quản lý phòng · CHDV Manager{% endblock %}
 {% block content %}
-<header class="page-header"><div><p class="eyebrow">KHÔNG GIAN QUẢN LÝ</p><h1>Quản lý phòng</h1><p class="muted">Thông tin khách thuê và chỉ số điện trong một bảng.</p></div><div class="actions"><a class="button secondary" href="{{ url_for('electricity.index', period=period) }}">{{ icon('bolt') }} Nhập chỉ số điện</a><a class="button primary" href="{{ url_for('rooms.edit') }}">{{ icon('plus') }} Thêm phòng</a></div></header>
+<header class="page-header"><div><p class="eyebrow">KHÔNG GIAN QUẢN LÝ</p><h1>Quản lý phòng</h1><p class="muted">Thông tin khách thuê và chỉ số điện trong một bảng.</p></div><div class="actions d-flex gap-2 align-items-center flex-wrap"><a class="button secondary btn btn-outline-secondary" href="{{ url_for('electricity.index', period=period) }}">{{ icon('bolt') }} Nhập chỉ số điện</a><a class="button primary btn btn-primary" href="{{ url_for('rooms.edit') }}">{{ icon('plus') }} Thêm phòng</a></div></header>
 <div class="overview-strip" aria-label="Tóm tắt kết quả đang xem">
   <div class="overview-item"><span class="overview-icon">{{ icon('building') }}</span><div><small>Phòng trong kết quả</small><strong>{{ rooms|length }} <span>phòng</span></strong></div></div>
   <div class="overview-item"><span class="overview-icon">{{ icon('users') }}</span><div><small>Đang có khách thuê</small><strong>{{ rooms|selectattr('current_tenancy')|list|length }} <span>phòng</span></strong></div></div>
   <div class="overview-item"><span class="overview-icon">{{ icon('rooms') }}</span><div><small>Phòng trống đang dùng</small><strong>{{ rooms|selectattr('active')|rejectattr('current_tenancy')|list|length }} <span>phòng</span></strong></div></div>
   <div class="overview-item"><span class="overview-icon">{{ icon('bolt') }}</span><div><small>Điện đã chốt · {{ period }}</small><strong>{{ total_consumption }} <span>kWh</span></strong></div></div>
 </div>
-<section class="card table-card"><form class="toolbar" method="get"><label class="search">Tìm phòng / khách thuê<input type="search" name="q" value="{{ q }}" placeholder="Mã phòng hoặc tên khách…"></label><label>Kỳ xem{% include 'partials/period_select.html' %}</label>{% include 'rooms/table_filters.html' %}<button class="button secondary" type="submit">Xem</button></form>
+<section class="card table-card"><form class="toolbar" method="get"><label class="search">Tìm phòng / khách thuê<input class="form-control" type="search" name="q" value="{{ q }}" placeholder="Mã phòng hoặc tên khách…"></label><label>Kỳ xem{% include 'partials/period_select.html' %}</label>{% include 'rooms/table_filters.html' %}<button class="button secondary btn btn-outline-secondary" type="submit">Xem</button></form>
 {% include 'rooms/full_table.html' if full_view else 'rooms/compact_table.html' %}
 <div class="table-summary"><span>Kết quả: <strong>{{ rooms|length }} phòng</strong> · Đang thuê: <strong>{{ rooms|selectattr('current_tenancy')|list|length }}</strong> · Kỳ: <strong>{{ period }}</strong></span><span>Điện đã chốt: <strong class="blue">{{ total_consumption }} kWh</strong></span></div></section>
 {% endblock %}

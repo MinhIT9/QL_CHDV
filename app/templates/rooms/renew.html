@@ -2,17 +2,17 @@
 {% block title %}Gia hạn {{ room.code }} · CHDV Manager{% endblock %}
 {% block content %}
 <header class="page-header"><div><a class="back-link" href="{{ url_for('rooms.detail', room_id=room.id) }}">← Chi tiết phòng</a><h1>Gia hạn hợp đồng · {{ room.code }}</h1><p class="muted">{{ tenant.tenant_name }} · Hạn hiện tại: {{ tenant.contract_end|business_date }}</p></div></header>
-<section class="card narrow"><form method="post" class="stack">
+<section class="card narrow"><form method="post" class="stack d-grid">
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 <input type="hidden" name="tenancy_id" value="{{ values.get('tenancy_id', '') }}">
 <input type="hidden" name="tenancy_version" value="{{ values.get('tenancy_version', '') }}">
-<label>Gia hạn thêm (tháng)<input type="number" name="months" required min="1" max="120" step="1" value="{{ values.get('months', '1') }}" {{ 'readonly' if preview }}></label>
-<label>Ghi chú<textarea name="note" maxlength="1000" rows="3" {{ 'readonly' if preview }}>{{ values.get('note', '') }}</textarea></label>
+<label>Gia hạn thêm (tháng)<input class="form-control" type="number" name="months" required min="1" max="120" step="1" value="{{ values.get('months', '1') }}" {{ 'readonly' if preview }}></label>
+<label>Ghi chú<textarea class="form-control" name="note" maxlength="1000" rows="3" {{ 'readonly' if preview }}>{{ values.get('note', '') }}</textarea></label>
 {% if preview %}
 <div class="notice"><strong>{{ preview.old_end|business_date }} → {{ preview.new_end|business_date }}</strong><p>Gia hạn {{ preview.months }} tháng từ hạn cũ. Giữ nguyên khách, đơn giá và ngày đóng tiền.</p></div>
 <input type="hidden" name="expected_new_end" value="{{ preview.new_end.isoformat() }}">
 {% if preview.overdue %}<div class="alert warning">Hợp đồng đã quá hạn.{% if preview.new_end < today %} Hạn mới vẫn nằm trong quá khứ.{% endif %} Kiểm tra kỹ trước khi xác nhận.</div><label class="checkbox"><input type="checkbox" name="confirm_overdue" required> Tôi xác nhận gia hạn từ hạn cũ đến đúng hạn mới ở trên.</label>{% endif %}
-<div class="actions"><a class="button secondary" href="{{ url_for('rooms.renew', room_id=room.id) }}">Nhập lại</a><button class="button primary" type="submit" name="action" value="confirm">Xác nhận gia hạn</button></div>
-{% else %}<p class="notice">Cộng theo tháng lịch, giữ ngày neo của hạn gốc. Tháng thiếu ngày dùng ngày cuối tháng. Đợt thuê đã trả phòng không được gia hạn.</p><button class="button primary" type="submit" name="action" value="preview">Xem trước hạn mới</button>{% endif %}
+<div class="actions d-flex gap-2 align-items-center flex-wrap"><a class="button secondary btn btn-outline-secondary" href="{{ url_for('rooms.renew', room_id=room.id) }}">Nhập lại</a><button class="button primary btn btn-primary" type="submit" name="action" value="confirm">Xác nhận gia hạn</button></div>
+{% else %}<p class="notice">Cộng theo tháng lịch, giữ ngày neo của hạn gốc. Tháng thiếu ngày dùng ngày cuối tháng. Đợt thuê đã trả phòng không được gia hạn.</p><button class="button primary btn btn-primary" type="submit" name="action" value="preview">Xem trước hạn mới</button>{% endif %}
 </form></section>
 {% endblock %}

@@ -1,5 +1,11 @@
 # Quyết định và vấn đề cần chốt
 
+## 2026-11-03 — Bootstrap CDN và sidebar (V1.2.0)
+
+- Theo yêu cầu mới, dùng Bootstrap 5.3.8 CSS/bundle từ jsDelivr có SRI; thay quyết định trước đây về giao diện chỉ dùng tài nguyên nội bộ. CSP thêm origin CDN, không thêm unsafe-inline/eval.
+- Ưu tiên class Bootstrap, bỏ CSS tương đương; giữ CSS cho theme/sidebar/sticky và bố cục đặc thù. Chưa chuyển popup thu tiền native sang component Bootstrap.
+- Bỏ animation sidebar tự chạy; khôi phục trạng thái trên html bằng script head trước paint để HTMX swap body không gây nhấp nháy. Cần mạng cho Bootstrap; chưa browser QA sau chuyển đổi.
+
 ## 2026-11-03 — Thu tiền và bảng Phòng (V1.1.14)
 
 - Triển khai phân tích V1.1.13: tách chốt phiếu khỏi đã thu. Admin được xác nhận thu đủ; root hoàn tác có lý do/audit, không xóa receipt hoặc tự hoàn tiền.

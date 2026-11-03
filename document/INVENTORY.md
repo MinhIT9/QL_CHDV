@@ -40,6 +40,7 @@ app/static/images/favicon.svg
 app/static/images/residence.svg
 app/static/js/.gitkeep
 app/static/js/app.js
+app/static/js/sidebar-state.js
 app/static/vendor/.gitkeep
 app/static/vendor/HTMX-LICENSE.txt
 app/static/vendor/htmx.min.js
@@ -109,4 +110,4 @@ tests/test_v1.py
 wsgi.py
 ```
 
-Tổng: 100 file (bao gồm file danh mục này).
+Tổng: 101 file (bao gồm file danh mục này).

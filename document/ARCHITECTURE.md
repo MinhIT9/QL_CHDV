@@ -8,7 +8,7 @@ V1.1.11: electricity/routes.py lấy phiếu hiệu lực và max audit cho kỳ
 
 V1.1.10: đơn giá điện nằm trong Tenancy.electricity_price, được validate/lưu cùng giá phòng/nước, form chốt tiền lấy cùng nguồn điều khoản hiện tại. Không đổi cấu trúc snapshot MonthlyBill; sửa giá không cập nhật phiếu cũ. Dùng tenancy version đã có để chặn form cũ; chưa thêm engine lịch giá.
 
-Một project Flask trả HTML bằng Jinja2. CSS riêng theo thiết kế bảng; HTMX 2.0.4 tăng tốc điều hướng qua hx-boost, form POST vẫn thông thường. JS tính điện khi nhập, khóa ô khách theo trạng thái và chống bấm lặp. Chưa dùng Bootstrap/Alpine.
+Một project Flask trả HTML bằng Jinja2. Bootstrap 5.3.8 CSS/bundle JS qua jsDelivr CDN có SRI cung cấp nút/form/bảng/alert và tiện ích; CSS riêng giữ theme/sidebar/sticky/responsive đặc thù. HTMX 2.0.4 nội bộ tăng tốc điều hướng qua hx-boost, form POST vẫn thông thường. JS tính điện khi nhập, khóa ô khách theo trạng thái và chống bấm lặp. Chưa dùng Alpine. CSP cho phép jsDelivr ở style-src/script-src, không bật unsafe-inline/eval. Cần mạng để tải Bootstrap.
 
 Luồng: trình duyệt → blueprint → quyền/CSRF → service nghiệp vụ → SQLAlchemy → SQLite → redirect/HTML.
 

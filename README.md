@@ -19,7 +19,7 @@ Giá điện có trong thông tin phòng cùng tiền phòng/nước. Thay giá 
 - Phí nước/người và dịch vụ/phòng (cho phép 0); ngày vào/hợp đồng/trả phòng, lịch đóng tiền hằng tháng và gia hạn có lịch sử.
 - Ngày vào ở dùng chung Ngày bắt đầu hợp đồng. Có tiền cọc theo đợt thuê (cho phép 0), không cộng vào phí tháng; chưa quản lý thu/hoàn cọc.
 - Có tiền phòng/tháng theo đợt thuê; tổng dự tính phòng + nước + dịch vụ, chưa gồm điện và tiền cọc.
-- Giao diện V1.1.7: sidebar navy/mint, đăng nhập hai cột, SVG nội bộ, bảng sticky và form responsive. Xem [thiết kế giao diện](document/UI_DESIGN.md).
+- Giao diện: Bootstrap 5.3.8 qua CDN jsDelivr cho nút/form/bảng/thông báo, kết hợp theme navy/mint, SVG nội bộ và bảng sticky. Cần mạng để tải Bootstrap. Xem [thiết kế giao diện](document/UI_DESIGN.md).
 - Sửa điện có lịch sử/ảnh hưởng kỳ sau; menu Chốt tiền lưu giá, số người và điện riêng từng tháng. Root hủy phiếu có lý do và giữ bản cũ khi cần lập lại.
 
 ## Chạy local trên Windows

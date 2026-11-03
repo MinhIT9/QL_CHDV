@@ -4,9 +4,9 @@ Cập nhật: 2026-11-03 (Asia/Saigon).
 
 ## Phiên bản hội thoại
 
-- Phiên bản phản hồi gần nhất: V1.1.24.
-- Nội dung: Thêm animation nhẹ bằng CSS và phản hồi tương tác, hỗ trợ giảm chuyển động.
-- Phản hồi tiếp theo tối thiểu V1.1.25; có thể tăng minor/major theo quy tắc mới trong AGENTS.md. V1.1.13 là lượt phân tích không sửa file theo yêu cầu người dùng.
+- Phiên bản phản hồi gần nhất: V1.2.0.
+- Nội dung: Bootstrap CDN, giảm CSS riêng và sửa sidebar nhấp nháy.
+- Phản hồi tiếp theo tối thiểu V1.2.1; có thể tăng minor/major theo quy tắc mới trong AGENTS.md.
 - Quy tắc đầy đủ ở AGENTS.md, mục “Phiên bản ở cuối phản hồi”.
 
 ## Đã làm
@@ -31,6 +31,8 @@ Cập nhật: 2026-11-03 (Asia/Saigon).
 - Chỉ chốt tiền một đợt thuê xác định đủ tháng; thiếu điện, ngày không rõ, vào/trả giữa tháng hoặc đổi khách cùng kỳ bị chặn. Không có engine lịch giá tự động: giá trên form là gợi ý, Admin xác nhận cho từng kỳ.
 
 ## Kiểm tra
+
+- V1.2.0: 47 unittest pass; Node syntax và 4 kiểm tra sidebar true/false/không lưu/storage bị chặn pass. Bootstrap CDN 5.3.8 có SRI/CSP; chưa browser QA/CDN runtime. Bước tiếp kiểm tra trực quan form/bảng/login và HTMX khi sidebar ẩn. Sidebar state lên html trước paint; bỏ animation sidebar. Không migration. Ưu tiên Bootstrap cho các thay đổi tiếp theo.
 
 - V1.1.24: chỉ CSS/cache asset, kiểm tra tài liệu/diff; không chạy lại suite nghiệp vụ, chưa browser QA. Animation opacity cho surface/popover, slide nhẹ lúc sidebar hiện, hover/nhấn; không có hiệu ứng thoát khi sidebar ẩn. Không thêm JS/thư viện. Bước tiếp: kiểm tra chuyển trang HTMX, sticky table, popover và chế độ giảm chuyển động trên browser.
 
