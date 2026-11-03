@@ -68,6 +68,8 @@ app/templates/rooms/index.html
 app/templates/rooms/remove.html
 app/templates/rooms/renew.html
 app/templates/rooms/table_filters.html
+app/templates/rooms/vehicle_cell.html
+app/templates/rooms/water_cell.html
 backups/.gitkeep
 document/ARCHITECTURE.md
 document/BILLING_CORRECTIONS_PROPOSAL.md
@@ -107,4 +109,4 @@ tests/test_v1.py
 wsgi.py
 ```
 
-Tổng: 98 file (bao gồm file danh mục này).
+Tổng: 100 file (bao gồm file danh mục này).

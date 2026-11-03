@@ -23,6 +23,24 @@ window.addEventListener("resize", repositionPaymentPanels);
 window.addEventListener("scroll", repositionPaymentPanels, true);
 
 function enhancePage() {
+const sidebar = document.querySelector("#sidebar");
+const sidebarToggle = document.querySelector(".sidebar-toggle");
+if (sidebar && sidebarToggle && !sidebarToggle.dataset.bound) {
+  sidebarToggle.dataset.bound = "true";
+  const setSidebar = (collapsed) => {
+    document.body.classList.toggle("sidebar-collapsed", collapsed);
+    sidebar.hidden = collapsed;
+    sidebarToggle.setAttribute("aria-expanded", String(!collapsed));
+    sidebarToggle.title = sidebarToggle.ariaLabel = collapsed ? "Hiện thanh điều hướng" : "Ẩn thanh điều hướng";
+  };
+  try { setSidebar(localStorage.getItem("chdv-sidebar-collapsed") === "true"); } catch { setSidebar(false); }
+  sidebarToggle.addEventListener("click", () => {
+    const collapsed = !sidebar.hidden;
+    setSidebar(collapsed);
+    try { localStorage.setItem("chdv-sidebar-collapsed", String(collapsed)); } catch { /* Storage may be disabled. */ }
+    repositionPaymentPanels();
+  });
+}
 document.querySelectorAll(".payment-panel[popover]:not([data-bound])").forEach((panel) => {
   panel.dataset.bound = "true";
   panel.addEventListener("beforetoggle", (event) => {

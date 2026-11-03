@@ -2,6 +2,10 @@
 
 ## 2026-11-03
 
+- V1.1.20: tách tiền nước/dịch vụ trong chi tiết; bảng phòng thêm số xe/biển số từng dòng, tiền nước tổng theo người, tiền dịch vụ riêng; căn chỉnh số tiền/nhãn xe/dòng bảng. Giữ nguyên phiếu đã chốt.
+
+- V1.1.19: nút ẩn/hiện sidebar và nhớ lựa chọn trên trình duyệt; header tên trang/tài khoản, footer gọn đồng bộ. Không đổi nghiệp vụ.
+
 - V1.1.18: thay bộ chọn month theo ngôn ngữ trình duyệt bằng danh sách Tháng/Năm tiếng Việt dùng chung cho Phòng, Điện và Chốt tiền; giữ YYYY-MM.
 
 - V1.1.17: gom trạng thái/Thông tin thu/Lịch sử thu cùng hàng; bỏ nhãn Đã chốt tiền lặp, giữ Quá hạn; gộp phòng/khách và giảm padding bảng tiền. Chỉ sửa template/CSS.

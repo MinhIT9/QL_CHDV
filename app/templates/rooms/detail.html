@@ -15,7 +15,8 @@
 <div><dt>Phí dịch vụ/phòng</dt><dd>{{ tenant.service_price|vnd }} / tháng</dd></div>
 <div><dt>Tiền phòng</dt><dd>{{ tenant.rent_price|vnd }} / tháng</dd></div>
 <div><dt>Tiền cọc</dt><dd>{{ tenant.deposit_amount|vnd }}<small>Theo đợt thuê; chưa xác nhận thực thu hoặc hoàn cọc.</small></dd></div>
-<div><dt>Nước + dịch vụ</dt><dd>{{ tenant.monthly_fees|vnd }}<small>Dự tính tháng đủ theo {{ tenant.people_count }} người hiện tại; chưa chia ngày, chưa gồm tiền thuê/điện.</small></dd></div>
+<div><dt>Tiền nước/tháng</dt><dd>{% include 'rooms/water_cell.html' %}</dd></div>
+<div><dt>Tiền dịch vụ/tháng</dt><dd>{{ tenant.service_price|vnd }}<small>Dự tính tháng đủ cho một phòng; chưa chia ngày.</small></dd></div>
 <div class="financial-summary"><dt>Tổng dự tính/tháng</dt><dd>{{ tenant.monthly_total|vnd }}<small>Tiền phòng + nước + dịch vụ. Chưa gồm điện, không cộng tiền cọc; chưa chia ngày hoặc xác nhận thực thu.</small></dd></div>
 </dl></div></section>
 {% endif %}

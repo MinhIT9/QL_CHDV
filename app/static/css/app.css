@@ -167,7 +167,16 @@ td small { max-width: 185px; font-size: 10px; line-height: 1.6; }
 tbody tr:last-child td { border-bottom: 0; }
 tbody tr:hover > td { background: #f7faff; }
 .room-table { min-width: 2080px; }
-.compact-room-table { min-width: 1100px; }
+.compact-room-table { min-width: 1550px; }
+.room-table th { white-space: nowrap; }
+.room-table td { vertical-align: middle; }
+.room-table tbody tr:nth-child(even) > td { background: #fafcfe; }
+.room-table tbody tr:hover > td { background: #eff7f7; }
+.room-table .fee-cell { color: #365b68; }
+.room-table .fee-cell small { margin-left: auto; color: #8b99a8; white-space: nowrap; }
+.vehicle-list { display: grid; justify-items: start; gap: 5px; padding: 3px 0; }
+.vehicle-count { font-size: 10px; color: #658292; font-weight: 650; }
+.vehicle-plate { display: block; white-space: nowrap; font-variant-numeric: tabular-nums; font-size: 11px; letter-spacing: .3px; padding: 3px 7px; border: 1px solid #dfe8ee; background: white; border-radius: 5px; }
 .billing-table { min-width: 1150px; }
 .billing-table td { padding-top: 14px; padding-bottom: 14px; }
 .billing-table td:nth-child(2), .billing-table td:nth-child(3), .billing-table td:nth-child(4), .billing-table td:nth-child(6), .billing-table td:nth-child(7) { white-space: nowrap; }
@@ -416,6 +425,29 @@ footer { display: flex; justify-content: space-between; align-items: center; gap
   .login-card h1 { font-size: 30px; }
   .login-card .eyebrow { font-size: 8px !important; }
   .guest footer { padding: 0 17px; }
+}
+/* Collapsible navigation and compact workspace chrome. */
+.sidebar-collapsed .main { margin-left: 0; }
+.workspace-bar { min-height: 80px; margin-bottom: 30px; gap: 16px; }
+.workspace-bar > div { gap: 14px; min-width: 0; }
+.sidebar-toggle { display: grid; place-items: center; width: 40px; height: 40px; flex-shrink: 0; border: 1px solid #dce5ed; border-radius: 11px; background: white; cursor: pointer; box-shadow: 0 2px 5px #102a3605; }
+.sidebar-toggle:hover { background: #edf6f3; border-color: #a9cfc3; }
+.workspace-bar .sidebar-toggle .icon { width: 19px; height: 19px; color: #365c62; }
+.workspace-heading { display: grid; gap: 5px; }
+.workspace-heading .workspace-label { font-size: 8px; letter-spacing: 1.5px; font-weight: 650; }
+.workspace-heading strong { font-size: 13px; color: var(--ink); font-weight: 600; }
+.workspace-account { display: grid; gap: 4px; text-align: right; }
+.workspace-account strong { font-size: 12px; font-weight: 650; }
+.workspace-account > span { font-size: 10px; color: var(--muted); }
+.workspace-user .mini-avatar { width: 35px; height: 35px; margin-left: 5px; border: 3px solid white; box-shadow: 0 0 0 1px #dce9e4; }
+.workspace-footer { padding: 20px 0 0; margin-top: 32px; color: #8b99a8; }
+.workspace-footer .footer-brand { display: inline-flex; align-items: center; gap: 8px; color: #60768a; font-size: 11px; font-weight: 600; }
+.workspace-footer .footer-brand > .icon { width: 17px; height: 17px; color: #679f92; }
+@media (max-width: 680px) {
+  .workspace-bar { min-height: 72px; margin-bottom: 23px; }
+  .workspace-heading strong { font-size: 12px; }
+  .workspace-account > span { display: none; }
+  .workspace-user .mini-avatar { width: 30px; height: 30px; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }

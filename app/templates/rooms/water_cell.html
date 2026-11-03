@@ -1,0 +1,1 @@
+{% if tenant %}{{ (tenant.water_price * tenant.people_count if tenant.water_price is not none else none)|vnd }}<small>{{ tenant.people_count }} người × {{ tenant.water_price|vnd }}</small>{% else %}—{% endif %}

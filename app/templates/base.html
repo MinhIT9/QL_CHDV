@@ -7,15 +7,15 @@
   <title>{% block title %}CHDV Manager{% endblock %}</title>
   <meta name="theme-color" content="#102a36">
   <link rel="icon" href="{{ url_for('static', filename='images/favicon.svg') }}" type="image/svg+xml">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css', v='1.1.18') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css', v='1.1.20') }}">
   <meta name="htmx-config" content='{"allowEval":false,"allowScriptTags":false,"historyCacheSize":0}'>
   <script src="{{ url_for('static', filename='vendor/htmx.min.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='js/app.js', v='1.1.15') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/app.js', v='1.1.19') }}" defer></script>
 </head>
 <body class="{% if not current_user.is_authenticated %}guest{% endif %}" hx-boost="true">
 <a class="skip-link" href="#main" hx-boost="false">Đến nội dung chính</a>
 {% if current_user.is_authenticated %}
-<aside class="sidebar">
+<aside class="sidebar" id="sidebar">
   <a class="brand" href="{{ url_for('rooms.index') }}"><span class="brand-icon">{{ icon('building') }}</span><span>CHDV<span class="brand-light"> Manager</span><small>KHÔNG GIAN QUẢN LÝ</small></span></a>
   <p class="nav-caption">KHÔNG GIAN LÀM VIỆC</p>
   <nav aria-label="Điều hướng chính">
@@ -32,12 +32,12 @@
 </aside>
 {% endif %}
 <main id="main" class="main">
-  {% if current_user.is_authenticated %}<div class="workspace-bar"><div><span class="workspace-label">Không gian làm việc</span>{{ icon('chevron') }}<strong>{{ 'Chỉ số điện' if request.blueprint == 'electricity' or request.endpoint == 'billing.correct' else 'Chốt tiền' if request.blueprint == 'billing' else 'Tài khoản' if request.blueprint == 'auth' else 'Quản lý phòng' }}</strong></div><span class="workspace-user">{{ icon('shield') }} {{ 'Root' if current_user.is_root else 'Admin' }} <span class="mini-avatar">{{ current_user.username[0]|upper }}</span></span></div>{% endif %}
+  {% if current_user.is_authenticated %}<header class="workspace-bar"><div><button type="button" class="sidebar-toggle" aria-controls="sidebar" aria-expanded="true" aria-label="Ẩn thanh điều hướng" title="Ẩn thanh điều hướng">{{ icon('menu') }}</button><div class="workspace-heading"><span class="workspace-label">CHDV MANAGER</span><strong>{{ 'Chỉ số điện' if request.blueprint == 'electricity' or request.endpoint == 'billing.correct' else 'Chốt tiền' if request.blueprint == 'billing' else 'Tài khoản' if request.blueprint == 'auth' else 'Quản lý phòng' }}</strong></div></div><span class="workspace-user"><span class="workspace-account"><strong>{{ current_user.username }}</strong><span>{{ 'Quản trị hệ thống' if current_user.is_root else 'Quản lý phòng' }}</span></span><span class="mini-avatar">{{ current_user.username[0]|upper }}</span></span></header>{% endif %}
   {% with messages = get_flashed_messages(with_categories=true) %}
   <div class="messages" aria-live="polite">{% for category, message in messages %}<div class="alert {{ category }}">{{ message }}</div>{% endfor %}</div>
   {% endwith %}
   {% block content %}{% endblock %}
-  <footer><span class="footer-brand">CHDV Manager <span class="edition">BASIC</span></span><span>Quản lý gọn gàng. An tâm mỗi ngày.</span></footer>
+  <footer class="workspace-footer"><span class="footer-brand">{{ icon('building') }} CHDV Manager <span class="edition">BASIC</span></span><span>Quản lý phòng · Điện · Thu tiền</span></footer>
 </main>
 </body>
 </html>

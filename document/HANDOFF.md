@@ -4,9 +4,9 @@ Cập nhật: 2026-11-03 (Asia/Saigon).
 
 ## Phiên bản hội thoại
 
-- Phiên bản phản hồi gần nhất: V1.1.18.
-- Nội dung: Việt hóa chọn kỳ tháng tại Phòng/Điện/Chốt tiền bằng select dùng chung.
-- Phản hồi tiếp theo dùng V1.1.19. V1.1.13 là lượt phân tích không sửa file theo yêu cầu người dùng.
+- Phiên bản phản hồi gần nhất: V1.1.20.
+- Nội dung: Tách nước/dịch vụ, thêm số xe/biển số từng dòng và căn chỉnh bảng phòng.
+- Phản hồi tiếp theo dùng V1.1.21. V1.1.13 là lượt phân tích không sửa file theo yêu cầu người dùng.
 - Quy tắc đầy đủ ở AGENTS.md, mục “Phiên bản ở cuối phản hồi”.
 
 ## Đã làm
@@ -31,6 +31,10 @@ Cập nhật: 2026-11-03 (Asia/Saigon).
 - Chỉ chốt tiền một đợt thuê xác định đủ tháng; thiếu điện, ngày không rõ, vào/trả giữa tháng hoặc đổi khách cùng kỳ bị chặn. Không có engine lịch giá tự động: giá trên form là gợi ý, Admin xác nhận cho từng kỳ.
 
 ## Kiểm tra
+
+- V1.1.20: 5 test_receipts và smoke render bảng gọn/đầy đủ/chi tiết pass với DB tạm: 2 xe, nước 2 × 100.000 = 200.000, dịch vụ 150.000. Partial water_cell giữ NULL là chưa có giá, 0 là miễn phí; vehicle_cell dùng chung hai bảng. Không đổi schema/backend/phiếu cũ. Chưa browser QA; bước tiếp kiểm tra bảng nhiều xe, cuộn ngang/mobile và căn cột thực tế.
+
+- V1.1.19: Node syntax và 10 test_billing pass. Sidebar dùng hidden/aria-expanded, localStorage có try/catch, bind trong enhancePage hỗ trợ HTMX. Không đổi DB/backend. Chưa browser QA; bước tiếp: kiểm tra ẩn/mở, điều hướng HTMX/reload, bàn phím/mobile và popover sau đổi độ rộng.
 
 - V1.1.18: thay input month native (lấy ngôn ngữ browser) bằng partial period_select.html hiển thị Tháng x / năm, nhóm Năm. Giữ name period/value YYYY-MM/nút Xem; không cần JS, không đổi backend/DB. Danh sách quanh năm đang chọn +/-3; chọn năm mới rồi Xem để dịch cửa sổ. Kiểm tra test_billing và render ba màn; chưa browser screenshot cho thay đổi này.
 
