@@ -1,6 +1,10 @@
 # Tiến độ thực tế
 
-Cập nhật: 2026-11-03 (Asia/Saigon). Phiên bản hội thoại: V1.1.15.
+Cập nhật: 2026-11-03 (Asia/Saigon). Phiên bản hội thoại: V1.1.17.
+
+V1.1.17 chỉ làm gọn dòng bảng tiền, trạng thái và nút nằm ngang, giữ cảnh báo quá hạn/popover. Không đổi nghiệp vụ/DB; kiểm tra render/luồng billing và receipts, chưa browser QA cho chỉnh sửa này.
+
+V1.1.16 chỉ hướng dẫn sử dụng chuyển kỳ điện, không sửa app/DB, không chạy lại test. Chọn tháng cần bấm Xem kỳ; đầu kỳ lấy cuối tháng trước, chỉ lưu kỳ không ở tương lai.
 
 V1.1.15 sửa UI menu thu tiền/history thành popover nổi không giãn dòng bảng. 5 test receipt pass và kiểm tra Edge row height128px trước/sau; không đổi nghiệp vụ/DB. Bộ46 test phía dưới là kết quả lượt triển khai trước.
 

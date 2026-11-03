@@ -4,9 +4,9 @@ Cập nhật: 2026-11-03 (Asia/Saigon).
 
 ## Phiên bản hội thoại
 
-- Phiên bản phản hồi gần nhất: V1.1.15.
-- Nội dung: sửa dropdown thu tiền/history làm giãn bảng, chuyển sang popover nổi tự định vị.
-- Phản hồi tiếp theo dùng V1.1.16. V1.1.13 là lượt phân tích không sửa file theo yêu cầu người dùng.
+- Phiên bản phản hồi gần nhất: V1.1.17.
+- Nội dung: giảm xuống dòng bảng tiền, gom trạng thái/nút cùng hàng, rút gọn phòng/khách; giữ popover và nghiệp vụ.
+- Phản hồi tiếp theo dùng V1.1.18. V1.1.13 là lượt phân tích không sửa file theo yêu cầu người dùng.
 - Quy tắc đầy đủ ở AGENTS.md, mục “Phiên bản ở cuối phản hồi”.
 
 ## Đã làm
@@ -31,6 +31,8 @@ Cập nhật: 2026-11-03 (Asia/Saigon).
 - Chỉ chốt tiền một đợt thuê xác định đủ tháng; thiếu điện, ngày không rõ, vào/trả giữa tháng hoặc đổi khách cùng kỳ bị chặn. Không có engine lịch giá tự động: giá trên form là gợi ý, Admin xác nhận cho từng kỳ.
 
 ## Kiểm tra
+
+- V1.1.17: thay template/CSS, gom badge và nút trong flex một hàng, bỏ nhãn Đã chốt tiền lặp (vẫn giữ Quá hạn), phòng/khách cùng dòng, giảm padding. Kiểm tra test_receipts và test_billing, không đổi DB/route hoặc thêm test mới cho thay đổi trình bày. Chưa chụp browser cho bố cục gọn này.
 
 - V1.1.15: 5 test_receipts pass, node syntax pass. Edge headless trên HTML fixture/DB tạm xác nhận row height trước/sau mở =128px, popover hiện và nằm trong viewport đo; đã xem screenshot instance/payment-layout.png. Không sửa backend/schema/DB; không chạy lại toàn bộ suite cho thay đổi UI này.
 - Payment menu/history dùng native Popover API top layer thay details nằm trong ô bảng; CSS fixed, max-height theo viewport, scroll nội bộ. JS neo theo nút, tránh mép, đổi vị trí khi resize/scroll/mở mục hủy. Escape/click ngoài/nút đóng do native popover xử lý. Cần browser hiện đại hỗ trợ Popover API.

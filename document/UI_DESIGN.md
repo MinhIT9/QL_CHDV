@@ -1,5 +1,7 @@
 # Giao diện V1.1.7
 
+V1.1.17: billing-table gọn hơn; bill-payment flex ngang không wrap, popover vẫn top layer, không đổi thao tác. Tên phòng/khách cùng dòng, mã phiếu/ngày ở dòng phụ. Giữ điện hai dòng để đọc chỉ số và phép tính; bảng cuộn ngang trên màn hẹp thay vì ép nút xuống nhiều hàng.
+
 V1.1.15 thay dropdown details/summary ở ô bảng bằng button popovertarget + panel popover=auto trong top layer. Panel fixed, giới hạn chiều rộng/cao theo màn hình, cuộn nội bộ; JS neo nút và chọn phía đủ chỗ, cập nhật resize/scroll/nested details. Không tăng chiều cao row hoặc bị table-scroll cắt. Mục hủy bên trong vẫn dùng details. Edge fixture đã kiểm tra128px trước/sau mở; yêu cầu browser hiện đại có Popover API. Ảnh QA: instance/payment-layout.png (dữ liệu giả, ngoài Git).
 
 V1.1.14: dropdown Thu tiền dùng details/summary, có form xác nhận ngày/số tiền và root hoàn tác. Nhóm đã thu có nền nhạt và tự xuống dưới sau POST. Bảng Phòng mặc định 10 cột gọn, view đầy đủ giữ 18 cột cũ; select lọc thu theo kỳ. Mã phòng giữ ổn định, tiền kỳ/hạn lấy từ phiếu chốt, ghi khách trên phiếu khi khác khách hiện tại. Chưa browser E2E cho UI này.

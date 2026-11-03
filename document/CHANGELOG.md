@@ -2,6 +2,10 @@
 
 ## 2026-11-03
 
+- V1.1.17: gom trạng thái/Thông tin thu/Lịch sử thu cùng hàng; bỏ nhãn Đã chốt tiền lặp, giữ Quá hạn; gộp phòng/khách và giảm padding bảng tiền. Chỉ sửa template/CSS.
+
+- V1.1.16: giải thích chọn tháng rồi bấm Xem kỳ, đầu kỳ tự nối cuối kỳ trước và giới hạn chặn lưu tháng tương lai; không đổi chức năng.
+
 - V1.1.15: sửa dropdown thu tiền/history kéo cao dòng và xô cột. Native popover top layer + fixed/JS tự neo, tránh clipping/vượt viewport; Escape/click ngoài/nút đóng. Giữ chức năng thu/hoàn tác/hủy.
 - 5 test receipt pass, Node syntax pass; Edge fixture xác nhận dòng128px trước/sau mở, đã xem ảnh. Không thay database.
 
