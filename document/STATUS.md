@@ -1,6 +1,8 @@
 # Tiến độ thực tế
 
-Cập nhật: 2026-11-03 (Asia/Saigon). Phiên bản hội thoại: V1.1.11.
+Cập nhật: 2026-11-03 (Asia/Saigon). Phiên bản hội thoại: V1.1.12.
+
+V1.1.12 chỉ chỉnh layout chốt tiền full-width và preview hai cột desktop; không đổi nghiệp vụ/DB. Kiểm tra render module billing, chưa browser QA cho layout mới.
 
 Đã triển khai sửa điện có audit và chốt tiền từng kỳ theo phương án gọn: phòng/điện cùng tháng, không thực thu/công nợ/chia ngày.
 

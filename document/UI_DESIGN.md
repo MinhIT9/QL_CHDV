@@ -1,5 +1,7 @@
 # Giao diện V1.1.7
 
+V1.1.12: form chốt tiền có bill-card full-width thay vì max1000px. Từ1200px input và preview đặt cạnh nhau; chưa preview dùng3 cột input. Dưới breakpoint giữ luồng dọc, form mobile một cột. Các form phòng/đổi mật khẩu vẫn giữ giới hạn riêng.
+
 Yêu cầu: nâng cấp hình thức, giữ nguyên chức năng. Không có migration, thay đổi route/service/model hoặc thêm tính năng nghiệp vụ trong đợt này.
 
 ## Định hướng

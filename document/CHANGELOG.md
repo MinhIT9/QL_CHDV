@@ -2,6 +2,8 @@
 
 ## 2026-11-03
 
+- V1.1.12: bỏ giới hạn1000px riêng form chốt tiền; dùng chiều ngang còn lại, desktop chia input/preview hai cột, mobile xếp dọc. Không đổi chức năng.
+
 - V1.1.11: thêm ngày giờ chốt, cập nhật lần cuối nếu có revision, đơn giá và tiền điện trong bảng. Nhập chỉ số tự hiện tiền/draft total, xử lý 0 và thiếu giá.
 - Snapshot giá khi lưu điện mới; kỳ đã chốt tiền ưu tiên giá phiếu, legacy chưa có giá được ghi rõ tạm tính. Migration d94f512a37b1 đã backup/upgrade; 41 test và Node smoke test pass.
 

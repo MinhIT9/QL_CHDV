@@ -4,9 +4,9 @@ Cập nhật: 2026-11-03 (Asia/Saigon).
 
 ## Phiên bản hội thoại
 
-- Phiên bản phản hồi gần nhất: V1.1.11.
-- Nội dung: ngày giờ chốt/sửa gần nhất và tiền điện tự tính ngay trên bảng điện.
-- Phản hồi tiếp theo dùng V1.1.12. Tăng số cuối sau mỗi final; đây không phải phiên bản phát hành.
+- Phiên bản phản hồi gần nhất: V1.1.12.
+- Nội dung: sửa khoảng trống trang chốt tiền, dùng hết chiều ngang và preview hai cột trên desktop.
+- Phản hồi tiếp theo dùng V1.1.13. Tăng số cuối sau mỗi final; đây không phải phiên bản phát hành.
 - Quy tắc đầy đủ ở AGENTS.md, mục “Phiên bản ở cuối phản hồi”.
 
 ## Đã làm
@@ -31,6 +31,8 @@ Cập nhật: 2026-11-03 (Asia/Saigon).
 - Chỉ chốt tiền một đợt thuê xác định đủ tháng; thiếu điện, ngày không rõ, vào/trả giữa tháng hoặc đổi khách cùng kỳ bị chặn. Không có engine lịch giá tự động: giá trên form là gợi ý, Admin xác nhận cho từng kỳ.
 
 ## Kiểm tra
+
+- V1.1.12: chỉnh template/CSS trang chốt tiền, bỏ max-width 1000px riêng trang này; desktop từ1200px đặt input/preview cạnh nhau, trước preview 3 cột input; mobile giữ một luồng dọc. Không đổi nghiệp vụ/DB. Kiểm tra render qua test_billing.py; chưa chụp browser cho thay đổi bố cục này.
 
 - V1.1.11: 41 unittest pass, kiểm tra thời điểm sửa từ revision, số tiền sau sửa/chốt phiếu, snapshot đơn giá và giá 0. Node smoke test live tiền 445 kWh × 4.000 = 1.780.000 đ, thiếu/0 giá, số sai; node syntax pass. Migration d94f512a37b1 đã backup/upgrade local (backups/pre-reading-dates-money-*.sqlite3), db check khớp. Chưa browser E2E cho bảng mới.
 
