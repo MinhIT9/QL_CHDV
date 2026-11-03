@@ -4,9 +4,9 @@ Cập nhật: 2026-11-03 (Asia/Saigon).
 
 ## Phiên bản hội thoại
 
-- Phiên bản phản hồi gần nhất: V1.1.17.
-- Nội dung: giảm xuống dòng bảng tiền, gom trạng thái/nút cùng hàng, rút gọn phòng/khách; giữ popover và nghiệp vụ.
-- Phản hồi tiếp theo dùng V1.1.18. V1.1.13 là lượt phân tích không sửa file theo yêu cầu người dùng.
+- Phiên bản phản hồi gần nhất: V1.1.18.
+- Nội dung: Việt hóa chọn kỳ tháng tại Phòng/Điện/Chốt tiền bằng select dùng chung.
+- Phản hồi tiếp theo dùng V1.1.19. V1.1.13 là lượt phân tích không sửa file theo yêu cầu người dùng.
 - Quy tắc đầy đủ ở AGENTS.md, mục “Phiên bản ở cuối phản hồi”.
 
 ## Đã làm
@@ -31,6 +31,8 @@ Cập nhật: 2026-11-03 (Asia/Saigon).
 - Chỉ chốt tiền một đợt thuê xác định đủ tháng; thiếu điện, ngày không rõ, vào/trả giữa tháng hoặc đổi khách cùng kỳ bị chặn. Không có engine lịch giá tự động: giá trên form là gợi ý, Admin xác nhận cho từng kỳ.
 
 ## Kiểm tra
+
+- V1.1.18: thay input month native (lấy ngôn ngữ browser) bằng partial period_select.html hiển thị Tháng x / năm, nhóm Năm. Giữ name period/value YYYY-MM/nút Xem; không cần JS, không đổi backend/DB. Danh sách quanh năm đang chọn +/-3; chọn năm mới rồi Xem để dịch cửa sổ. Kiểm tra test_billing và render ba màn; chưa browser screenshot cho thay đổi này.
 
 - V1.1.17: thay template/CSS, gom badge và nút trong flex một hàng, bỏ nhãn Đã chốt tiền lặp (vẫn giữ Quá hạn), phòng/khách cùng dòng, giảm padding. Kiểm tra test_receipts và test_billing, không đổi DB/route hoặc thêm test mới cho thay đổi trình bày. Chưa chụp browser cho bố cục gọn này.
 

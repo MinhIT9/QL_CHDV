@@ -58,6 +58,7 @@ app/templates/electricity/reading_meta.html
 app/templates/error.html
 app/templates/partials/.gitkeep
 app/templates/partials/icons.html
+app/templates/partials/period_select.html
 app/templates/rooms/.gitkeep
 app/templates/rooms/compact_table.html
 app/templates/rooms/detail.html
@@ -106,4 +107,4 @@ tests/test_v1.py
 wsgi.py
 ```
 
-Tổng: 97 file (bao gồm file danh mục này).
+Tổng: 98 file (bao gồm file danh mục này).

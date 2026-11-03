@@ -1,6 +1,8 @@
 # Tiến độ thực tế
 
-Cập nhật: 2026-11-03 (Asia/Saigon). Phiên bản hội thoại: V1.1.17.
+Cập nhật: 2026-11-03 (Asia/Saigon). Phiên bản hội thoại: V1.1.18.
+
+V1.1.18 Việt hóa chọn kỳ tháng tại ba màn hình bằng select Tháng/Năm, giữ dữ liệu YYYY-MM và nút Xem. Chỉ thay template/CSS, không DB/route.
 
 V1.1.17 chỉ làm gọn dòng bảng tiền, trạng thái và nút nằm ngang, giữ cảnh báo quá hạn/popover. Không đổi nghiệp vụ/DB; kiểm tra render/luồng billing và receipts, chưa browser QA cho chỉnh sửa này.
 

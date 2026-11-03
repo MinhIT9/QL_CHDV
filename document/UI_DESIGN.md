@@ -1,5 +1,7 @@
 # Giao diện V1.1.7
 
+V1.1.18: chọn kỳ tháng dùng partial period_select.html với nhãn Tháng x / năm và optgroup Năm, thay input month có popup phụ thuộc ngôn ngữ browser. Giữ một select name period, value YYYY-MM, +/-3 năm quanh năm chọn; chọn kỳ rồi bấm Xem như trước. Không dùng JS hoặc dependency mới.
+
 V1.1.17: billing-table gọn hơn; bill-payment flex ngang không wrap, popover vẫn top layer, không đổi thao tác. Tên phòng/khách cùng dòng, mã phiếu/ngày ở dòng phụ. Giữ điện hai dòng để đọc chỉ số và phép tính; bảng cuộn ngang trên màn hẹp thay vì ép nút xuống nhiều hàng.
 
 V1.1.15 thay dropdown details/summary ở ô bảng bằng button popovertarget + panel popover=auto trong top layer. Panel fixed, giới hạn chiều rộng/cao theo màn hình, cuộn nội bộ; JS neo nút và chọn phía đủ chỗ, cập nhật resize/scroll/nested details. Không tăng chiều cao row hoặc bị table-scroll cắt. Mục hủy bên trong vẫn dùng details. Edge fixture đã kiểm tra128px trước/sau mở; yêu cầu browser hiện đại có Popover API. Ảnh QA: instance/payment-layout.png (dữ liệu giả, ngoài Git).

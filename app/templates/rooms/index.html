@@ -8,7 +8,7 @@
   <div class="overview-item"><span class="overview-icon">{{ icon('rooms') }}</span><div><small>Phòng trống đang dùng</small><strong>{{ rooms|selectattr('active')|rejectattr('current_tenancy')|list|length }} <span>phòng</span></strong></div></div>
   <div class="overview-item"><span class="overview-icon">{{ icon('bolt') }}</span><div><small>Điện đã chốt · {{ period }}</small><strong>{{ total_consumption }} <span>kWh</span></strong></div></div>
 </div>
-<section class="card table-card"><form class="toolbar" method="get"><label class="search">Tìm phòng / khách thuê<input type="search" name="q" value="{{ q }}" placeholder="Mã phòng hoặc tên khách…"></label><label>Kỳ xem<input type="month" name="period" value="{{ period }}" required></label>{% include 'rooms/table_filters.html' %}<button class="button secondary" type="submit">Xem</button></form>
+<section class="card table-card"><form class="toolbar" method="get"><label class="search">Tìm phòng / khách thuê<input type="search" name="q" value="{{ q }}" placeholder="Mã phòng hoặc tên khách…"></label><label>Kỳ xem{% include 'partials/period_select.html' %}</label>{% include 'rooms/table_filters.html' %}<button class="button secondary" type="submit">Xem</button></form>
 {% include 'rooms/full_table.html' if full_view else 'rooms/compact_table.html' %}
 <div class="table-summary"><span>Kết quả: <strong>{{ rooms|length }} phòng</strong> · Đang thuê: <strong>{{ rooms|selectattr('current_tenancy')|list|length }}</strong> · Kỳ: <strong>{{ period }}</strong></span><span>Điện đã chốt: <strong class="blue">{{ total_consumption }} kWh</strong></span></div></section>
 {% endblock %}

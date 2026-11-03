@@ -2,6 +2,8 @@
 
 ## 2026-11-03
 
+- V1.1.18: thay bộ chọn month theo ngôn ngữ trình duyệt bằng danh sách Tháng/Năm tiếng Việt dùng chung cho Phòng, Điện và Chốt tiền; giữ YYYY-MM.
+
 - V1.1.17: gom trạng thái/Thông tin thu/Lịch sử thu cùng hàng; bỏ nhãn Đã chốt tiền lặp, giữ Quá hạn; gộp phòng/khách và giảm padding bảng tiền. Chỉ sửa template/CSS.
 
 - V1.1.16: giải thích chọn tháng rồi bấm Xem kỳ, đầu kỳ tự nối cuối kỳ trước và giới hạn chặn lưu tháng tương lai; không đổi chức năng.
