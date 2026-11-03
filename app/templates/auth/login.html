@@ -2,15 +2,14 @@
 {% block title %}Đăng nhập · CHDV Manager{% endblock %}
 {% block content %}
 <section class="login-shell">
-  <div class="login-brand"><span class="building">▥</span><h1>CHDV Manager</h1><p>Quản lý căn hộ dịch vụ</p></div>
-  <div class="card login-card"><h2>Đăng nhập</h2><p class="muted">Chào bạn, hãy đăng nhập để quản lý phòng.</p>
+  <div class="login-showcase"><a class="brand" href="{{ url_for('auth.login') }}"><span class="brand-icon">{{ icon('building') }}</span><span>CHDV<span class="brand-light"> Manager</span><small>QUẢN LÝ CĂN HỘ DỊCH VỤ</small></span></a><div class="showcase-copy"><p class="eyebrow">GỌN GÀNG HƠN MỖI NGÀY</p><h2>Mọi căn phòng.<br><em>Trong tầm tay.</em></h2><p>Từ thông tin khách thuê đến chỉ số điện.<br>Một nơi để bạn quản lý thật nhẹ nhàng.</p></div><img class="residence-art" src="{{ url_for('static', filename='images/residence.svg') }}" alt="" width="560" height="410"><div class="showcase-tags"><span>{{ icon('rooms') }} Phòng</span><span>{{ icon('users') }} Khách thuê</span><span>{{ icon('bolt') }} Điện năng</span></div></div>
+  <div class="login-content"><div class="login-mobile-brand">{{ icon('building') }} CHDV Manager</div><div class="card login-card"><span class="login-symbol">{{ icon('lock') }}</span><p class="eyebrow">CHÀO MỪNG BẠN TRỞ LẠI</p><h1>Đăng nhập</h1><p class="muted">Tiếp tục quản lý không gian của bạn.</p>
     <form method="post" class="stack">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <label>Tài khoản<input name="username" autocomplete="username" required maxlength="64" autofocus value="{{ request.form.get('username', '') }}"></label>
       <label>Mật khẩu<input type="password" name="password" autocomplete="current-password" required maxlength="128"></label>
-      <button class="button primary full" type="submit">Đăng nhập →</button>
+      <button class="button primary full" type="submit">Đăng nhập {{ icon('arrow') }}</button>
     </form>
-  </div>
-  <p class="muted small">Chỉ dành cho quản trị viên được cấp tài khoản.</p>
+  </div><p class="login-security">{{ icon('shield') }} Chỉ dành cho quản trị viên được cấp tài khoản.</p></div>
 </section>
 {% endblock %}

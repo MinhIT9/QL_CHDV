@@ -66,6 +66,8 @@ Cần WSGI server, HTTPS, COOKIE_SECURE=true, SECRET_KEY ổn định/bí mật,
 
 ## Tài liệu và Git
 
+FE V1.1.7 dùng design system trong app/static/css/app.css; xem UI_DESIGN.md trước khi sửa UI. Có ảnh review dữ liệu giả trong instance/ui-*.png (ngoài Git). Không có migration mới cho đợt nâng FE; Ctrl+F5 nếu browser còn dùng CSS cũ. Đã review ảnh tĩnh, chưa browser E2E.
+
 Cập nhật STATUS.md, HANDOFF.md, CHANGELOG.md sau mỗi thay đổi; sửa kiến trúc/phạm vi/quyết định khi cần. Chạy sinh danh mục và --check. Agent tuân AGENTS.md, bao gồm số phiên bản cuối phản hồi.
 
 INVENTORY.md tự sinh; chức năng phải được đánh dấu dựa trên kiểm tra thực tế. Hook local tùy chọn:

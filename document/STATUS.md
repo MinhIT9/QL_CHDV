@@ -1,6 +1,6 @@
 # Tiến độ thực tế
 
-Cập nhật: 2026-11-02 (Asia/Saigon). Phiên bản hội thoại: V1.1.6.
+Cập nhật: 2026-11-02 (Asia/Saigon). Phiên bản hội thoại: V1.1.7.
 
 Đã triển khai phần phí/hợp đồng theo FEES_CONTRACTS_PROPOSAL.md: lưu đơn giá, ngày và lịch nhắc; chưa chia phí giữa tháng hoặc ghi nhận thực thu.
 
@@ -21,7 +21,7 @@ Cập nhật: 2026-11-02 (Asia/Saigon). Phiên bản hội thoại: V1.1.6.
 | Xóa/ngừng sử dụng phòng | Đã có | Có đợt thuê/điện thì ngừng sử dụng, giữ lịch sử |
 | Chốt điện theo tháng | Đã có | Số nguyên, lưu từng phần, chống trùng kỳ, giao dịch nguyên tử |
 | Chi tiết phòng | Đã có | Khách hiện tại, lịch sử thuê và điện |
-| Giao diện | Đã có | Jinja2 + CSS riêng + HTMX 2.0.4 nội bộ; chưa Bootstrap/Alpine |
+| Giao diện | Đã nâng cấp V1.1.7 | Jinja2 + CSS riêng + SVG nội bộ; sidebar, login hai cột, bảng sticky, responsive; giữ nguyên chức năng |
 | Backup | Có CLI thủ công | SQLite Backup API, đích mới; chưa lịch hoặc lưu ngoài máy |
 | Phí nước/dịch vụ | Đã có | Theo đợt thuê, nguyên VND >=0, NULL legacy không phải miễn phí |
 | Ngày hợp đồng/trả phòng | Đã có | DATE riêng; không dùng ngày tạo record để suy diễn |
@@ -32,7 +32,7 @@ Cập nhật: 2026-11-02 (Asia/Saigon). Phiên bản hội thoại: V1.1.6.
 | Tiền phòng | Đã có | Theo tháng/đợt thuê, cho phép 0; giá cũ thiếu giữ NULL; tổng dự tính phòng+nước+dịch vụ chưa điện/cọc |
 | Kiểm thử | 31 test pass | unittest, CSRF thật, migration rỗng và có dữ liệu cũ |
 | Model/migration khớp nhau | Đã kiểm tra | flask db check không có schema drift |
-| Browser/production | Chưa kiểm tra / triển khai | Chưa browser QA, HTTPS, reverse proxy, job backup |
+| Browser/production | Có kiểm tra hình ảnh / chưa production | Edge headless với HTML dữ liệu giả ở desktop và root rộng 390px; chưa kiểm tra tương tác E2E, HTTPS, proxy, job backup |
 
 ## Giới hạn nghiệp vụ
 

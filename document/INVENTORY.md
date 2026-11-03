@@ -34,6 +34,8 @@ app/services/rooms.py
 app/static/css/.gitkeep
 app/static/css/app.css
 app/static/images/.gitkeep
+app/static/images/favicon.svg
+app/static/images/residence.svg
 app/static/js/.gitkeep
 app/static/js/app.js
 app/static/vendor/.gitkeep
@@ -48,6 +50,7 @@ app/templates/electricity/.gitkeep
 app/templates/electricity/index.html
 app/templates/error.html
 app/templates/partials/.gitkeep
+app/templates/partials/icons.html
 app/templates/rooms/.gitkeep
 app/templates/rooms/detail.html
 app/templates/rooms/form.html
@@ -66,6 +69,7 @@ document/INVENTORY.md
 document/README.md
 document/SCOPE.md
 document/STATUS.md
+document/UI_DESIGN.md
 instance/.gitkeep
 logs/.gitkeep
 migrations/README
@@ -85,4 +89,4 @@ tests/test_v1.py
 wsgi.py
 ```
 
-Tổng: 76 file (bao gồm file danh mục này).
+Tổng: 80 file (bao gồm file danh mục này).

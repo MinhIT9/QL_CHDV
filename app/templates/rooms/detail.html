@@ -15,7 +15,7 @@
 <div><dt>Tiền phòng</dt><dd>{{ tenant.rent_price|vnd }} / tháng</dd></div>
 <div><dt>Tiền cọc</dt><dd>{{ tenant.deposit_amount|vnd }}<small>Theo đợt thuê; chưa xác nhận thực thu hoặc hoàn cọc.</small></dd></div>
 <div><dt>Nước + dịch vụ</dt><dd>{{ tenant.monthly_fees|vnd }}<small>Dự tính tháng đủ theo {{ tenant.people_count }} người hiện tại; chưa chia ngày, chưa gồm tiền thuê/điện.</small></dd></div>
-<div><dt>Tổng dự tính/tháng</dt><dd>{{ tenant.monthly_total|vnd }}<small>Tiền phòng + nước + dịch vụ. Chưa gồm điện, không cộng tiền cọc; chưa chia ngày hoặc xác nhận thực thu.</small></dd></div>
+<div class="financial-summary"><dt>Tổng dự tính/tháng</dt><dd>{{ tenant.monthly_total|vnd }}<small>Tiền phòng + nước + dịch vụ. Chưa gồm điện, không cộng tiền cọc; chưa chia ngày hoặc xác nhận thực thu.</small></dd></div>
 </dl></div></section>
 {% endif %}
 <div class="detail-grid"><section class="card"><h2>Thông tin hiện tại</h2><dl class="info-list"><div><dt>Khách thuê</dt><dd>{{ tenant.tenant_name if tenant else '—' }}</dd></div><div><dt>Số người</dt><dd>{{ tenant.people_count if tenant else 0 }}</dd></div><div><dt>Người ở cùng</dt><dd>{{ tenant.occupants|map(attribute='name')|join(', ') if tenant else '—' }}</dd></div><div><dt>Biển số xe</dt><dd>{{ tenant.vehicles|map(attribute='plate')|join(', ') if tenant else '—' }}</dd></div><div><dt>Chỉ số gần nhất</dt><dd>{{ (room.readings[-1].end_value ~ ' kWh') if room.readings else 'Chưa ghi nhận' }}</dd></div><div><dt>Ghi chú</dt><dd class="pre-line">{{ room.note or '—' }}</dd></div></dl></section>

@@ -50,3 +50,10 @@ Không cần giải quyết các mục trên chỉ để tạo sườn.
 - Theo yêu cầu người dùng, thêm rent_price/tháng theo đợt thuê; nhập bắt buộc cho đợt mới, cho phép 0, số nguyên VND không âm. Legacy không tự gán giá.
 - Gia hạn giữ giá, đổi khách nhập giá riêng. Tổng phòng+nước+dịch vụ chỉ là dự tính tháng đủ, chưa điện/cọc/thực thu.
 - Migration b71c430e92ad thêm cột nullable/CHECK; đã backup local trước upgrade.
+
+## 2026-11-02 — Nâng cấp FE (V1.1.7)
+
+- Theo yêu cầu giữ chức năng: chỉ sửa template/CSS và bổ sung SVG nội bộ; không migration hoặc đổi quyền/kiểm tra nghiệp vụ.
+- Navy/mint/nền sáng, font hệ thống và icon SVG; không thêm framework hoặc font/ảnh từ CDN.
+- Giữ bảng đầy đủ, sticky mã phòng/thao tác và nhãn cuộn ngang. Tóm tắt dùng dữ liệu hiện có của kết quả đang xem.
+- QA bằng unittest và ảnh tĩnh Edge headless dữ liệu tạm; chưa browser E2E. Giới hạn viewport 390px được mô tả trong UI_DESIGN.md.

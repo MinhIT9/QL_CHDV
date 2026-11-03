@@ -13,6 +13,7 @@
 - Phí nước/người và dịch vụ/phòng (cho phép 0); ngày vào/hợp đồng/trả phòng, lịch đóng tiền hằng tháng và gia hạn có lịch sử.
 - Ngày vào ở dùng chung Ngày bắt đầu hợp đồng. Có tiền cọc theo đợt thuê (cho phép 0), không cộng vào phí tháng; chưa quản lý thu/hoàn cọc.
 - Có tiền phòng/tháng theo đợt thuê; tổng dự tính phòng + nước + dịch vụ, chưa gồm điện và tiền cọc.
+- Giao diện V1.1.7: sidebar navy/mint, đăng nhập hai cột, SVG nội bộ, bảng sticky và form responsive. Xem [thiết kế giao diện](document/UI_DESIGN.md).
 
 ## Chạy local trên Windows
 
@@ -39,4 +40,4 @@ Với bản clone mới: copy .env.example thành .env, tạo SECRET_KEY ngẫu 
 
 Đọc [tiến độ](document/STATUS.md), [hướng dẫn dev](document/DEVELOPMENT.md), [bàn giao](document/HANDOFF.md) hoặc [mục lục](document/README.md).
 
-V1 dùng chỉ số nguyên kWh; chưa sửa điện cũ, thay đồng hồ, hóa đơn/thực thu hoặc báo cáo. Phí chỉ dự tính tháng đủ, chưa chia ngày; lịch đóng tiền không xác nhận đã thu. Backup ngoài máy chủ và HTTPS production cần cấu hình khi triển khai. Chưa kiểm tra giao diện bằng trình duyệt tự động.
+V1 dùng chỉ số nguyên kWh; chưa sửa điện cũ, thay đồng hồ, hóa đơn/thực thu hoặc báo cáo. Phí chỉ dự tính tháng đủ, chưa chia ngày; lịch đóng tiền không xác nhận đã thu. Backup ngoài máy chủ và HTTPS production cần cấu hình khi triển khai. Đã review ảnh tĩnh bằng Edge headless; chưa kiểm tra browser end-to-end.

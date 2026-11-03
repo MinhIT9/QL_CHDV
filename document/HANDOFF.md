@@ -4,9 +4,9 @@ Cập nhật: 2026-11-02 (Asia/Saigon).
 
 ## Phiên bản hội thoại
 
-- Phiên bản phản hồi gần nhất: V1.1.6.
-- Nội dung: thêm tiền phòng/tháng theo đợt thuê và tổng dự tính gồm phòng/nước/dịch vụ.
-- Phản hồi tiếp theo dùng V1.1.7. Tăng số cuối sau mỗi final; đây không phải phiên bản phát hành.
+- Phiên bản phản hồi gần nhất: V1.1.7.
+- Nội dung: nâng cấp giao diện đồng bộ, giữ nguyên chức năng và database.
+- Phản hồi tiếp theo dùng V1.1.8. Tăng số cuối sau mỗi final; đây không phải phiên bản phát hành.
 - Quy tắc đầy đủ ở AGENTS.md, mục “Phiên bản ở cuối phản hồi”.
 
 ## Đã làm
@@ -18,6 +18,7 @@ Cập nhật: 2026-11-02 (Asia/Saigon).
 - Năm màn hình nghiệp vụ, cùng đổi mật khẩu và quản lý tài khoản root.
 - Phòng có đợt thuê/người/xe; chốt điện nối tiếp tháng, không ghi đè dữ liệu cũ.
 - HTMX và license lưu nội bộ, CSS riêng; không cần CDN lúc chạy.
+- FE V1.1.7: sidebar xanh đậm/điểm nhấn mint, nền sáng, icon SVG nội bộ, trang đăng nhập hai cột có minh họa SVG. Thiết kế dùng chung cho mọi trang; bảng cố định mã phòng/thao tác khi cuộn, form rõ nhóm, responsive, focus bàn phím và reduced-motion. Không đổi route/model/service/JS nghiệp vụ.
 - CLI backup nhất quán và bộ test tích hợp.
 - Phí nước/người/tháng, dịch vụ/phòng/tháng cho phép 0; NULL của dữ liệu cũ là chưa biết. Hiển thị dự tính phí tháng đủ, chưa phải hóa đơn.
 - Chỉ còn ngày bắt đầu hợp đồng (cũng là ngày vào ở), ngày hết hạn/trả thực tế và lịch đóng 1–31. move_in_date chỉ giữ làm cột legacy, không có ô nhập riêng; save/checkout đồng bộ theo contract_start.
@@ -32,7 +33,7 @@ Cập nhật: 2026-11-02 (Asia/Saigon).
 - flask db check: không schema drift. node --check app/static/js/app.js: hợp lệ.
 - Test client trên app local: /login trả HTTP 200; chưa đổi mật khẩu root thật khi test.
 - .env, DB và SQLite sidecars bị Git ignore. Chưa commit/push trong lượt này.
-- Chưa kiểm tra trực quan/JavaScript runtime bằng browser; không có trình duyệt tự động tại môi trường hiện tại.
+- Đã kiểm tra ảnh tĩnh bằng Edge headless: đăng nhập/bảng phòng/form desktop và bố cục 390px với dữ liệu giả từ DB tạm. Ảnh trong instance/ui-*.png, ngoài Git. Edge có viewport tối thiểu ~492px nên bản 390px giới hạn chiều rộng root trong fixture, cùng breakpoint mobile. Chưa kiểm tra tương tác browser end-to-end trên server thật hoặc thiết bị điện thoại.
 - Chưa bật Git hook, hosting hoặc lịch backup tự động.
 
 ## Chạy tiếp

@@ -2,6 +2,10 @@
 
 ## 2026-11-02
 
+- V1.1.7 (hội thoại): nâng cấp FE đồng bộ: nền sáng, sidebar navy/mint, icon SVG, login hai cột và minh họa căn hộ nội bộ.
+- Bảng phòng có cột mã/thao tác sticky, thanh tóm tắt dữ liệu sẵn có, form và trạng thái dễ đọc, responsive, focus bàn phím/reduced-motion; không đổi nghiệp vụ, database hoặc quyền.
+- 31 test hồi quy pass; kiểm tra ảnh Edge headless desktop và bố cục 390px bằng dữ liệu tạm, chưa browser E2E.
+
 - V1.1.6 (hội thoại): thêm tiền phòng/tháng theo đợt thuê, form/bảng/chi tiết/lịch sử và tổng dự tính phòng+nước+dịch vụ, không gồm điện/cọc.
 - Giá nguyên VND >=0, legacy NULL; migration b71c430e92ad đã backup/upgrade local. 31 test pass. Bổ sung tiêu đề cột lịch sử khớp dữ liệu tiền cọc/phòng.
 

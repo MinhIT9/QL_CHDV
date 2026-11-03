@@ -46,3 +46,7 @@ must_change_password kiểm tra mọi request đã đăng nhập; khi còn bật
 - Ngày đóng 1–31 là lịch tham chiếu theo điều khoản hiện tại, không phải bảng phải thu hoặc thực thu. Chưa có snapshot phí/số người theo kỳ, dự tính tháng đủ không phải hóa đơn.
 - Từ V1.1.5: contract_start là ngày vào ở/bắt đầu thống nhất. move_in_date giữ legacy, không chỉnh riêng; save/checkout đồng bộ theo contract_start. deposit_amount theo đợt thuê, không tham gia tổng phí tháng. Migration a65b2f9c018e không xóa cột ngày cũ.
 - V1.1.6 bổ sung rent_price theo đợt thuê và migration b71c430e92ad. Tổng dự tính monthly_total = rent_price + monthly_fees; không tính điện/cọc, không phải hóa đơn.
+
+## Giao diện V1.1.7
+
+Thiết kế chia sẻ nằm trong app/static/css/app.css và shell base.html, icon macro trong partials/icons.html, minh họa SVG nội bộ. Bảng vẫn giữ tất cả dữ liệu, chỉ thay trình bày/sticky. Không đổi JS nghiệp vụ, route hoặc schema; xem UI_DESIGN.md.
