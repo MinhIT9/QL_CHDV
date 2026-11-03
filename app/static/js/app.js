@@ -108,6 +108,8 @@ if (meterForm && !meterForm.dataset.bound) {
       if (!start || !end || !output) return;
       const startRaw = start.dataset.value ?? start.value;
       const endRaw = end.value;
+      const photo = row.querySelector(".meter-photo");
+      if (photo) photo.required = endRaw !== "";
       end.setCustomValidity("");
       if (start.tagName === "INPUT") start.required = endRaw !== "";
       if (amount) amount.textContent = "—";

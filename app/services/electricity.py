@@ -3,6 +3,7 @@ from datetime import datetime, timedelta, timezone
 
 from app.extensions import db
 from app.models import ElectricityReading, Room
+from app.services.photos import stage_photo, upload_batch
 
 MAX_READING = 2_147_483_647
 
@@ -56,7 +57,7 @@ def integer_reading(value, label):
     return result
 
 
-def save_readings(period, data, user_id):
+def save_readings(period, data, user_id, files):
     if not valid_period(period) or period > current_period():
         raise ValueError("Kỳ chốt không hợp lệ hoặc nằm trong tương lai.")
     # Serialize SQLite writers before re-reading history to avoid stale concurrent starts.
@@ -84,6 +85,13 @@ def save_readings(period, data, user_id):
                                            electricity_price=tenant.electricity_price if tenant else None, created_by=user_id))
     if not submitted:
         raise ValueError("Hãy nhập chỉ số cuối cho ít nhất một phòng chưa chốt.")
-    db.session.add_all(submitted)
-    db.session.commit()
+    with upload_batch() as staged:
+        codes = {room.id: room.code for room in rooms}
+        for reading in submitted:
+            upload = files.get(f"photo_{reading.room_id}")
+            if upload is None or not upload.filename:
+                raise ValueError(f"Phòng {codes[reading.room_id]}: bắt buộc có ảnh chốt số điện.")
+            stage_photo(upload, user_id, staged, reading=reading)
+        db.session.add_all(submitted)
+        db.session.commit()
     return len(submitted)

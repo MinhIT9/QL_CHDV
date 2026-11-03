@@ -1,5 +1,7 @@
 # Hướng dẫn phát triển và vận hành local
 
+V1.3.0: dùng Python >=3.11 và requirements có Pillow 13.0.0. Khi chạy dev mở thêm terminal `.venv\Scripts\python.exe -m flask --app wsgi process-photos`; upload sẽ chờ nếu worker không chạy. Migration f13a98c52b70 đã backup/upgrade local, thêm bảng photo. Chi tiết giới hạn ảnh, worker, cập nhật VPS và backup DB/ảnh ở PHOTOS.md. Không copy ảnh thử/dữ liệu thật vào Git.
+
 V1.1.14: migration 41eb1b88b816 đã backup/upgrade local. Menu Chốt tiền → Thu tiền → xác nhận đã nhận đủ, chọn ngày/ghi chú; phiếu xuống nhóm Đã thu. Nếu ghi nhầm, root mở Thông tin thu → hoàn tác với lý do. Không hủy phiếu đã thu trước khi hoàn tác, không coi hoàn tác là hoàn tiền thật. Chưa nhận từng phần. Bảng Phòng chọn lọc thu/kỳ hoặc Cột hiển thị Đầy đủ rồi bấm Xem. Khởi động lại Flask và Ctrl+F5.
 
 V1.1.11: migration mới nhất d94f512a37b1 đã backup/upgrade local. Bảng điện hiển thị ngày giờ lưu/sửa gần nhất và tự tính tiền; đơn giá được chụp khi lưu điện mới. Bản cũ chưa biết giá được ghi tạm tính, phiếu hiệu lực luôn ưu tiên hơn dự tính. Ctrl+F5 sau khởi động lại để nạp CSS/JS mới.

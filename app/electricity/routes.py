@@ -20,8 +20,8 @@ def index():
     status = 200
     if request.method == "POST":
         try:
-            count = save_readings(period, request.form, current_user.id)
-        except (ValueError, IntegrityError, OperationalError) as error:
+            count = save_readings(period, request.form, current_user.id, request.files)
+        except (ValueError, IntegrityError, OperationalError, OSError) as error:
             db.session.rollback()
             flash(str(error) if isinstance(error, ValueError) else "Dữ liệu vừa được cập nhật hoặc đang bận. Hãy tải lại trước khi lưu.", "danger")
             status = 400

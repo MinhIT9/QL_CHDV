@@ -79,6 +79,7 @@ class Tenancy(db.Model):
     occupants = db.relationship("Occupant", cascade="all, delete-orphan", order_by="Occupant.id")
     vehicles = db.relationship("Vehicle", cascade="all, delete-orphan", order_by="Vehicle.id")
     renewals = db.relationship("ContractRenewal", order_by="ContractRenewal.id", back_populates="tenancy")
+    photos = db.relationship("Photo", back_populates="tenancy", order_by="Photo.id")
     __mapper_args__ = {"version_id_col": version}
     __table_args__ = (
         db.CheckConstraint("water_price IS NULL OR water_price BETWEEN 0 AND 2147483647", name="ck_water_price"),
@@ -150,6 +151,7 @@ class ElectricityReading(db.Model):
     created_by = db.Column(db.Integer, db.ForeignKey("user.id", ondelete="RESTRICT"), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=utcnow)
     room = db.relationship("Room", back_populates="readings")
+    photos = db.relationship("Photo", back_populates="reading", order_by="Photo.id")
     __table_args__ = (
         db.UniqueConstraint("room_id", "period", name="uq_room_period"),
         db.CheckConstraint("start_value >= 0 AND end_value >= start_value", name="ck_valid_reading"),
@@ -159,6 +161,22 @@ class ElectricityReading(db.Model):
     @property
     def consumption(self):
         return self.end_value - self.start_value
+
+
+class Photo(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    token = db.Column(db.String(32), unique=True, nullable=False)
+    tenancy_id = db.Column(db.Integer, db.ForeignKey("tenancy.id", ondelete="RESTRICT"))
+    reading_id = db.Column(db.Integer, db.ForeignKey("electricity_reading.id", ondelete="RESTRICT"))
+    status = db.Column(db.String(16), nullable=False, default="pending")
+    created_by = db.Column(db.Integer, db.ForeignKey("user.id", ondelete="RESTRICT"), nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=utcnow)
+    tenancy = db.relationship("Tenancy", back_populates="photos")
+    reading = db.relationship("ElectricityReading", back_populates="photos")
+    __table_args__ = (
+        db.CheckConstraint("(tenancy_id IS NOT NULL AND reading_id IS NULL) OR (tenancy_id IS NULL AND reading_id IS NOT NULL)", name="ck_photo_owner"),
+        db.CheckConstraint("status IN ('pending', 'ready', 'failed')", name="ck_photo_status"),
+    )
 
 
 class ReadingRevision(db.Model):

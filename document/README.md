@@ -8,6 +8,7 @@
 | [HANDOFF.md](HANDOFF.md) | Bối cảnh và bước tiếp theo | Dev/agent cập nhật khi bàn giao |
 | [SCOPE.md](SCOPE.md) | Phạm vi và nghiệp vụ V1 | Khi chốt/thay đổi yêu cầu |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Vai trò thư mục, luồng xử lý | Khi kiến trúc thay đổi |
+| [PHOTOS.md](PHOTOS.md) | Upload, nén nền, quyền xem ảnh và backup | Khi đổi xử lý/vận hành ảnh |
 | [UI_DESIGN.md](UI_DESIGN.md) | Giao diện, responsive, asset và phạm vi kiểm tra FE | Khi thay đổi thiết kế |
 | [BILLING_CORRECTIONS_PROPOSAL.md](BILLING_CORRECTIONS_PROPOSAL.md) | Phân tích và phạm vi sửa điện/chốt tiền đã triển khai | Khi thay đổi kỳ tính hoặc quy tắc điều chỉnh |
 | [DATA_MODEL.md](DATA_MODEL.md) | Mô hình dữ liệu đề xuất | Trước và khi làm model/migration |

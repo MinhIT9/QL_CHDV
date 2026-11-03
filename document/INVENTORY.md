@@ -24,6 +24,7 @@ app/electricity/routes.py
 app/extensions.py
 app/models/.gitkeep
 app/models/__init__.py
+app/photos.py
 app/rooms/.gitkeep
 app/rooms/__init__.py
 app/rooms/routes.py
@@ -32,6 +33,7 @@ app/services/__init__.py
 app/services/billing.py
 app/services/contracts.py
 app/services/electricity.py
+app/services/photos.py
 app/services/queries.py
 app/services/rooms.py
 app/static/css/.gitkeep
@@ -56,11 +58,13 @@ app/templates/billing/payment.html
 app/templates/electricity/.gitkeep
 app/templates/electricity/correct.html
 app/templates/electricity/index.html
+app/templates/electricity/photo_cell.html
 app/templates/electricity/reading_meta.html
 app/templates/error.html
 app/templates/partials/.gitkeep
 app/templates/partials/icons.html
 app/templates/partials/period_select.html
+app/templates/partials/photos.html
 app/templates/rooms/.gitkeep
 app/templates/rooms/compact_table.html
 app/templates/rooms/detail.html
@@ -73,15 +77,18 @@ app/templates/rooms/table_filters.html
 app/templates/rooms/vehicle_cell.html
 app/templates/rooms/water_cell.html
 backups/.gitkeep
+deploy/chdv-photos.service
 document/ARCHITECTURE.md
 document/BILLING_CORRECTIONS_PROPOSAL.md
 document/CHANGELOG.md
 document/DATA_MODEL.md
 document/DECISIONS.md
+document/DEPLOY_UBUNTU.md
 document/DEVELOPMENT.md
 document/FEES_CONTRACTS_PROPOSAL.md
 document/HANDOFF.md
 document/INVENTORY.md
+document/PHOTOS.md
 document/README.md
 document/SCOPE.md
 document/STATUS.md
@@ -100,15 +107,17 @@ migrations/versions/c83e4d16b2a0_tenancy_electricity_price.py
 migrations/versions/d94f512a37b1_reading_price.py
 migrations/versions/dd7493777e83_fees_and_contracts.py
 migrations/versions/e9329a770fe9_initial_schema.py
+migrations/versions/f13a98c52b70_private_photos.py
 requirements-dev.txt
 requirements.txt
 scripts/update_docs.py
 tests/.gitkeep
 tests/test_billing.py
 tests/test_contracts.py
+tests/test_photos.py
 tests/test_receipts.py
 tests/test_v1.py
 wsgi.py
 ```
 
-Tổng: 102 file (bao gồm file danh mục này).
+Tổng: 111 file (bao gồm file danh mục này).

@@ -1,6 +1,12 @@
 # Mô hình dữ liệu V1
 
-Đã triển khai tại app/models/__init__.py; migration mới nhất 41eb1b88b816 (ghi nhận thu đủ).
+Đã triển khai tại app/models/__init__.py; migration mới nhất f13a98c52b70 (ảnh riêng tư).
+
+## Photo — V1.3.0
+
+- token ngẫu nhiên duy nhất; tenancy_id hoặc reading_id (CHECK đúng một chủ sở hữu), created_by/at, status pending/ready/failed (CHECK). Không lưu blob/đường dẫn từ khách vào DB. FK RESTRICT giữ liên kết lịch sử.
+- Byte gốc ở instance/uploads/tmp trong lúc chờ; file dài hạn là WebP ở contracts/electricity. Tên file theo token, không theo tên khách hoặc tên upload. Xem PHOTOS.md về worker, crash recovery và backup.
+- Ảnh hợp đồng tùy chọn theo đợt thuê; chốt/sửa điện mới phải có ảnh ở service. Không backfill hay yêu cầu dữ liệu cũ có ảnh, ảnh cũ không bị thay thế khi sửa số. Ảnh có thể bổ sung, chưa có UI xóa.
 
 ## Receipt — V1.1.14
 

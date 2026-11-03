@@ -4,9 +4,9 @@ Cập nhật: 2026-11-03 (Asia/Saigon).
 
 ## Phiên bản hội thoại
 
-- Phiên bản phản hồi gần nhất: V1.2.2.
-- Nội dung: Gom logic tiền điện và query dùng chung vào service; quy ước tái sử dụng.
-- Phản hồi tiếp theo tối thiểu V1.2.3; có thể tăng minor/major theo quy tắc mới trong AGENTS.md.
+- Phiên bản phản hồi gần nhất: V1.3.0.
+- Nội dung: Thêm ảnh hợp đồng tùy chọn theo đợt thuê, ảnh chốt/sửa điện bắt buộc; upload riêng tư, hàng đợi SQLite và worker CLI nén WebP/xóa gốc tạm. 57 tests pass với Pillow 13.0.0 trong .venv; local đã backup/upgrade f13a98c52b70, db check/Node/docs đạt. VPS chưa cập nhật; xem PHOTOS.md và deploy/chdv-photos.service, cần Nginx 64m và worker. Chưa browser QA/Ubuntu runtime/restore ảnh.
+- Phản hồi tiếp theo tối thiểu V1.3.1; có thể tăng minor/major theo quy tắc mới trong AGENTS.md.
 - Quy tắc đầy đủ ở AGENTS.md, mục “Phiên bản ở cuối phản hồi”.
 
 ## Đã làm
@@ -31,6 +31,12 @@ Cập nhật: 2026-11-03 (Asia/Saigon).
 - Chỉ chốt tiền một đợt thuê xác định đủ tháng; thiếu điện, ngày không rõ, vào/trả giữa tháng hoặc đổi khách cùng kỳ bị chặn. Không có engine lịch giá tự động: giá trên form là gợi ý, Admin xác nhận cho từng kỳ.
 
 ## Kiểm tra
+
+- V1.3.0: `.venv/Scripts/python.exe -m unittest discover -s tests`: 57 tests pass (34.859s), gồm 9 test ảnh: thiếu ảnh/rollback, upload giả/quá byte/pixel/ảnh động, quyền/CSRF/413, giữ ảnh theo đợt thuê, sửa điện bắt buộc ảnh mới, EXIF/resize/WebP/xóa gốc, worker lỗi/reupload/khôi phục sau rename, orphan cleanup và khóa worker. Pillow 13.0.0 cài riêng trong .venv (system-site-packages cho dependencies đã có), không đổi Python toàn cục. Migration f13a98c52b70 đã backup `backups/pre-photos-20261103-v130.sqlite3` rồi upgrade local; số dòng các bảng nghiệp vụ không đổi, integrity_check ok và db check không drift. Node syntax và inventory/diff đạt. Không tự khởi động worker nền lâu dài; mở terminal chạy process-photos theo PHOTOS.md khi thử dev. Chưa browser E2E, kiểm tra độ rõ ảnh hợp đồng thực tế, Ubuntu worker/HTTPS upload hoặc restore bộ DB+ảnh. Bước tiếp: thử ảnh giả qua UI dev, sau đó cập nhật VPS từng bước, tăng Nginx 64m, cài dependencies/migration và bật chdv-photos. Backup phải thêm uploads; không chỉ DB.
+
+- V1.2.28: đã kiểm tra đường dẫn xóa nằm trong instance dev, xóa 23 mục artifact UI; liệt kê sau dọn chỉ còn .gitkeep và chdv.sqlite3 (94.208 byte), SHA256 DB trước/sau giống nhau. Inventory và diff whitespace đạt; không chạy lại test nghiệp vụ. Khi cần kiểm tra hình ảnh, tạo lại artifact; các ảnh/HTML cũ được nhắc trong bàn giao phía dưới đã được dọn.
+
+- V1.2.3: đối chiếu code/config và nguồn chính thức để viết DEPLOY_UBUNTU.md; inventory và diff whitespace đạt. Chưa chạy lệnh Ubuntu, test Python 3.12, HTTPS hoặc restore trên VPS; không chạy lại test nghiệp vụ vì chỉ sửa tài liệu. Bước tiếp: xác định domain, cổng SSH, giữ DB cũ hay tạo mới và thực hiện hướng dẫn. Gunicorn chưa khóa phiên bản; lịch backup ngoài máy chưa triển khai.
 
 - V1.2.2: 47 test suite pass; 12 test_billing pass sau khi th?m test helper. refactor giá điện và query đọc, không DB. Lịch sử không fallback giá hiện tại; màn nhập vẫn fallback có nhãn. Không gom validation kỳ vì cách báo lỗi khác nhau. Bước tiếp nếu cần: rà macro trường giá form phòng/phiếu; không gom khác biệt nghiệp vụ. Chưa browser QA.
 

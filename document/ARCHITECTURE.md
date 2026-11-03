@@ -1,5 +1,7 @@
 # Kiến trúc hiện tại
 
+V1.3.0: bảng Photo gắn Tenancy hoặc ElectricityReading; services/photos.py kiểm tra upload, quản lý ảnh tạm/hàng đợi SQLite và nén bằng Pillow 13.0.0. CLI process-photos chạy một worker riêng, khóa OS chống trùng, ghi WebP nguyên tử rồi xóa gốc tạm. app/photos.py phục vụ ảnh qua xác thực và nhận bổ sung, không public uploads. Migration f13a98c52b70 chỉ thêm bảng. Request tối đa 64 MB; ảnh 10 MB/24 MP; WebP tối đa 2200 px/quality 82, bỏ metadata. Xem PHOTOS.md và deploy/chdv-photos.service về vận hành/backup/failure.
+
 V1.2.2: services/queries.py chứa room_query và active_bill_query, không đặt query dùng chung trong route. services/electricity.py có reading_cost trả price/amount/estimated/current_price; màn điện truyền fallback giá hiện tại rõ ràng, lịch sử phòng không fallback. Route chuẩn bị dữ liệu, template không tính lại tiền điện.
 
 V1.1.15: payment.html dùng native popover top layer; app.js định vị panel theo nút, cập nhật scroll/resize và toggle mục con. Chỉ thay UI để tránh giãn row/overflow clipping, không thay route/model/thu tiền. CSS/JS cache version1.1.15.

@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block title %}Phòng {{ room.code }} · CHDV Manager{% endblock %}
 {% block content %}
+{% from 'partials/photos.html' import photo_list, photo_upload with context %}
 {% set tenant = room.current_tenancy %}
 <header class="page-header"><div><a class="back-link" href="{{ url_for('rooms.index') }}">← Danh sách phòng</a><h1>Phòng {{ room.code }} <span class="badge {{ 'inactive' if not room.active else 'occupied' if tenant else 'vacant' }}">{{ room.status }}</span></h1></div><a class="button secondary btn btn-outline-secondary" href="{{ url_for('rooms.edit', room_id=room.id) }}">Sửa thông tin</a></header>
 {% if tenant %}
@@ -18,7 +19,10 @@
 <div><dt>Tiền nước/tháng</dt><dd>{% include 'rooms/water_cell.html' %}</dd></div>
 <div><dt>Tiền dịch vụ/tháng</dt><dd>{{ tenant.service_price|vnd }}<small>Dự tính tháng đủ cho một phòng; chưa chia ngày.</small></dd></div>
 <div class="financial-summary"><dt>Tổng dự tính/tháng</dt><dd>{{ tenant.monthly_total|vnd }}<small>Tiền phòng + nước + dịch vụ. Chưa gồm điện, không cộng tiền cọc; chưa chia ngày hoặc xác nhận thực thu.</small></dd></div>
-</dl></div></section>
+</dl></div>
+<h3>Ảnh hợp đồng</h3>
+{{ photo_list(tenant.photos) }}
+</section>
 {% endif %}
 <div class="detail-grid"><section class="card"><h2>Thông tin hiện tại</h2><dl class="info-list"><div><dt>Khách thuê</dt><dd>{{ tenant.tenant_name if tenant else '—' }}</dd></div><div><dt>Số người</dt><dd>{{ tenant.people_count if tenant else 0 }}</dd></div><div><dt>Người ở cùng</dt><dd>{{ tenant.occupants|map(attribute='name')|join(', ') if tenant else '—' }}</dd></div><div><dt>Biển số xe</dt><dd>{{ tenant.vehicles|map(attribute='plate')|join(', ') if tenant else '—' }}</dd></div><div><dt>Chỉ số gần nhất</dt><dd>{{ (room.readings[-1].end_value ~ ' kWh') if room.readings else 'Chưa ghi nhận' }}</dd></div><div><dt>Ghi chú</dt><dd class="pre-line">{{ room.note or '—' }}</dd></div></dl></section>
 <section class="card table-card">
@@ -30,7 +34,7 @@
         {% for reading in room.readings|reverse %}
         {% set cost = costs[reading.id] %}
         <tr>
-          <td>{{ reading.period }}</td>
+          <td>{{ reading.period }}{{ photo_list(reading.photos) }}</td>
           <td class="number text-end text-nowrap">{{ reading.start_value }}</td>
           <td class="number text-end text-nowrap">{{ reading.end_value }}</td>
           <td class="number text-end text-nowrap">{{ reading.consumption }}</td>
@@ -45,4 +49,21 @@
 <section class="card table-card"><div class="section-heading"><h2>Các đợt thuê</h2></div><div class="table-scroll"><table class="table table-striped table-hover align-middle mb-0"><thead><tr><th>Khách chính</th><th>Người ở cùng</th><th>Xe</th><th>Bắt đầu hợp đồng</th><th>Ngày trả thực tế</th><th>Hạn hợp đồng</th><th>Nước/người</th><th>Dịch vụ/phòng</th><th>Giá điện</th><th>Tiền phòng</th><th>Tiền cọc</th></tr></thead><tbody>{% for item in room.tenancies|reverse %}<tr><td>{{ item.tenant_name }}</td><td>{{ item.occupants|map(attribute='name')|join(', ') or '—' }}</td><td>{{ item.vehicles|map(attribute='plate')|join(', ') or '—' }}</td><td>{{ item.contract_start|business_date }}</td><td>{{ item.move_out_date|business_date if item.ended_at else 'Đang thuê' }}</td><td>{{ item.contract_end|business_date }}</td><td>{{ item.water_price|vnd }}</td><td>{{ item.service_price|vnd }}</td><td>{{ item.electricity_price|vnd }}</td><td>{{ item.rent_price|vnd }}</td><td>{{ item.deposit_amount|vnd }}</td></tr>{% else %}<tr><td colspan="11" class="empty">Chưa có đợt thuê.</td></tr>{% endfor %}</tbody></table></div></section>
 <section class="card table-card"><div class="section-heading"><h2>Lịch sử gia hạn</h2></div><div class="table-scroll"><table class="table table-striped table-hover align-middle mb-0"><thead><tr><th>Khách</th><th>Hạn cũ</th><th>Số tháng</th><th>Hạn mới</th><th>Ngày thao tác</th><th>Admin</th><th>Ghi chú</th></tr></thead><tbody>{% set count = namespace(value=0) %}{% for item in room.tenancies|reverse %}{% for renewal in item.renewals|reverse %}{% set count.value = count.value + 1 %}<tr><td>{{ item.tenant_name }}</td><td>{{ renewal.old_end|business_date }}</td><td>{{ renewal.months }}</td><td>{{ renewal.new_end|business_date }}</td><td>{{ renewal.created_at|local_date }}</td><td>{{ renewal.author.username }}</td><td>{{ renewal.note or '—' }}</td></tr>{% endfor %}{% endfor %}{% if count.value == 0 %}<tr><td colspan="7" class="empty">Chưa có gia hạn hợp đồng.</td></tr>{% endif %}</tbody></table></div></section>
 {% if room.active or (not room.readings and not room.tenancies) %}<a class="button danger btn btn-outline-danger" href="{{ url_for('rooms.remove', room_id=room.id) }}">{{ 'Ngừng sử dụng phòng' if room.readings or room.tenancies else 'Xóa phòng' }}</a>{% endif %}
+<section class="card mt-3">
+  <h2>Ảnh theo đợt thuê và kỳ điện</h2>
+  {% for item in room.tenancies|reverse %}
+    <details class="mb-3">
+      <summary>Hợp đồng · {{ item.tenant_name }} · {{ item.contract_start|business_date }}</summary>
+      {{ photo_list(item.photos) }}
+      {{ photo_upload('contract', item.id) }}
+    </details>
+  {% endfor %}
+  {% for reading in room.readings|reverse %}
+    <details class="mb-3">
+      <summary>Chốt điện · {{ reading.period }}</summary>
+      {{ photo_list(reading.photos) }}
+      {{ photo_upload('electricity', reading.id) }}
+    </details>
+  {% endfor %}
+</section>
 {% endblock %}

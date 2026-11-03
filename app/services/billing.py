@@ -6,6 +6,7 @@ from app.extensions import db
 from app.models import ElectricityReading, MonthlyBill, ReadingRevision, utcnow
 from app.services.contracts import parse_integer
 from app.services.electricity import current_period, integer_reading, valid_period
+from app.services.photos import stage_photo, upload_batch
 
 
 def lock_writes():
@@ -26,7 +27,7 @@ def reading_stamp(reading):
     return hashlib.sha256(str(values).encode()).hexdigest()
 
 
-def correction(reading, data, user_id, save=False):
+def correction(reading, data, user_id, save=False, upload=None):
     if save:
         lock_writes()
     if data.get("stamp") != reading_stamp(reading):
@@ -50,10 +51,12 @@ def correction(reading, data, user_id, save=False):
         raise ValueError("Có phiếu tiền đã chốt trong các kỳ bị ảnh hưởng. Root cần hủy phiếu với lý do trước khi sửa điện.")
     preview = [{"period": r.period, "old_start": r.start_value, "old_end": r.end_value, "new_start": a, "new_end": b} for r, a, b in changes]
     if save:
-        for r, a, b in changes:
-            db.session.add(ReadingRevision(reading_id=r.id, old_start=r.start_value, old_end=r.end_value, new_start=a, new_end=b, reason=reason, created_by=user_id))
-            r.start_value, r.end_value = a, b
-        db.session.commit()
+        with upload_batch() as staged:
+            stage_photo(upload, user_id, staged, reading=reading)
+            for r, a, b in changes:
+                db.session.add(ReadingRevision(reading_id=r.id, old_start=r.start_value, old_end=r.end_value, new_start=a, new_end=b, reason=reason, created_by=user_id))
+                r.start_value, r.end_value = a, b
+            db.session.commit()
     return preview
 
 

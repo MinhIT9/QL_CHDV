@@ -1,5 +1,7 @@
 # Phạm vi V1
 
+V1.3.0: ảnh hợp đồng tùy chọn theo đợt thuê, ảnh điện bắt buộc khi chốt/sửa số mới; bổ sung ảnh lịch sử. Upload JPEG/PNG/WebP, worker nền nén WebP và xóa gốc tạm; ảnh chỉ xem qua đăng nhập. Không OCR, HEIC/PDF, xóa ảnh hoặc lưu ảnh gốc dài hạn. Worker CLI/systemd cùng project, không thêm dịch vụ hàng đợi ngoài. Xem PHOTOS.md.
+
 V1.1.14: xác nhận thu đủ từng phiếu, ngày/người/số tiền và root hoàn tác có lịch sử; phiếu đã thu xuống dưới. Bảng Phòng gọn, lọc thu theo tháng, chế độ đầy đủ. Chưa thu một phần/hoàn tiền tự động/đối soát ngân hàng; không thêm công nợ phức tạp.
 
 V1.1.11 thêm ngày giờ chốt/cập nhật lần cuối và tự tính tiền điện trên bảng. Không tự tạo phiếu, không đổi chức năng thực thu; tiền trước chốt phiếu chỉ là dự tính theo giá lưu (hoặc giá hiện tại có nhãn khi legacy chưa biết).

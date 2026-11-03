@@ -2,7 +2,7 @@
 {% block title %}{{ 'Sửa phòng' if room else 'Thêm phòng' }} · CHDV Manager{% endblock %}
 {% block content %}
 <header class="page-header"><div><a class="back-link" href="{{ url_for('rooms.index') }}">← Danh sách phòng</a><h1>{{ 'Sửa phòng ' ~ room.code if room else 'Thêm phòng mới' }}</h1><p class="muted">Thông tin phòng, người ở và phương tiện.</p></div></header>
-<section class="card form-card mw-100 w-100"><form method="post" class="stack d-grid">
+<section class="card form-card mw-100 w-100"><form method="post" enctype="multipart/form-data" class="stack d-grid">
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 <input type="hidden" name="tenancy_id" value="{{ values.get('tenancy_id', '') }}">
 <input type="hidden" name="tenancy_version" value="{{ values.get('tenancy_version', '') }}">
@@ -15,6 +15,7 @@
 <label>Biển số xe<textarea class="form-control" name="vehicles" rows="4" placeholder="Mỗi biển số một dòng">{{ values.get('vehicles', '') }}</textarea><small>Có thể để trống nếu không có xe.</small></label></div>
 {% if room and room.current_tenancy %}<label class="checkbox"><input type="checkbox" name="new_tenancy" {{ 'checked' if values.get('new_tenancy') == 'on' }}> Đổi sang khách mới (kết thúc đợt thuê cũ và giữ lịch sử)</label>{% endif %}
 <h2>Hợp đồng và phí hằng tháng</h2>
+<label>Ảnh hợp đồng (không bắt buộc)<input class="form-control" type="file" name="contract_photos" accept="image/jpeg,image/png,image/webp" multiple><small>Tối đa 5 ảnh mỗi lần, 10 MB/ảnh. JPEG, PNG hoặc WebP. Ảnh sẽ được xử lý sau khi lưu.</small></label>
 <p class="muted small">Đợt thuê mới cần nhập đủ các mục dưới đây. Dữ liệu cũ có thể bổ sung dần; nhập 0 nếu miễn phí. Không tự chia phí giữa tháng.</p>
 <div class="row g-3 align-items-start">
 <label class="col-12 col-md-6 col-xl-4">Ngày bắt đầu hợp đồng<input class="form-control" type="date" name="contract_start" max="{{ today }}" value="{{ values.get('contract_start', '') }}" data-new-required></label>

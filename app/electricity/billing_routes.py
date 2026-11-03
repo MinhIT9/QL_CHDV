@@ -11,7 +11,7 @@ from app.services.billing import bill_tenancy, bill_values, correction, lock_wri
 from app.services.electricity import current_period, valid_period
 
 bp = Blueprint("billing", __name__)
-WRITE_ERRORS = (ValueError, IntegrityError, OperationalError)
+WRITE_ERRORS = (ValueError, IntegrityError, OperationalError, OSError)
 
 
 def report(error):
@@ -27,7 +27,7 @@ def correct(reading_id):
     preview, status = None, 200
     if request.method == "POST":
         try:
-            preview = correction(reading, request.form, current_user.id, request.form.get("action") == "confirm")
+            preview = correction(reading, request.form, current_user.id, request.form.get("action") == "confirm", request.files.get("photo"))
             if request.form.get("action") == "confirm":
                 flash("Đã điều chỉnh số điện và lưu lịch sử các kỳ bị ảnh hưởng.", "success")
                 return redirect(url_for("billing.correct", reading_id=reading.id))

@@ -1,4 +1,5 @@
 import re
+from io import BytesIO
 import sqlite3
 import tempfile
 import unittest
@@ -9,6 +10,7 @@ from unittest.mock import patch
 from flask import g
 from flask.testing import FlaskClient
 from sqlalchemy.exc import IntegrityError
+from PIL import Image
 
 from app import create_app
 from app.extensions import db
@@ -30,6 +32,7 @@ class AppTestCase(unittest.TestCase):
             "TESTING": True, "SECRET_KEY": "test-only-secret",
             "SQLALCHEMY_DATABASE_URI": "sqlite:///" + (Path(self.temp.name) / "test.sqlite3").as_posix(),
             "SESSION_COOKIE_SECURE": False,
+            "PHOTO_ROOT": str(Path(self.temp.name) / "uploads"),
         })
         self.ctx = self.app.app_context()
         self.ctx.push()
@@ -58,7 +61,21 @@ class AppTestCase(unittest.TestCase):
 
     def post(self, path, data=None, client=None, page="/", follow=False):
         client = client or self.client
-        return client.post(path, data={**(data or {}), "csrf_token": self.token(client, page)}, follow_redirects=follow)
+        data = dict(data or {})
+        # Existing business tests submit the now-required meter evidence.
+        if path == "/electricity/":
+            for key, value in list(data.items()):
+                if key.startswith("end_") and value:
+                    data.setdefault("photo_" + key[4:], self.image_upload())
+        if path.startswith("/electricity/") and path.endswith("/correct") and data.get("action") == "confirm":
+            data.setdefault("photo", self.image_upload())
+        return client.post(path, data={**data, "csrf_token": self.token(client, page)}, follow_redirects=follow)
+
+    def image_upload(self, size=(100, 80)):
+        stream = BytesIO()
+        Image.new("RGB", size, "white").save(stream, "JPEG")
+        stream.seek(0)
+        return stream, "test.jpg"
 
     def login(self, username="root", password="RootTest123!", client=None):
         return self.post("/login", {"username": username, "password": password}, client=client, page="/login")
@@ -245,7 +262,7 @@ class V1Tests(AppTestCase):
             result = migrated.test_cli_runner().invoke(args=["db", "upgrade"])
             self.assertEqual(result.exit_code, 0, f"{result.output}\n{result.exception}")
             self.assertEqual(db.session.scalar(db.select(db.func.count()).select_from(Room)), 0)
-            self.assertEqual(db.session.execute(db.text("SELECT version_num FROM alembic_version")).scalar(), "41eb1b88b816")
+            self.assertEqual(db.session.execute(db.text("SELECT version_num FROM alembic_version")).scalar(), "f13a98c52b70")
             db.session.remove()
             db.engine.dispose()
 

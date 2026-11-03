@@ -1,5 +1,11 @@
 # Quyết định và vấn đề cần chốt
 
+## 2026-11-03 — Ảnh hợp đồng/điện và nén nền (V1.3.0)
+
+- Người dùng yêu cầu hợp đồng tùy chọn, ảnh chốt điện bắt buộc, lưu thư mục riêng và chỉ giữ ảnh nén dài hạn. Gắn ảnh hợp đồng theo đợt thuê, ảnh điện theo lần chốt; dữ liệu cũ giữ nguyên và có thể bổ sung. Chốt mới/sửa điện yêu cầu ảnh ở máy chủ, ảnh cũ không bị ghi đè.
+- Dùng Pillow 13.0.0 và worker CLI riêng trong cùng project Flask; hàng đợi ở SQLite và OS lock một worker, không thêm Redis/Celery. Upload được xác nhận khi đã kiểm tra/lưu tạm và commit nghiệp vụ, trạng thái ảnh pending đến khi nén xong. Khi lỗi, giữ nghiệp vụ và báo failed để tải lại ảnh.
+- Gốc chỉ ở tmp, xóa sau xử lý cả khi lỗi; dọn orphan sau 1 giờ khi worker hoạt động. WebP 2200 px/quality 82 bỏ metadata, chỉ xem qua xác thực. Backup cần DB và uploads tương ứng; VPS phải tăng Nginx lên 64m và chạy chdv-photos.service. Chưa tự triển khai VPS.
+
 ## 2026-11-03 — Bootstrap CDN và sidebar (V1.2.0)
 
 - Theo yêu cầu mới, dùng Bootstrap 5.3.8 CSS/bundle từ jsDelivr có SRI; thay quyết định trước đây về giao diện chỉ dùng tài nguyên nội bộ. CSP thêm origin CDN, không thêm unsafe-inline/eval.

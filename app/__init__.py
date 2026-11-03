@@ -25,7 +25,9 @@ def create_app(test_config=None):
         SESSION_COOKIE_SAMESITE="Lax",
         SESSION_COOKIE_SECURE=os.environ.get("COOKIE_SECURE", "false").lower() == "true",
         PERMANENT_SESSION_LIFETIME=timedelta(hours=8),
-        MAX_CONTENT_LENGTH=256 * 1024,
+        MAX_CONTENT_LENGTH=64 * 1024 * 1024,
+        PHOTO_ROOT=str(root / "instance" / "uploads"),
+        PHOTO_MAX_BYTES=10 * 1024 * 1024,
         WTF_CSRF_TIME_LIMIT=8 * 60 * 60,
     )
     if test_config:
@@ -49,6 +51,10 @@ def create_app(test_config=None):
     app.register_blueprint(rooms_bp)
     app.register_blueprint(electricity_bp)
     app.register_blueprint(billing_bp)
+    from app.photos import bp as photos_bp
+    from app.services.photos import register_commands
+    app.register_blueprint(photos_bp)
+    register_commands(app)
 
     with app.app_context():
         if db.engine.dialect.name == "sqlite":

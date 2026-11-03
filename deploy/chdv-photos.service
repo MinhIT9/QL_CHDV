@@ -1,0 +1,18 @@
+[Unit]
+Description=CHDV photo compression worker
+After=network.target
+
+[Service]
+User=chdv
+Group=chdv
+WorkingDirectory=/opt/chdv
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/opt/chdv/.venv/bin/python -m flask --app wsgi process-photos
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

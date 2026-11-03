@@ -7,6 +7,7 @@ from sqlalchemy.orm.exc import StaleDataError
 from app.extensions import db
 from app.models import MonthlyBill, Room
 from app.services.rooms import save_room
+from app.services.photos import stage_photo, upload_batch
 from app.services.electricity import current_period, reading_cost, valid_period
 from app.services.queries import active_bill_query, room_query
 from app.services.contracts import check_version, due_date, end_tenancy, local_today, renewal_preview, renew_contract
@@ -43,9 +44,17 @@ def edit(room_id=None):
     room = db.get_or_404(Room, room_id) if room_id else None
     if request.method == "POST":
         try:
-            saved = save_room(room, request.form)
-            db.session.commit()
-        except (ValueError, IntegrityError, StaleDataError, OperationalError) as error:
+            with upload_batch() as staged:
+                saved = save_room(room, request.form)
+                uploads = [f for f in request.files.getlist("contract_photos") if f.filename]
+                if uploads and not saved.current_tenancy:
+                    raise ValueError("Chỉ thêm ảnh hợp đồng khi phòng đang thuê.")
+                if len(uploads) > 5:
+                    raise ValueError("Mỗi lần tải tối đa 5 ảnh hợp đồng.")
+                for upload in uploads:
+                    stage_photo(upload, current_user.id, staged, tenancy=saved.current_tenancy)
+                db.session.commit()
+        except (ValueError, IntegrityError, StaleDataError, OperationalError, OSError) as error:
             db.session.rollback()
             flash(str(error) if isinstance(error, ValueError) else "Mã phòng đã tồn tại hoặc dữ liệu vừa được thay đổi. Vui lòng kiểm tra lại.", "danger")
             return render_template("rooms/form.html", room=room, values=request.form, today=local_today()), 400

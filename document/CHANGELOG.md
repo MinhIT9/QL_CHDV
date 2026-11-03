@@ -2,6 +2,60 @@
 
 ## 2026-11-03
 
+- V1.3.0: thêm upload hợp đồng tùy chọn, ảnh chốt/sửa điện bắt buộc, xem ảnh qua đăng nhập và bổ sung ảnh lịch sử. Thêm Photo/migration f13a98c52b70, worker SQLite/CLI nén WebP và xóa gốc tạm, xử lý lỗi/khôi phục sau crash, service Ubuntu và hướng dẫn backup DB+ảnh. Pillow 13.0.0; 57 tests pass. Đã backup/upgrade dev, chưa triển khai VPS hoặc browser QA.
+
+- V1.2.28: dọn 23 mục file/thư mục kiểm tra UI trong instance dev; giữ .gitkeep và database, kiểm tra SHA256 DB không đổi. Không thay ứng dụng hoặc VPS.
+
+- V1.2.27: làm rõ nội dung instance dev theo ảnh IDE; chưa xóa file hoặc đổi cấu hình.
+
+- V1.2.26: giải thích vai trò thư mục instance, bộ file SQLite và các file kiểm tra giao diện local; không thay dữ liệu runtime.
+
+- V1.2.25: giải thích backup SQLite đang chạy có WAL/SHM; hướng dẫn dùng CLI tạo bản nhất quán thay cho copy trực tiếp file runtime.
+
+- V1.2.24: hướng dẫn lưu database nhất quán, .env, code và cấu hình systemd/Nginx từ VPS; phân biệt chứng chỉ có thể cấp lại và runtime không cần lưu.
+
+- V1.2.23: giải thích access.log chứa request dò đường dẫn và hướng dẫn xem gọn các trường chính bằng awk; không thay cấu hình logging.
+
+- V1.2.22: xác nhận trạng thái dịch vụ từ log, giải thích journalctl chờ dữ liệu mới và hướng dẫn theo dõi lượt truy cập qua log Nginx.
+
+- V1.2.21: hướng dẫn theo dõi trạng thái dịch vụ, log ứng dụng trực tiếp và phản hồi HTTPS qua MobaXterm.
+
+- V1.2.20: xác nhận HTTPS đã cấp/cài thành công từ log Certbot; hướng dẫn kiểm tra đăng nhập root, đổi mật khẩu và gia hạn thử, chưa đánh dấu vận hành hoàn tất.
+
+- V1.2.19: xác nhận Nginx proxy trả 200 qua ảnh, hướng dẫn cấp HTTPS và chuyển HTTP sang HTTPS bằng Certbot; chờ kết quả.
+
+- V1.2.18: ghi nhận Nginx syntax pass nhưng proxy trả 404; hướng dẫn thu thập cấu hình đang nạp và kiểm tra lại trước HTTPS.
+
+- V1.2.17: ghi nhận systemd/Gunicorn chạy và /login HTTP 200 từ log; hướng dẫn Nginx reverse proxy cho domain, chờ kiểm tra trước HTTPS.
+
+- V1.2.16: làm rõ thao tác mở nano từ terminal trước khi dán nội dung chdv.service; chờ người dùng mở trình soạn thảo.
+
+- V1.2.15: xác nhận DNS đúng IP từ nslookup người dùng; hướng dẫn tạo/khởi động systemd Gunicorn và kiểm tra nội bộ.
+
+- V1.2.14: chốt IP VPS 103.167.88.214 theo người dùng; hướng dẫn cập nhật riêng DNS chdv và kiểm tra phân giải.
+
+- V1.2.13: phát hiện IP bản ghi chdv khác IP phiên SSH Ubuntu; hướng dẫn xác minh IP VPS trước bước cấu hình dịch vụ và HTTPS.
+
+- V1.2.12: xác nhận tạo root từ log; hướng dẫn cấu hình DNS subdomain chdv.alominh.homes trên Porkbun, chờ kết quả trước cấu hình web/HTTPS.
+
+- V1.2.11: ghi nhận migration VPS đạt head từ log; giải thích APP_ENV hiện chưa có tác dụng trong code và không bắt buộc cấu hình.
+
+- V1.2.10: ghi nhận 48 test pass trên VPS từ log người dùng, chọn DB mới; hướng dẫn tạo .env bí mật riêng và khởi tạo schema qua migration, chờ kết quả.
+
+- V1.2.9: ghi nhận pip cài thành công dependencies và Gunicorn 26.2.0 từ ảnh; hướng dẫn kiểm thử Ubuntu và xác định phương án dữ liệu trước khi cấu hình.
+
+- V1.2.8: giải thích cảnh báo trong bước tạo user/copy code, hướng dẫn kiểm tra thư mục và tiếp tục venv/pip; chưa xác nhận cài thư viện.
+
+- V1.2.7: ghi nhận apt hoàn tất từ ảnh, hướng dẫn tạo tài khoản/thư mục chạy ứng dụng và cài thư viện trong venv, chờ kết quả VPS.
+
+- V1.2.6: xác nhận danh sách upload từ ảnh; hướng dẫn đợt cài gói hệ thống Ubuntu, chờ kết quả trước khi cấu hình thư mục ứng dụng.
+
+- V1.2.5: ghi nhận kết quả kiểm tra VPS từ ảnh; hướng dẫn upload danh sách code cần thiết qua SFTP, chưa chuyển dữ liệu hoặc cài đặt.
+
+- V1.2.4: chuyển sang hướng dẫn triển khai từng đợt ngắn; bắt đầu kiểm tra VPS và tạo thư mục upload, chờ kết quả người dùng trước đợt tiếp theo.
+
+- V1.2.3: phân tích triển khai Ubuntu 24.04 qua MobaXterm; thêm hướng dẫn copy code/backup SQLite, thư mục, Gunicorn/systemd, Nginx/HTTPS và vận hành. Chưa thực thi trên VPS; không đổi app hoặc schema.
+
 - V1.2.2: tái sử dụng reading_cost cho giá/tiền điện; query phòng/phiếu hiệu lực vào service, bỏ phụ thuộc giữa route; thêm test nguồn giá và quy ước tái sử dụng.
 
 - V1.2.1: form phòng rộng theo khung, grid hợp đồng/phí responsive Bootstrap, bỏ sticky thanh lưu gây phủ nội dung.
