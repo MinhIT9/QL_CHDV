@@ -4,9 +4,9 @@ Cập nhật: 2026-11-03 (Asia/Saigon).
 
 ## Phiên bản hội thoại
 
-- Phiên bản phản hồi gần nhất: V1.3.0.
-- Nội dung: Thêm ảnh hợp đồng tùy chọn theo đợt thuê, ảnh chốt/sửa điện bắt buộc; upload riêng tư, hàng đợi SQLite và worker CLI nén WebP/xóa gốc tạm. 57 tests pass với Pillow 13.0.0 trong .venv; local đã backup/upgrade f13a98c52b70, db check/Node/docs đạt. VPS chưa cập nhật; xem PHOTOS.md và deploy/chdv-photos.service, cần Nginx 64m và worker. Chưa browser QA/Ubuntu runtime/restore ảnh.
-- Phản hồi tiếp theo tối thiểu V1.3.1; có thể tăng minor/major theo quy tắc mới trong AGENTS.md.
+- Phiên bản phản hồi gần nhất: V1.3.3.
+- Nội dung: Chuyển bổ sung ảnh công tơ sang màn Sửa điện, hiển thị ngay khi mở trang, upload không cần sửa số và redirect về đúng kỳ. Bảng điện dẫn tới mục ảnh màn điện; phòng chỉ còn form ảnh hợp đồng, lịch sử điện vẫn xem ảnh. 10 test ảnh và 12 test billing đạt, không đổi schema/nén; chưa browser QA/VPS.
+- Phản hồi tiếp theo tối thiểu V1.3.4; có thể tăng minor/major theo quy tắc mới trong AGENTS.md.
 - Quy tắc đầy đủ ở AGENTS.md, mục “Phiên bản ở cuối phản hồi”.
 
 ## Đã làm
@@ -31,6 +31,10 @@ Cập nhật: 2026-11-03 (Asia/Saigon).
 - Chỉ chốt tiền một đợt thuê xác định đủ tháng; thiếu điện, ngày không rõ, vào/trả giữa tháng hoặc đổi khách cùng kỳ bị chặn. Không có engine lịch giá tự động: giá trên form là gợi ý, Admin xác nhận cho từng kỳ.
 
 ## Kiểm tra
+
+- V1.3.2: đọc log người dùng và DB local xác nhận no such table: photo, schema 41eb1b88b816. Backup trước upgrade rồi kiểm tra schema không drift, integrity ok, toàn bộ dòng/cột các bảng cũ khớp backup; smoke GET /electricity/ có phiên xác thực trả 200, không chỉnh user. Inventory/diff đạt; không chạy lại suite vì không đổi code. Không chứng minh bản copy live từ VPS có đầy đủ WAL, chỉ xác nhận dữ liệu bản nhập được giữ khi migrate.
+
+- V1.3.1: đã tạo lại .env dev bị mất từ .env.example, SECRET_KEY ngẫu nhiên mới, DATABASE_URL local và COOKIE_SECURE=false; không đặt/reset mật khẩu root, không đổi DB hoặc VPS. App đọc cấu hình được và test client GET /login HTTP 200. Khóa mới làm phiên dev cũ hết hiệu lực. Inventory/diff đạt; không chạy lại suite nghiệp vụ vì chỉ khôi phục cấu hình local.
 
 - V1.3.0: `.venv/Scripts/python.exe -m unittest discover -s tests`: 57 tests pass (34.859s), gồm 9 test ảnh: thiếu ảnh/rollback, upload giả/quá byte/pixel/ảnh động, quyền/CSRF/413, giữ ảnh theo đợt thuê, sửa điện bắt buộc ảnh mới, EXIF/resize/WebP/xóa gốc, worker lỗi/reupload/khôi phục sau rename, orphan cleanup và khóa worker. Pillow 13.0.0 cài riêng trong .venv (system-site-packages cho dependencies đã có), không đổi Python toàn cục. Migration f13a98c52b70 đã backup `backups/pre-photos-20261103-v130.sqlite3` rồi upgrade local; số dòng các bảng nghiệp vụ không đổi, integrity_check ok và db check không drift. Node syntax và inventory/diff đạt. Không tự khởi động worker nền lâu dài; mở terminal chạy process-photos theo PHOTOS.md khi thử dev. Chưa browser E2E, kiểm tra độ rõ ảnh hợp đồng thực tế, Ubuntu worker/HTTPS upload hoặc restore bộ DB+ảnh. Bước tiếp: thử ảnh giả qua UI dev, sau đó cập nhật VPS từng bước, tăng Nginx 64m, cài dependencies/migration và bật chdv-photos. Backup phải thêm uploads; không chỉ DB.
 

@@ -50,19 +50,12 @@
 <section class="card table-card"><div class="section-heading"><h2>Lịch sử gia hạn</h2></div><div class="table-scroll"><table class="table table-striped table-hover align-middle mb-0"><thead><tr><th>Khách</th><th>Hạn cũ</th><th>Số tháng</th><th>Hạn mới</th><th>Ngày thao tác</th><th>Admin</th><th>Ghi chú</th></tr></thead><tbody>{% set count = namespace(value=0) %}{% for item in room.tenancies|reverse %}{% for renewal in item.renewals|reverse %}{% set count.value = count.value + 1 %}<tr><td>{{ item.tenant_name }}</td><td>{{ renewal.old_end|business_date }}</td><td>{{ renewal.months }}</td><td>{{ renewal.new_end|business_date }}</td><td>{{ renewal.created_at|local_date }}</td><td>{{ renewal.author.username }}</td><td>{{ renewal.note or '—' }}</td></tr>{% endfor %}{% endfor %}{% if count.value == 0 %}<tr><td colspan="7" class="empty">Chưa có gia hạn hợp đồng.</td></tr>{% endif %}</tbody></table></div></section>
 {% if room.active or (not room.readings and not room.tenancies) %}<a class="button danger btn btn-outline-danger" href="{{ url_for('rooms.remove', room_id=room.id) }}">{{ 'Ngừng sử dụng phòng' if room.readings or room.tenancies else 'Xóa phòng' }}</a>{% endif %}
 <section class="card mt-3">
-  <h2>Ảnh theo đợt thuê và kỳ điện</h2>
+  <h2>Ảnh hợp đồng theo đợt thuê</h2>
   {% for item in room.tenancies|reverse %}
     <details class="mb-3">
       <summary>Hợp đồng · {{ item.tenant_name }} · {{ item.contract_start|business_date }}</summary>
       {{ photo_list(item.photos) }}
       {{ photo_upload('contract', item.id) }}
-    </details>
-  {% endfor %}
-  {% for reading in room.readings|reverse %}
-    <details class="mb-3">
-      <summary>Chốt điện · {{ reading.period }}</summary>
-      {{ photo_list(reading.photos) }}
-      {{ photo_upload('electricity', reading.id) }}
     </details>
   {% endfor %}
 </section>

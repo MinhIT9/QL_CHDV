@@ -1,12 +1,19 @@
 {% extends 'base.html' %}
 {% block content %}
+{% from 'partials/photos.html' import photo_list, photo_upload with context %}
 <header class="page-header"><div><a class="back-link" href="{{ url_for('electricity.index', period=reading.period) }}">← Chỉ số điện</a><h1>Sửa điện · {{ reading.room.code }}</h1><p class="muted">Kỳ {{ reading.period }} · Kiểm tra ảnh hưởng kỳ sau trước khi lưu.</p></div></header>
+<section class="card narrow mb-3" id="meter-photos">
+  <h2>Ảnh công tơ điện · kỳ {{ reading.period }}</h2>
+  <p class="text-muted small">Có thể bổ sung ảnh cho kỳ này mà không cần thay đổi chỉ số điện.</p>
+  {{ photo_list(reading.photos) }}
+  {{ photo_upload('electricity', reading.id) }}
+</section>
 <section class="card narrow"><form method="post" enctype="multipart/form-data" class="stack d-grid">
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="stamp" value="{{ values.get('stamp', '') }}">
 <label>Chỉ số đầu<input class="form-control" type="number" name="start_value" min="0" max="2147483647" required value="{{ values.get('start_value', '') }}" {{ 'readonly' if previous or preview }}><small>Chỉ được sửa đầu kỳ nếu là lần ghi đầu tiên.</small></label>
 <label>Chỉ số cuối mới<input class="form-control" type="number" name="end_value" min="0" max="2147483647" required value="{{ values.get('end_value', '') }}" {{ 'readonly' if preview }}></label>
 <label>Lý do điều chỉnh<textarea class="form-control" name="reason" required maxlength="500" {{ 'readonly' if preview }}>{{ values.get('reason', '') }}</textarea></label>
-{% if preview %}<label>Ảnh đối chiếu số điện (bắt buộc)<input class="form-control" type="file" name="photo" accept="image/jpeg,image/png,image/webp" required><small>Chọn ảnh sau khi xem trước, tối đa 10 MB. Ảnh cũ được giữ trong lịch sử phòng.</small></label>{% endif %}
+{% if preview %}<label>Ảnh đối chiếu số điện (bắt buộc)<input class="form-control" type="file" name="photo" accept="image/jpeg,image/png,image/webp" required><small>Tối đa 10 MB. Ảnh mới được lưu cùng lần sửa; ảnh cũ vẫn được giữ để đối chiếu.</small></label>{% else %}<p class="text-muted small">Nếu thay đổi chỉ số, bạn sẽ chọn ảnh đối chiếu mới ở bước xác nhận sau khi xem trước.</p>{% endif %}
 {% if preview %}<div class="notice">{% for item in preview %}<p><strong>{{ item.period }}</strong>: {{ item.old_start }} → {{ item.old_end }} ({{ item.old_end - item.old_start }} kWh)<br>Thành {{ item.new_start }} → {{ item.new_end }} ({{ item.new_end - item.new_start }} kWh)</p>{% endfor %}</div><div class="actions d-flex gap-2 align-items-center flex-wrap"><a class="button secondary btn btn-outline-secondary" href="{{ url_for('billing.correct', reading_id=reading.id) }}">Nhập lại</a><button class="button primary btn btn-primary" name="action" value="confirm" type="submit">Xác nhận sửa</button></div>
 {% else %}<button class="button primary btn btn-primary" name="action" value="preview" type="submit">Xem trước thay đổi</button>{% endif %}
 </form></section>

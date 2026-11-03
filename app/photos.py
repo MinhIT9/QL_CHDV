@@ -37,4 +37,6 @@ def add(kind, owner_id):
         flash(str(error) if isinstance(error, ValueError) else "Không thể lưu ảnh. Hãy thử lại.", "danger")
     else:
         flash("Đã nhận ảnh, đang xử lý. Tải lại trang sau vài giây để xem.", "success")
+    if kind == "electricity":
+        return redirect(url_for("billing.correct", reading_id=owner.id, _anchor="meter-photos"))
     return redirect(url_for("rooms.detail", room_id=owner.room_id))

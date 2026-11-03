@@ -2,6 +2,12 @@
 
 ## 2026-11-03
 
+- V1.3.3: chuyển form bổ sung ảnh công tơ sang màn điện, hiển thị ngay khi mở Sửa điện; upload giữ nguyên chỉ số và quay lại đúng kỳ, bỏ form ảnh điện khỏi chi tiết phòng.
+
+- V1.3.2: backup và migrate DB VPS cũ vừa nhập vào dev để thêm bảng photo; giữ nguyên nội dung bảng cũ, kiểm tra schema/integrity và màn điện HTTP 200.
+
+- V1.3.1: khôi phục .env dev bị mất từ mẫu với khóa ngẫu nhiên mới, giữ dữ liệu/tài khoản; kiểm tra load app và /login HTTP 200.
+
 - V1.3.0: thêm upload hợp đồng tùy chọn, ảnh chốt/sửa điện bắt buộc, xem ảnh qua đăng nhập và bổ sung ảnh lịch sử. Thêm Photo/migration f13a98c52b70, worker SQLite/CLI nén WebP và xóa gốc tạm, xử lý lỗi/khôi phục sau crash, service Ubuntu và hướng dẫn backup DB+ảnh. Pillow 13.0.0; 57 tests pass. Đã backup/upgrade dev, chưa triển khai VPS hoặc browser QA.
 
 - V1.2.28: dọn 23 mục file/thư mục kiểm tra UI trong instance dev; giữ .gitkeep và database, kiểm tra SHA256 DB không đổi. Không thay ứng dụng hoặc VPS.

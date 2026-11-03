@@ -185,3 +185,24 @@ class PhotoTests(AppTestCase):
             result = self.app.test_cli_runner().invoke(args=["process-photos", "--once"])
             self.assertNotEqual(result.exit_code, 0)
             self.assertIn("already running", result.output)
+
+    def test_meter_photo_upload_is_available_on_electricity_page_without_changing_reading(self):
+        room = self.room()
+        reading = ElectricityReading(room_id=room.id, period="2026-01", start_value=10, end_value=20, created_by=self.root_id)
+        db.session.add(reading)
+        db.session.commit()
+        path = f"/electricity/{reading.id}/correct"
+        html = self.client.get(path).get_data(as_text=True)
+        upload_path = f"/photos/electricity/{reading.id}"
+        self.assertIn('id="meter-photos"', html)
+        self.assertIn(f'action="{upload_path}"', html)
+        self.assertIn('type="file"', html)
+        response = self.post(upload_path, {"photo": self.image_upload()})
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.location.endswith(path + "#meter-photos"))
+        self.assertEqual((reading.start_value, reading.end_value), (10, 20))
+        self.assertEqual(len(reading.photos), 1)
+        html = self.client.get('/electricity/?period=2026-01').get_data(as_text=True)
+        self.assertIn(path + '#meter-photos', html)
+        room_html = self.client.get(f'/rooms/{room.id}').get_data(as_text=True)
+        self.assertNotIn(f'action="{upload_path}"', room_html)

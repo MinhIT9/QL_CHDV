@@ -1,6 +1,12 @@
 # Tiến độ thực tế
 
-Cập nhật: 2026-11-03 (Asia/Saigon). Phiên bản hội thoại: V1.3.0.
+Cập nhật: 2026-11-03 (Asia/Saigon). Phiên bản hội thoại: V1.3.3.
+
+V1.3.3: bổ sung/xem ảnh công tơ ngay trên màn Sửa điện; form ảnh riêng không yêu cầu đổi số. Link từ bảng điện và redirect upload về đúng kỳ điện, bỏ form ảnh điện bên phòng (giữ xem lịch sử). Kiểm tra 10 test ảnh và 12 test billing đạt, inventory/diff đạt. Không đổi DB/nén; chưa browser QA/VPS.
+
+V1.3.2: sửa lỗi dev thiếu bảng photo sau khi người dùng nhập DB VPS cũ. Đã backup bản nhập rồi upgrade từ 41eb1b88b816 lên f13a98c52b70. db check/integrity đạt, nội dung mọi bảng cũ khớp backup, GET /electricity/ với phiên đăng nhập trả 200. Không đổi tài khoản/mật khẩu hoặc VPS; không xác nhận tính đầy đủ của bản copy so với VPS/WAL. Kiểm tra inventory/diff; không chạy lại suite vì không đổi code.
+
+V1.3.1: tạo lại .env dev bị xóa bằng mẫu và SECRET_KEY ngẫu nhiên mới; giữ database/tài khoản, COOKIE_SECURE=false để chạy HTTP local. Kiểm tra app load và /login HTTP 200, inventory/diff đạt; không chạy lại suite nghiệp vụ hoặc thao tác VPS. Phiên đăng nhập dev cũ hết hiệu lực do đổi khóa.
 
 V1.3.0: đã hiện thực upload ảnh hợp đồng tùy chọn theo đợt thuê, ảnh điện bắt buộc khi chốt/sửa; dữ liệu cũ giữ nguyên và có thể bổ sung ảnh. Ảnh riêng tư ngoài static, kiểm tra JPEG/PNG/WebP 10 MB/24 MP, request 64 MB. Hàng đợi SQLite + một worker CLI có khóa OS nén WebP 2200 px/quality 82, bỏ metadata, xóa gốc tạm, báo pending/failed và cho tải lại. 57 tests pass với Pillow 13.0.0 trong .venv; Node syntax đạt. Migration f13a98c52b70 đã backup/upgrade local, số dòng nghiệp vụ giữ nguyên/integrity ok/db check không drift. Docs inventory/diff đạt. Có hướng dẫn PHOTOS.md và service worker Ubuntu; chưa cập nhật VPS hoặc chạy worker dev lâu dài, chưa browser QA/đánh giá ảnh chữ thực tế/restore DB+ảnh. Khi deploy cần Nginx 64m và bật worker; backup phải lưu thêm uploads.
 

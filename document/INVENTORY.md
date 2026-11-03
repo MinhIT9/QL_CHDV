@@ -88,6 +88,7 @@ document/DEVELOPMENT.md
 document/FEES_CONTRACTS_PROPOSAL.md
 document/HANDOFF.md
 document/INVENTORY.md
+document/Lệnh Hay Dùng.md
 document/PHOTOS.md
 document/README.md
 document/SCOPE.md
@@ -120,4 +121,4 @@ tests/test_v1.py
 wsgi.py
 ```
 
-Tổng: 111 file (bao gồm file danh mục này).
+Tổng: 112 file (bao gồm file danh mục này).

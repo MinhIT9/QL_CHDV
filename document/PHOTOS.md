@@ -5,7 +5,7 @@
 - Thêm/sửa phòng đang thuê: tối đa 5 ảnh hợp đồng mỗi lần, không bắt buộc. Ảnh gắn với đợt thuê, không chuyển sang khách mới khi đổi khách.
 - Chốt số điện: mỗi phòng có nhập cuối kỳ phải chọn một ảnh. Phòng không nhập số được bỏ qua. Kiểm tra bắt buộc ở máy chủ.
 - Sửa số điện: sau xem trước, chọn ảnh đối chiếu mới rồi xác nhận. Giữ ảnh cũ và lịch sử; kỳ sau được cập nhật đầu kỳ tự động không yêu cầu chụp lại cuối kỳ.
-- Chi tiết phòng: xem ảnh theo đợt thuê/kỳ, bổ sung vào dữ liệu cũ hoặc tải lại nếu xử lý lỗi. Không ép dữ liệu cũ phải có ảnh khi migration.
+- Màn Sửa điện: mục Ảnh công tơ điện xuất hiện ngay khi mở trang, cho xem/bổ sung ảnh vào kỳ cũ mà không cần đổi số; bảng Chỉ số điện dẫn bổ sung ảnh tới đây. Upload xong quay lại đúng màn điện/kỳ. Chi tiết phòng chỉ bổ sung ảnh hợp đồng, lịch sử điện vẫn xem ảnh đã lưu. Không ép dữ liệu cũ phải có ảnh khi migration.
 - Nhận JPEG, PNG, WebP tĩnh, tối đa 10 MB và 24 megapixel/ảnh. Chưa nhận HEIC, PDF, SVG hoặc ảnh động. Mỗi request tối đa 64 MB; nhiều phòng hãy lưu từng phần. Sau lỗi form cần chọn lại file.
 - Hiện trạng thái đang xử lý/lỗi; tải lại trang sau vài giây để xem liên kết ảnh. Chỉ Root/Admin đã đăng nhập và đã đổi mật khẩu bắt buộc mới xem/bổ sung ảnh, cùng phạm vi quyền phòng hiện tại.
 
