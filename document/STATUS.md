@@ -1,6 +1,8 @@
 # Tiến độ thực tế
 
-Cập nhật: 2026-11-03 (Asia/Saigon). Phiên bản hội thoại: V1.2.0.
+Cập nhật: 2026-11-03 (Asia/Saigon). Phiên bản hội thoại: V1.2.1.
+
+V1.2.1: 14 test_contracts pass. form thêm/sửa phòng dùng Bootstrap mw-100/w-100 bỏ giới hạn 1000px, nhóm hợp đồng/phí dùng grid 1/2/3 cột theo màn hình, thanh lưu position-static để không phủ nội dung khi cuộn. Ô khách bị khóa khi trạng thái Trống là hành vi hiện có, giữ nguyên. Chưa browser QA; không đổi DB/nghiệp vụ.
 
 V1.2.0: Bootstrap 5.3.8 CSS/bundle CDN có SRI; CSP cho phép jsDelivr. Chuyển nút/form/bảng/alert và tiện ích bố cục sang Bootstrap, bỏ CSS trùng. Sidebar bỏ animation lặp, khôi phục trạng thái lên html trước paint để tránh flash khi tải/chuyển HTMX. 47 test pass, Node syntax và 4 kiểm tra trạng thái trước paint pass. Chưa browser QA/CDN runtime; cần mạng cho Bootstrap. Không đổi DB/nghiệp vụ.
 

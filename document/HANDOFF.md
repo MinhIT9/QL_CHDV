@@ -4,9 +4,9 @@ Cập nhật: 2026-11-03 (Asia/Saigon).
 
 ## Phiên bản hội thoại
 
-- Phiên bản phản hồi gần nhất: V1.2.0.
-- Nội dung: Bootstrap CDN, giảm CSS riêng và sửa sidebar nhấp nháy.
-- Phản hồi tiếp theo tối thiểu V1.2.1; có thể tăng minor/major theo quy tắc mới trong AGENTS.md.
+- Phiên bản phản hồi gần nhất: V1.2.1.
+- Nội dung: Sửa khoảng trống và thanh lưu che nội dung trong form phòng bằng Bootstrap.
+- Phản hồi tiếp theo tối thiểu V1.2.2; có thể tăng minor/major theo quy tắc mới trong AGENTS.md.
 - Quy tắc đầy đủ ở AGENTS.md, mục “Phiên bản ở cuối phản hồi”.
 
 ## Đã làm
@@ -31,6 +31,8 @@ Cập nhật: 2026-11-03 (Asia/Saigon).
 - Chỉ chốt tiền một đợt thuê xác định đủ tháng; thiếu điện, ngày không rõ, vào/trả giữa tháng hoặc đổi khách cùng kỳ bị chặn. Không có engine lịch giá tự động: giá trên form là gợi ý, Admin xác nhận cho từng kỳ.
 
 ## Kiểm tra
+
+- V1.2.1: 14 test_contracts pass. template form phòng đổi utility Bootstrap để rộng theo khung, phí 1/2/3 cột, thanh lưu trong luồng bình thường. Chưa browser QA. Bước tiếp kiểm tra thực tế desktop/mobile và chọn Đang thuê để mở ô khách; không thay logic disabled.
 
 - V1.2.0: 47 unittest pass; Node syntax và 4 kiểm tra sidebar true/false/không lưu/storage bị chặn pass. Bootstrap CDN 5.3.8 có SRI/CSP; chưa browser QA/CDN runtime. Bước tiếp kiểm tra trực quan form/bảng/login và HTMX khi sidebar ẩn. Sidebar state lên html trước paint; bỏ animation sidebar. Không migration. Ưu tiên Bootstrap cho các thay đổi tiếp theo.
 

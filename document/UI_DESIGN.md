@@ -1,5 +1,7 @@
 # Giao diện V1.1.7
 
+V1.2.1: form phòng dùng mw-100/w-100, nhóm phí dùng row/g-3 và col-12/col-md-6/col-xl-4; thanh lưu position-static. Không đổi form nghiệp vụ, ô khách tiếp tục disabled khi phòng Trống.
+
 V1.2.0: Bootstrap 5.3.8 CDN trước app.css, bundle defer; ưu tiên btn/form-control/form-select/table/alert và tiện ích align/flex/gap. Giữ theme/sticky/sidebar/responsive đặc thù; popup thu tiền vẫn native. Sidebar bỏ animation lúc render, script head nội bộ khôi phục html.sidebar-collapsed trước paint, tránh flash khi HTMX thay body. Cần mạng cho Bootstrap, chưa browser QA sau chuyển đổi.
 
 V1.1.24: motion CSS 140–240ms, opacity khi hiện surface/thông báo/popover; sidebar trượt nhẹ khi hiện, ẩn ngay như trước. Hover menu, nút menu, thẻ tổng quan và dòng bảng có transition. Tránh transform container nội dung để giữ sticky; không delay nhập liệu, không stagger hàng bảng. Tôn trọng prefers-reduced-motion, không thêm dependency.

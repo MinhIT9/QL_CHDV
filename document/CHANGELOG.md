@@ -2,6 +2,8 @@
 
 ## 2026-11-03
 
+- V1.2.1: form phòng rộng theo khung, grid hợp đồng/phí responsive Bootstrap, bỏ sticky thanh lưu gây phủ nội dung.
+
 - V1.2.0: Bootstrap 5.3.8 CSS/bundle CDN có SRI/CSP; nút/form/bảng/alert và tiện ích dùng Bootstrap, bỏ CSS trùng. Sidebar khôi phục trạng thái trước paint và bỏ animation lặp.
 
 - V1.1.24: thêm chuyển động nhẹ khi hiện trang/sidebar/popover/thông báo, phản hồi hover/nhấn; tắt animation khi người dùng chọn giảm chuyển động.
