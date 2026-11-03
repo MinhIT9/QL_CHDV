@@ -1,5 +1,7 @@
 # Giao diện V1.1.7
 
+V1.1.23: lịch sử điện chi tiết phòng có 6 cột, thêm đơn giá và tiền điện; nhãn Đã chốt tiền/Tạm tính/Chưa có giá đã lưu. Ưu tiên giá phiếu hiệu lực, nếu chưa có phiếu dùng snapshot lần chốt điện, không suy giá hiện tại cho dữ liệu cũ. Nav Tài khoản dành root đặt cuối sidebar trên hồ sơ, tách menu nghiệp vụ.
+
 V1.1.21: cột Xe / biển số chỉ hiển thị biển số từng dòng, bỏ dòng đếm xe theo yêu cầu; không có xe dùng dấu —.
 
 V1.1.20: bảng phòng gọn 13 cột, thêm Xe / biển số (đếm xe, mỗi biển một nhãn/dòng), tiền dịch vụ và tổng tiền nước kèm phép tính theo người. Bảng đầy đủ cũng dùng hai partial vehicle_cell/water_cell. Đây là dự tính theo giá phòng hiện tại, không thay snapshot tiền kỳ. Chi tiết tách nước/dịch vụ thay dòng cộng gộp; giữ tổng dự tính cũ. Tiền căn phải, số người căn giữa, màu dòng xen kẽ/hover; màn hẹp cuộn ngang, giữ sticky phòng/thao tác.

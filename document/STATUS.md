@@ -1,6 +1,10 @@
 # Tiến độ thực tế
 
-Cập nhật: 2026-11-03 (Asia/Saigon). Phiên bản hội thoại: V1.1.21.
+Cập nhật: 2026-11-03 (Asia/Saigon). Phiên bản hội thoại: V1.1.23.
+
+V1.1.23: lịch sử điện chi tiết phòng thêm đơn giá và tiền điện tự tính; ưu tiên phiếu hiệu lực, sau đó giá snapshot của lần chốt điện. Dữ liệu cũ thiếu giá hiển thị chưa có giá đã lưu, không tự áp giá hiện tại vào lịch sử. Tài khoản chuyển cuối menu sidebar, trên hồ sơ. 11 test billing pass, có test giá snapshot/phiếu/0/thiếu giá; chưa browser QA. Không đổi schema.
+
+V1.1.22: cập nhật AGENTS.md theo yêu cầu: tự tăng patch/minor/major theo mức thay đổi; code gọn, đúng chuẩn, format dễ đọc trong phạm vi sửa. Chỉ sửa tài liệu, không format lại app trong lượt này; không cần chạy test nghiệp vụ. Kiểm tra bằng script tài liệu và diff whitespace.
 
 V1.1.21: bỏ dòng đếm xe trong hai bảng phòng, chỉ giữ biển số từng dòng; không có xe hiển thị dấu —. Xóa CSS vehicle-count không dùng. Kiểm tra render partial với 2 xe/không xe/không khách; không đổi nghiệp vụ/DB, chưa browser QA.
 

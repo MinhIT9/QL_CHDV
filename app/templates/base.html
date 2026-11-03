@@ -7,7 +7,7 @@
   <title>{% block title %}CHDV Manager{% endblock %}</title>
   <meta name="theme-color" content="#102a36">
   <link rel="icon" href="{{ url_for('static', filename='images/favicon.svg') }}" type="image/svg+xml">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css', v='1.1.20') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css', v='1.1.23') }}">
   <meta name="htmx-config" content='{"allowEval":false,"allowScriptTags":false,"historyCacheSize":0}'>
   <script src="{{ url_for('static', filename='vendor/htmx.min.js') }}" defer></script>
   <script src="{{ url_for('static', filename='js/app.js', v='1.1.19') }}" defer></script>
@@ -21,10 +21,16 @@
   <nav aria-label="Điều hướng chính">
     <a class="{{ 'selected' if request.blueprint == 'rooms' }}" {% if request.blueprint == 'rooms' %}aria-current="page"{% endif %} href="{{ url_for('rooms.index') }}">{{ icon('rooms') }} <span>Phòng</span>{{ icon('chevron', 'nav-chevron') }}</a>
     <a class="{{ 'selected' if request.blueprint == 'electricity' }}" {% if request.blueprint == 'electricity' %}aria-current="page"{% endif %} href="{{ url_for('electricity.index') }}">{{ icon('bolt') }} <span>Chỉ số điện</span>{{ icon('chevron', 'nav-chevron') }}</a>
-    {% if current_user.is_root %}<a class="{{ 'selected' if request.endpoint == 'auth.accounts' }}" {% if request.endpoint == 'auth.accounts' %}aria-current="page"{% endif %} href="{{ url_for('auth.accounts') }}">{{ icon('users') }} <span>Tài khoản</span>{{ icon('chevron', 'nav-chevron') }}</a>{% endif %}
     <a class="{{ 'selected' if request.endpoint and request.endpoint.startswith('billing.') and request.endpoint != 'billing.correct' }}" href="{{ url_for('billing.index') }}">{{ icon('calendar') }} <span>Chốt tiền</span></a>
   </nav>
   <div class="sidebar-note">{{ icon('building') }}<p>Mọi căn phòng.<br><strong>Trong tầm tay.</strong></p><span>CHDV MANAGER BASIC</span></div>
+  {% if current_user.is_root %}
+  <nav class="sidebar-bottom" aria-label="Quản trị">
+    <a class="{{ 'selected' if request.endpoint == 'auth.accounts' }}" {% if request.endpoint == 'auth.accounts' %}aria-current="page"{% endif %} href="{{ url_for('auth.accounts') }}">
+      {{ icon('users') }} <span>Tài khoản</span>
+    </a>
+  </nav>
+  {% endif %}
   <div class="profile"><div class="profile-identity"><span class="avatar">{{ current_user.username[0]|upper }}</span><div><strong>{{ current_user.username }}</strong><small>{{ 'Quản trị hệ thống' if current_user.is_root else 'Quản lý phòng' }}</small></div></div>
     <div class="profile-actions"><a href="{{ url_for('auth.change_password') }}">{{ icon('lock') }} Đổi mật khẩu</a>
     <form action="{{ url_for('auth.logout') }}" method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="logout" type="submit" aria-label="Đăng xuất" title="Đăng xuất">{{ icon('logout') }}</button></form></div>

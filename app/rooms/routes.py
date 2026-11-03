@@ -82,7 +82,16 @@ def detail(room_id):
     period = request.args.get("period", current_period())
     if not valid_period(period):
         period = current_period()
+    bills = {
+        bill.period: bill
+        for bill in db.session.scalars(
+            db.select(MonthlyBill).where(
+                MonthlyBill.room_id == room.id, MonthlyBill.cancelled_at.is_(None)
+            )
+        )
+    }
     return render_template("rooms/detail.html", room=room, today=local_today(), period=period,
+                           bills=bills,
                            payment_due=due_date(room.current_tenancy, period) if room.current_tenancy else None)
 
 

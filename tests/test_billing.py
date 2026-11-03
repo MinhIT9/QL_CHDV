@@ -25,6 +25,26 @@ class BillingTests(AppTestCase):
     def correction_data(self, **extra):
         return {"action": "confirm", "stamp": reading_stamp(self.first), "start_value": "1250", "end_value": "1300", "reason": "Correct reading", **extra}
 
+    def test_room_history_uses_saved_price_and_bill_override(self):
+        path = f"/rooms/{self.room_obj.id}"
+        self.first.electricity_price = 3600
+        self.next.electricity_price = 0
+        db.session.commit()
+        html = self.client.get(path).get_data(as_text=True)
+        self.assertIn('360.000', html)
+        self.assertIn('<strong>0 ', html)
+        self.room_obj.current_tenancy.electricity_price = 9000
+        db.session.commit()
+        self.assertIn('360.000', self.client.get(path).get_data(as_text=True))
+        self.assertEqual(self.post(f"/rooms/{self.room_obj.id}/bill", self.bill_data()).status_code, 302)
+        html = self.client.get(path).get_data(as_text=True)
+        self.assertIn('400.000', html)
+        self.assertNotIn('360.000', html)
+        self.next.electricity_price = None
+        db.session.commit()
+        html = self.client.get(path).get_data(as_text=True)
+        self.assertNotIn('450.000', html)
+
     def test_correction_updates_next_start_and_audits_both(self):
         data = self.correction_data(action="preview")
         path = f"/electricity/{self.first.id}/correct"

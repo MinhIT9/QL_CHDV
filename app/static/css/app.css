@@ -60,6 +60,9 @@ small { display: block; color: var(--muted); font-weight: 400; margin-top: 6px; 
 .brand-icon .icon { width: 25px; height: 25px; }
 .nav-caption { font-size: 9px; letter-spacing: 1.8px; color: #829ba5; padding-left: 15px; margin-bottom: 15px; font-weight: 600; }
 .sidebar nav { display: grid; gap: 7px; }
+.sidebar .sidebar-bottom { margin: 0 0 14px; }
+.reading-history { min-width: 660px; }
+.reading-history td, .reading-history th { padding-left: 16px; padding-right: 16px; }
 .sidebar nav a { position: relative; display: flex; align-items: center; gap: 13px; min-height: 48px; color: #a9bdc7; padding: 13px 15px; border-radius: 9px; font-size: 13px; font-weight: 550; transition: background .18s, color .18s; }
 .sidebar nav a:hover { color: white; background: #ffffff08; }
 .sidebar nav a.selected { background: #ffffff0c; color: #f5fbfa; }
