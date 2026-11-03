@@ -155,3 +155,49 @@ class ElectricityReading(db.Model):
     @property
     def consumption(self):
         return self.end_value - self.start_value
+
+
+class ReadingRevision(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    reading_id = db.Column(db.Integer, db.ForeignKey("electricity_reading.id", ondelete="RESTRICT"), nullable=False)
+    old_start = db.Column(db.Integer, nullable=False)
+    old_end = db.Column(db.Integer, nullable=False)
+    new_start = db.Column(db.Integer, nullable=False)
+    new_end = db.Column(db.Integer, nullable=False)
+    reason = db.Column(db.String(500), nullable=False)
+    created_by = db.Column(db.Integer, db.ForeignKey("user.id", ondelete="RESTRICT"), nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=utcnow)
+    author = db.relationship("User")
+
+
+class MonthlyBill(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    room_id = db.Column(db.Integer, db.ForeignKey("room.id", ondelete="RESTRICT"), nullable=False)
+    tenancy_id = db.Column(db.Integer, db.ForeignKey("tenancy.id", ondelete="RESTRICT"), nullable=False)
+    period = db.Column(db.String(7), nullable=False)
+    tenant_name = db.Column(db.String(120), nullable=False)
+    room_code = db.Column(db.String(30), nullable=False)
+    start_value = db.Column(db.Integer, nullable=False)
+    end_value = db.Column(db.Integer, nullable=False)
+    rent_price = db.Column(db.Integer, nullable=False)
+    water_price = db.Column(db.Integer, nullable=False)
+    service_price = db.Column(db.Integer, nullable=False)
+    electricity_price = db.Column(db.Integer, nullable=False)
+    people_count = db.Column(db.Integer, nullable=False)
+    due_date = db.Column(db.Date, nullable=False)
+    created_by = db.Column(db.Integer, db.ForeignKey("user.id", ondelete="RESTRICT"), nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=utcnow)
+    cancelled_at = db.Column(db.DateTime)
+    cancelled_by = db.Column(db.Integer, db.ForeignKey("user.id", ondelete="RESTRICT"))
+    cancel_reason = db.Column(db.String(500))
+    __table_args__ = (
+        db.CheckConstraint("start_value >= 0 AND end_value >= start_value AND rent_price >= 0 AND water_price >= 0 AND service_price >= 0 AND electricity_price >= 0 AND people_count BETWEEN 1 AND 31", name="ck_bill_values"),
+    )
+
+    @property
+    def total(self):
+        return self.rent_price + self.water_price * self.people_count + self.service_price + (self.end_value - self.start_value) * self.electricity_price
+
+
+db.Index("uq_active_bill", MonthlyBill.room_id, MonthlyBill.period, unique=True,
+         sqlite_where=MonthlyBill.cancelled_at.is_(None), postgresql_where=MonthlyBill.cancelled_at.is_(None))

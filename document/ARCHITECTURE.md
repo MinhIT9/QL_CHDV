@@ -50,3 +50,7 @@ must_change_password kiểm tra mọi request đã đăng nhập; khi còn bật
 ## Giao diện V1.1.7
 
 Thiết kế chia sẻ nằm trong app/static/css/app.css và shell base.html, icon macro trong partials/icons.html, minh họa SVG nội bộ. Bảng vẫn giữ tất cả dữ liệu, chỉ thay trình bày/sticky. Không đổi JS nghiệp vụ, route hoặc schema; xem UI_DESIGN.md.
+
+## Module chốt tiền V1.1.9
+
+app/services/billing.py xử lý sửa điện và snapshot phiếu; app/electricity/billing_routes.py cung cấp route correction, danh sách/tạo/hủy phiếu. Template billing/ và electricity/correct.html dùng layout hiện có. Không thêm framework/dependency; chỉ thêm 2 bảng. Nháp là form preview, chưa có state nháp dài hạn hoặc engine lịch giá.

@@ -245,7 +245,7 @@ class V1Tests(AppTestCase):
             result = migrated.test_cli_runner().invoke(args=["db", "upgrade"])
             self.assertEqual(result.exit_code, 0, f"{result.output}\n{result.exception}")
             self.assertEqual(db.session.scalar(db.select(db.func.count()).select_from(Room)), 0)
-            self.assertEqual(db.session.execute(db.text("SELECT version_num FROM alembic_version")).scalar(), "b71c430e92ad")
+            self.assertEqual(db.session.execute(db.text("SELECT version_num FROM alembic_version")).scalar(), "0fecdf9f864b")
             db.session.remove()
             db.engine.dispose()
 

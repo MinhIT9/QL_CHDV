@@ -19,6 +19,7 @@ app/auth/__init__.py
 app/auth/routes.py
 app/electricity/.gitkeep
 app/electricity/__init__.py
+app/electricity/billing_routes.py
 app/electricity/routes.py
 app/extensions.py
 app/models/.gitkeep
@@ -28,6 +29,7 @@ app/rooms/__init__.py
 app/rooms/routes.py
 app/services/.gitkeep
 app/services/__init__.py
+app/services/billing.py
 app/services/contracts.py
 app/services/electricity.py
 app/services/rooms.py
@@ -46,7 +48,10 @@ app/templates/auth/accounts.html
 app/templates/auth/change_password.html
 app/templates/auth/login.html
 app/templates/base.html
+app/templates/billing/form.html
+app/templates/billing/index.html
 app/templates/electricity/.gitkeep
+app/templates/electricity/correct.html
 app/templates/electricity/index.html
 app/templates/error.html
 app/templates/partials/.gitkeep
@@ -59,6 +64,7 @@ app/templates/rooms/remove.html
 app/templates/rooms/renew.html
 backups/.gitkeep
 document/ARCHITECTURE.md
+document/BILLING_CORRECTIONS_PROPOSAL.md
 document/CHANGELOG.md
 document/DATA_MODEL.md
 document/DECISIONS.md
@@ -76,6 +82,7 @@ migrations/README
 migrations/alembic.ini
 migrations/env.py
 migrations/script.py.mako
+migrations/versions/0fecdf9f864b_monthly_bills_and_reading_revisions.py
 migrations/versions/a65b2f9c018e_deposit_and_unified_start.py
 migrations/versions/b71c430e92ad_tenancy_rent.py
 migrations/versions/dd7493777e83_fees_and_contracts.py
@@ -84,9 +91,10 @@ requirements-dev.txt
 requirements.txt
 scripts/update_docs.py
 tests/.gitkeep
+tests/test_billing.py
 tests/test_contracts.py
 tests/test_v1.py
 wsgi.py
 ```
 
-Tổng: 80 file (bao gồm file danh mục này).
+Tổng: 88 file (bao gồm file danh mục này).

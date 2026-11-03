@@ -49,6 +49,10 @@ Khôi phục: dừng mọi tiến trình truy cập DB, giữ bản hiện tại
 
 ## Phí, hợp đồng và thao tác phòng
 
+V1.1.9 (migration 0fecdf9f864b) đã backup/upgrade local. Sửa điện: vào Chỉ số điện → Sửa điện → nhập số/lý do → xem trước → xác nhận. Kỳ sau được đồng bộ đầu kỳ và có audit; chỉ số cuối thực tế giữ nguyên.
+
+Chốt tiền: menu Chốt tiền → chọn tháng/phòng → xác nhận bốn giá, số người và ngày đến hạn → xem trước → chốt. Phòng và điện cùng tháng; giá là snapshot riêng mỗi phiếu, không thay hợp đồng hoặc các tháng khác. Chưa thực thu/chia ngày/lịch giá tự động. Khi sai: root hủy hiệu lực phiếu với lý do (kể cả phiếu kỳ kế tiếp nếu bị ảnh hưởng), sửa điện rồi lập lại. Nếu đã thu ngoài hệ thống phải đối chiếu riêng; hủy phiếu không hoàn tiền.
+
 V1.1.6 thêm tiền phòng/tháng (rent_price); đợt mới bắt buộc nhập, cho phép 0, legacy NULL chưa cập nhật. Giá giữ qua gia hạn và lưu theo lịch sử khách. Tổng dự tính phòng+nước+dịch vụ chưa điện/cọc/chia ngày. Migration mới nhất b71c430e92ad đã backup/upgrade local.
 
 Từ V1.1.5 chỉ nhập Ngày bắt đầu hợp đồng, đồng thời là ngày vào ở. Tiền cọc nhập số nguyên VND (0 nếu không cọc); dữ liệu cũ NULL là chưa cập nhật. Không cộng cọc vào phí tháng hoặc hiểu là đã thu/hoàn. Migration mới nhất a65b2f9c018e đã backup và áp dụng local; khởi động lại Flask để nạp code mới.

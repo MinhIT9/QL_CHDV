@@ -57,3 +57,10 @@ Không cần giải quyết các mục trên chỉ để tạo sườn.
 - Navy/mint/nền sáng, font hệ thống và icon SVG; không thêm framework hoặc font/ảnh từ CDN.
 - Giữ bảng đầy đủ, sticky mã phòng/thao tác và nhãn cuộn ngang. Tóm tắt dùng dữ liệu hiện có của kết quả đang xem.
 - QA bằng unittest và ảnh tĩnh Edge headless dữ liệu tạm; chưa browser E2E. Giới hạn viewport 390px được mô tả trong UI_DESIGN.md.
+
+## 2026-11-03 — Chốt tiền và sửa điện gọn (V1.1.9)
+
+- Theo yêu cầu ưu tiên code ngắn/tập trung: chỉ revision số điện + snapshot tiền tháng; không thực thu/công nợ/chia ngày/lịch giá tự động.
+- Phòng và điện cùng kỳ tháng, thông báo giả định trước triển khai và trên UI. Kỳ khách vào/trả giữa tháng hoặc thay khách chưa được chốt để tránh gán sai điện/tiền.
+- Admin được sửa điện chưa bị phiếu hiệu lực khóa; root hủy hiệu lực phiếu có lý do trước khi sửa, rồi lập mới. Giữ nguyên dữ liệu phiếu cũ, không tính là hoàn/cấn tiền thực tế.
+- Giá theo từng phiếu; điều khoản hiện tại chỉ gợi ý, Admin xác nhận giá kỳ. Số người tính nước được nhập kiểm tra; tiền cọc không thuộc tổng tháng.

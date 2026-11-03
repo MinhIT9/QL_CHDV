@@ -1,0 +1,91 @@
+from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask_login import current_user, login_required
+from sqlalchemy.exc import IntegrityError, OperationalError
+
+from app.auth.routes import root_required
+from app.extensions import db
+from app.models import ElectricityReading, MonthlyBill, ReadingRevision, Room, utcnow
+from app.services.billing import bill_tenancy, bill_values, correction, lock_writes, reading_pair, reading_stamp
+from app.services.electricity import current_period, valid_period
+
+bp = Blueprint("billing", __name__)
+WRITE_ERRORS = (ValueError, IntegrityError, OperationalError)
+
+
+def report(error):
+    db.session.rollback()
+    flash(str(error) if isinstance(error, ValueError) else "Dữ liệu vừa thay đổi hoặc đang bận. Hãy tải lại trang.", "danger")
+
+
+@bp.route("/electricity/<int:reading_id>/correct", methods=["GET", "POST"])
+@login_required
+def correct(reading_id):
+    reading = db.get_or_404(ElectricityReading, reading_id)
+    values = request.form if request.method == "POST" else {"start_value": reading.start_value, "end_value": reading.end_value, "stamp": reading_stamp(reading)}
+    preview, status = None, 200
+    if request.method == "POST":
+        try:
+            preview = correction(reading, request.form, current_user.id, request.form.get("action") == "confirm")
+            if request.form.get("action") == "confirm":
+                flash("Đã điều chỉnh số điện và lưu lịch sử các kỳ bị ảnh hưởng.", "success")
+                return redirect(url_for("billing.correct", reading_id=reading.id))
+        except WRITE_ERRORS as error:
+            report(error)
+            status = 400
+    revisions = db.session.scalars(db.select(ReadingRevision).where(ReadingRevision.reading_id == reading.id).order_by(ReadingRevision.id.desc())).all()
+    return render_template("electricity/correct.html", reading=reading, values=values, preview=preview, revisions=revisions, previous=reading_pair(reading)[0]), status
+
+
+@bp.get("/bills")
+@login_required
+def index():
+    period = request.args.get("period", current_period())
+    if not valid_period(period):
+        period = current_period()
+    bills = db.session.scalars(db.select(MonthlyBill).where(MonthlyBill.period == period).order_by(MonthlyBill.id.desc())).all()
+    return render_template("billing/index.html", period=period, bills=bills, rooms=db.session.scalars(db.select(Room).order_by(Room.code)).all())
+
+
+@bp.route("/rooms/<int:room_id>/bill", methods=["GET", "POST"])
+@login_required
+def create(room_id):
+    room = db.get_or_404(Room, room_id)
+    period = request.form.get("period", "") if request.method == "POST" else request.args.get("period", current_period())
+    preview, values = None, request.form
+    try:
+        tenant = bill_tenancy(room, period)
+        if request.method == "POST":
+            preview = bill_values(room, period, values, current_user.id, values.get("action") == "confirm")
+            if values.get("action") == "confirm":
+                flash("Đã chốt tiền. Giá và số người của phiếu được giữ cố định.", "success")
+                return redirect(url_for("billing.index", period=period))
+        else:
+            reading = db.session.scalar(db.select(ElectricityReading).where(ElectricityReading.room_id == room.id, ElectricityReading.period == period))
+            if not reading:
+                raise ValueError("Cần lưu số điện kỳ này trước khi tính tiền.")
+            prior = db.session.scalar(db.select(MonthlyBill).where(MonthlyBill.tenancy_id == tenant.id, MonthlyBill.period <= period).order_by(MonthlyBill.period.desc(), MonthlyBill.id.desc()))
+            values = {key: getattr(tenant, key) if getattr(tenant, key) is not None else "" for key in ("rent_price", "water_price", "service_price", "payment_day")}
+            values.update(period=period, people_count=tenant.people_count, electricity_price=prior.electricity_price if prior else "", tenancy_id=tenant.id, tenancy_version=tenant.version, stamp=reading_stamp(reading))
+    except WRITE_ERRORS as error:
+        report(error)
+        if request.method == "GET":
+            return redirect(url_for("billing.index", period=period if valid_period(period) else current_period()))
+        return render_template("billing/form.html", room=room, values=values, preview=None, period=period), 400
+    return render_template("billing/form.html", room=room, values=values, preview=preview, period=period)
+
+
+@bp.post("/bills/<int:bill_id>/cancel")
+@root_required
+def cancel(bill_id):
+    try:
+        lock_writes()
+        bill = db.get_or_404(MonthlyBill, bill_id)
+        reason = request.form.get("reason", "").strip()
+        if bill.cancelled_at or not reason or len(reason) > 500:
+            raise ValueError("Phiếu đã hủy hoặc thiếu lý do hợp lệ (tối đa 500 ký tự).")
+        bill.cancelled_at, bill.cancelled_by, bill.cancel_reason = utcnow(), current_user.id, reason
+        db.session.commit()
+        flash("Đã hủy hiệu lực phiếu và giữ nguyên bản cũ. Có thể sửa điện rồi lập phiếu mới.", "success")
+    except WRITE_ERRORS as error:
+        report(error)
+    return redirect(url_for("billing.index", period=db.get_or_404(MonthlyBill, bill_id).period))

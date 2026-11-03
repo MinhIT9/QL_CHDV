@@ -44,9 +44,11 @@ def create_app(test_config=None):
     from app.auth.routes import bp as auth_bp
     from app.rooms.routes import bp as rooms_bp
     from app.electricity.routes import bp as electricity_bp
+    from app.electricity.billing_routes import bp as billing_bp
     app.register_blueprint(auth_bp)
     app.register_blueprint(rooms_bp)
     app.register_blueprint(electricity_bp)
+    app.register_blueprint(billing_bp)
 
     with app.app_context():
         if db.engine.dialect.name == "sqlite":

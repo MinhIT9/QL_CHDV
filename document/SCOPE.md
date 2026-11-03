@@ -1,5 +1,11 @@
 # Phạm vi V1
 
+## Mở rộng V1.1.9
+
+- Sửa số điện có preview, lý do và lịch sử; đồng bộ đầu kỳ kế tiếp khi cần. Phiếu tiền hiệu lực khóa các kỳ bị ảnh hưởng cho đến khi root hủy có lý do.
+- Chốt tiền theo tháng lưu snapshot giá/người/điện; một phiếu hiệu lực/phòng/kỳ. Giá từng phiếu độc lập các tháng, không tự đổi giá hợp đồng.
+- Giới hạn triển khai gọn: phòng/điện cùng tháng và một khách đủ tháng. Chưa thực thu/công nợ/chia ngày/lịch giá tự động; không cộng cọc vào phiếu.
+
 ## Mục tiêu
 
 Quản lý CHDV ban đầu khoảng 7 phòng, một Admin, ưu tiên bảng và thao tác nhập nhanh. Không có dashboard biểu đồ, quản lý tiền hoặc báo cáo trong V1.

@@ -1,6 +1,6 @@
 # Mô hình dữ liệu V1
 
-Đã triển khai tại app/models/__init__.py; migration mới nhất b71c430e92ad (tiền phòng).
+Đã triển khai tại app/models/__init__.py; migration mới nhất 0fecdf9f864b (phiếu tiền và lịch sử sửa điện).
 
 | Bảng | Dữ liệu chính | Ràng buộc / quan hệ |
 | --- | --- | --- |
@@ -40,3 +40,11 @@
 - Tenancy.rent_price: số nguyên VND/tháng từ 0 đến 2.147.483.647. Đợt mới nhập bắt buộc; dữ liệu cũ giữ NULL và hiển thị chưa cập nhật.
 - monthly_fees vẫn là nước + dịch vụ; monthly_total thêm tiền phòng, trả None khi thiếu giá thành phần. Không cộng điện hoặc cọc, chưa chia ngày hoặc chốt hóa đơn.
 - Gia hạn giữ nguyên rent_price; đổi khách mới nhập giá riêng và giữ giá đợt cũ trong lịch sử.
+
+## Sửa điện và chốt tiền V1.1.9
+
+- reading_revision: reading_id, old_start/end, new_start/end, reason, created_by/at. Chỉnh kỳ trước làm thay đầu kỳ sau thì ghi revision cho cả hai bản ghi.
+- monthly_bill: room/tenancy ID và tên/mã snapshot, period, chỉ số điện, bốn đơn giá, số người tính nước, due_date, created_by/at; cancelled_at/by/reason để hủy hiệu lực nhưng giữ bản cũ.
+- Partial unique index một phiếu hiệu lực/phòng/kỳ. Tổng tính từ snapshot, không từ Tenancy hiện tại; không cộng cọc. Chưa có Payment hoặc phân bổ thu tiền.
+- Điện và tiền phòng cùng tháng, chỉ một đợt thuê đủ tháng. Xác định khách qua contract_start/move_out_date, không tự lấy khách mới cho tháng cũ.
+- Ghi SQLite dùng BEGIN IMMEDIATE; kiểm tra stamp chỉ số liên quan và tenancy ID/version trước khi lưu. Hủy phiếu cần root; phiếu hiệu lực chặn sửa điện các kỳ liên quan.

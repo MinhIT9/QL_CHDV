@@ -1,5 +1,13 @@
 # Lịch sử thay đổi
 
+## 2026-11-03
+
+- V1.1.9: sửa điện preview/confirm, audit trước/sau, đồng bộ kỳ kế tiếp và chống ghi đè dữ liệu vừa thay đổi.
+- Chốt tiền từng kỳ, snapshot giá/người/điện, chống trùng; root hủy hiệu lực có lý do và giữ bản cũ. Không mở rộng thực thu/công nợ/chia ngày.
+- Migration 0fecdf9f864b đã backup/upgrade local; 38 test pass và schema khớp model.
+
+- V1.1.8 (hội thoại): đối chiếu code và phân tích sửa điện có revision, kiểm tra kỳ sau, chốt giá/snapshot theo tháng và xử lý phiếu đã thu; chưa thay đổi chức năng hoặc database.
+
 ## 2026-11-02
 
 - V1.1.7 (hội thoại): nâng cấp FE đồng bộ: nền sáng, sidebar navy/mint, icon SVG, login hai cột và minh họa căn hộ nội bộ.

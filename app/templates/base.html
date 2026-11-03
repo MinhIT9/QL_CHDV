@@ -22,6 +22,7 @@
     <a class="{{ 'selected' if request.blueprint == 'rooms' }}" {% if request.blueprint == 'rooms' %}aria-current="page"{% endif %} href="{{ url_for('rooms.index') }}">{{ icon('rooms') }} <span>Phòng</span>{{ icon('chevron', 'nav-chevron') }}</a>
     <a class="{{ 'selected' if request.blueprint == 'electricity' }}" {% if request.blueprint == 'electricity' %}aria-current="page"{% endif %} href="{{ url_for('electricity.index') }}">{{ icon('bolt') }} <span>Chỉ số điện</span>{{ icon('chevron', 'nav-chevron') }}</a>
     {% if current_user.is_root %}<a class="{{ 'selected' if request.endpoint == 'auth.accounts' }}" {% if request.endpoint == 'auth.accounts' %}aria-current="page"{% endif %} href="{{ url_for('auth.accounts') }}">{{ icon('users') }} <span>Tài khoản</span>{{ icon('chevron', 'nav-chevron') }}</a>{% endif %}
+    <a class="{{ 'selected' if request.endpoint and request.endpoint.startswith('billing.') and request.endpoint != 'billing.correct' }}" href="{{ url_for('billing.index') }}">{{ icon('calendar') }} <span>Chốt tiền</span></a>
   </nav>
   <div class="sidebar-note">{{ icon('building') }}<p>Mọi căn phòng.<br><strong>Trong tầm tay.</strong></p><span>CHDV MANAGER BASIC</span></div>
   <div class="profile"><div class="profile-identity"><span class="avatar">{{ current_user.username[0]|upper }}</span><div><strong>{{ current_user.username }}</strong><small>{{ 'Quản trị hệ thống' if current_user.is_root else 'Quản lý phòng' }}</small></div></div>
@@ -31,7 +32,7 @@
 </aside>
 {% endif %}
 <main id="main" class="main">
-  {% if current_user.is_authenticated %}<div class="workspace-bar"><div><span class="workspace-label">Không gian làm việc</span>{{ icon('chevron') }}<strong>{{ 'Chỉ số điện' if request.blueprint == 'electricity' else 'Tài khoản' if request.blueprint == 'auth' else 'Quản lý phòng' }}</strong></div><span class="workspace-user">{{ icon('shield') }} {{ 'Root' if current_user.is_root else 'Admin' }} <span class="mini-avatar">{{ current_user.username[0]|upper }}</span></span></div>{% endif %}
+  {% if current_user.is_authenticated %}<div class="workspace-bar"><div><span class="workspace-label">Không gian làm việc</span>{{ icon('chevron') }}<strong>{{ 'Chỉ số điện' if request.blueprint == 'electricity' or request.endpoint == 'billing.correct' else 'Chốt tiền' if request.blueprint == 'billing' else 'Tài khoản' if request.blueprint == 'auth' else 'Quản lý phòng' }}</strong></div><span class="workspace-user">{{ icon('shield') }} {{ 'Root' if current_user.is_root else 'Admin' }} <span class="mini-avatar">{{ current_user.username[0]|upper }}</span></span></div>{% endif %}
   {% with messages = get_flashed_messages(with_categories=true) %}
   <div class="messages" aria-live="polite">{% for category, message in messages %}<div class="alert {{ category }}">{{ message }}</div>{% endfor %}</div>
   {% endwith %}
