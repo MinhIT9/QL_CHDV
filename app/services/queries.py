@@ -16,3 +16,9 @@ def room_query():
 
 def active_bill_query():
     return db.select(MonthlyBill).where(MonthlyBill.cancelled_at.is_(None))
+
+
+def bill_history_query(room_id):
+    return db.select(MonthlyBill).options(selectinload(MonthlyBill.receipts)).where(
+        MonthlyBill.room_id == room_id
+    ).order_by(MonthlyBill.period.desc(), MonthlyBill.id.desc())

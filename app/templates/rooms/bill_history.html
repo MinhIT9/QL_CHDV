@@ -1,0 +1,23 @@
+<section class="card table-card mt-3">
+  <div class="section-heading"><h2>Lịch sử chốt tiền</h2></div>
+  <div class="table-scroll">
+    <table class="table table-striped table-hover align-middle mb-0">
+      <thead><tr><th>Phiếu / kỳ</th><th>Khách thuê</th><th>Ngày lập</th><th class="text-end">Tự tính</th><th class="text-end">Điều chỉnh</th><th class="text-end">Tiền thu cuối cùng</th><th>Trạng thái</th></tr></thead>
+      <tbody>
+        {% for bill in bill_history %}
+        <tr>
+          <td><a href="{{ url_for('billing.detail', bill_id=bill.id) }}" hx-boost="false">Phiếu #{{ bill.id }}</a><small>{{ bill.period }}</small></td>
+          <td>{{ bill.tenant_name }}</td>
+          <td>{{ bill.created_at|local_datetime }}</td>
+          <td class="text-end text-nowrap">{{ bill.computed_total|vnd }}</td>
+          <td class="text-end">{{ '+' if bill.adjustment_amount > 0 else '' }}{{ bill.adjustment_amount|vnd }}{% if bill.adjustment_reason %}<small>{{ bill.adjustment_reason }}</small>{% endif %}</td>
+          <td class="text-end text-nowrap"><strong>{{ bill.total|vnd }}</strong></td>
+          <td>{% if bill.cancelled_at %}<span class="badge inactive">Đã hủy hiệu lực</span><small>{{ bill.cancelled_at|local_datetime }} · {{ bill.cancel_reason }}</small>
+              {% elif bill.paid_receipt %}<span class="badge occupied">Đã thu đủ</span><small>{{ bill.paid_receipt.paid_date|business_date }}</small>
+              {% else %}<span class="badge vacant">Chưa thu</span>{% endif %}</td>
+        </tr>
+        {% else %}<tr><td colspan="7" class="empty">Chưa có lịch sử chốt tiền.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>

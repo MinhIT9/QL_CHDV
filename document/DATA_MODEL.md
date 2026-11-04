@@ -1,6 +1,10 @@
 # Mô hình dữ liệu V1
 
-Đã triển khai tại app/models/__init__.py; migration mới nhất a24d09e86c31 (một ảnh cho mỗi lần chốt điện).
+Đã triển khai tại app/models/__init__.py; migration mới nhất b35e10f97d42 (số tiền thu cuối cùng).
+
+## Điều chỉnh tổng phiếu — V1.5.0
+
+MonthlyBill.final_amount là BigInteger không âm, nullable để giữ nguyên phiếu cũ; adjustment_reason tối đa 500 ký tự. computed_total luôn là tổng bốn khoản snapshot; total dùng final_amount nếu có, kể cả 0, ngược lại dùng computed_total. Phiếu mới lưu số cuối cùng khi xác nhận, bắt buộc lý do nếu khác tổng tính. Receipt nhận đúng total từ máy chủ. Không sửa trực tiếp phiếu đã chốt; hủy/lập lại theo quyền hiện có, giữ lịch sử.
 
 ## Photo — V1.3.0
 

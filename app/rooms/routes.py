@@ -9,7 +9,7 @@ from app.models import MonthlyBill, Room
 from app.services.rooms import save_room
 from app.services.photos import stage_photo, upload_batch
 from app.services.electricity import current_period, reading_cost, valid_period
-from app.services.queries import active_bill_query, room_query
+from app.services.queries import active_bill_query, bill_history_query, room_query
 from app.services.contracts import check_version, due_date, end_tenancy, local_today, renewal_preview, renew_contract
 
 bp = Blueprint("rooms", __name__)
@@ -84,14 +84,10 @@ def detail(room_id):
     period = request.args.get("period", current_period())
     if not valid_period(period):
         period = current_period()
-    bills = {
-        bill.period: bill
-        for bill in db.session.scalars(
-            active_bill_query().where(MonthlyBill.room_id == room.id)
-        )
-    }
+    bill_history = db.session.scalars(bill_history_query(room.id)).all()
+    bills = {bill.period: bill for bill in bill_history if bill.cancelled_at is None}
     return render_template("rooms/detail.html", room=room, today=local_today(), period=period,
-                           costs={r.id: reading_cost(r, bills.get(r.period)) for r in room.readings},
+                           costs={r.id: reading_cost(r, bills.get(r.period)) for r in room.readings}, bill_history=bill_history,
                            payment_due=due_date(room.current_tenancy, period) if room.current_tenancy else None)
 
 

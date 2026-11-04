@@ -1,6 +1,19 @@
 # Tiến độ thực tế
 
-Cập nhật: 2026-11-04 (Asia/Saigon). Phiên bản hội thoại: V1.4.13.
+## 2026-11-04 — Phiếu tiền phòng V1.5.0
+
+Kiểm tra: 73 unittest OK (44.715s), db check không phát sinh thay đổi, Node syntax đạt; dữ liệu các cột cũ so với backup giữ nguyên, SQLite integrity_check=ok.
+
+V1.5.0: Đã triển khai trên dev trang phiếu riêng khi bấm ID, tổng tự tính và số thu cuối cùng kèm lý do bắt buộc khi khác tổng gốc; lịch sử phòng có cả phiếu hủy/đã thu. Máy chủ kiểm tra số nguyên không âm, giữ giá 0; Receipt thu theo số cuối cùng đã chốt. Phiếu cũ dùng tổng snapshot, không đổi tiền đã thu. Phiếu đã chốt bất biến, muốn đổi dùng hủy/lập lại theo quyền hiện có. Trang cần đăng nhập, có tiền bằng chữ, responsive và CSS in ẩn toolbar; chưa có link công khai/xuất ảnh tự động. Migration b35e10f97d42 đã áp dụng DEV sau backup backups/pre-bill-final-20261104-v150.sqlite3. Edge headless đạt desktop/390px/in; ảnh giả ở exports/receipt-preview-desktop.png và exports/receipt-preview-mobile.png. Chưa thử máy in giấy/điện thoại thật hoặc cập nhật VPS. Bước tiếp: restart web dev, Ctrl+F5; triển khai VPS cần upgrade DB trước mở web.
+
+
+Cập nhật: 2026-11-04 (Asia/Saigon). Phiên bản hội thoại: V1.4.17.
+
+V1.4.17: vẽ mockup phiếu gửi khách bằng imagegen built-in theo yêu cầu chỉ thiết kế, chưa code. Phiếu dọc trắng/mint/navy, tổng tiền nổi bật, bảng kê, dữ liệu minh họa; phân biệt chưa thanh toán với đã thu. Đã hiển thị ảnh và ghi BILL_RECEIPT_DESIGN.md, kiểm tra trực quan/số tiền, inventory/diff đạt. Chưa có route click ID/xuất phiếu trong app; không chạy test nghiệp vụ hoặc thao tác VPS.
+
+V1.4.15: ảnh upload cho thấy ZIP ở /opt/chdv thay vì /root, hướng dẫn lại đúng đường dẫn test/giải nén. Không backup theo yêu cầu hiện có; chưa có kết quả triển khai. Chỉ sửa tài liệu, inventory/diff đạt.
+
+V1.4.14: đóng gói exports/chdv-v1.4.13.zip chỉ 4 file app và test billing cho sửa chọn phòng; CRC/allowlist đạt, không .env/DB/migration. Theo yêu cầu bỏ backup lần cập nhật này, hướng dẫn upload /root/ rồi thay code và test/start web. Không đụng worker/schema, chưa có bằng chứng upload/triển khai. Inventory/diff đạt, không chạy lại suite đã đạt lượt trước.
 
 V1.4.13: sửa lập phiếu tự quay phòng đầu bằng form GET room_id/period, bỏ JS đổi href. Giữ đủ mã phòng trong dropdown, option đã có phiếu hiệu lực cùng kỳ bị khóa/không đề xuất; hết phòng khóa nút; lỗi dữ liệu giữ lựa chọn. 67 tests và Edge bật/tắt JS đạt, Node/inventory/diff đạt. Không migration, không đổi DB dev hoặc VPS.
 

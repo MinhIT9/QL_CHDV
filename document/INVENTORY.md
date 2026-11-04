@@ -38,12 +38,14 @@ app/services/queries.py
 app/services/rooms.py
 app/static/css/.gitkeep
 app/static/css/app.css
+app/static/css/receipt.css
 app/static/images/.gitkeep
 app/static/images/favicon.svg
 app/static/images/residence.svg
 app/static/js/.gitkeep
 app/static/js/app.js
 app/static/js/meter-photos.js
+app/static/js/receipt.js
 app/static/js/sidebar-state.js
 app/static/vendor/.gitkeep
 app/static/vendor/HTMX-LICENSE.txt
@@ -53,6 +55,7 @@ app/templates/auth/accounts.html
 app/templates/auth/change_password.html
 app/templates/auth/login.html
 app/templates/base.html
+app/templates/billing/detail.html
 app/templates/billing/form.html
 app/templates/billing/index.html
 app/templates/billing/payment.html
@@ -68,6 +71,7 @@ app/templates/partials/icons.html
 app/templates/partials/period_select.html
 app/templates/partials/photos.html
 app/templates/rooms/.gitkeep
+app/templates/rooms/bill_history.html
 app/templates/rooms/compact_table.html
 app/templates/rooms/detail.html
 app/templates/rooms/form.html
@@ -82,6 +86,7 @@ backups/.gitkeep
 deploy/chdv-photos.service
 document/ARCHITECTURE.md
 document/BILLING_CORRECTIONS_PROPOSAL.md
+document/BILL_RECEIPT_DESIGN.md
 document/CHANGELOG.md
 document/DATA_MODEL.md
 document/DECISIONS.md
@@ -107,6 +112,7 @@ migrations/versions/0fecdf9f864b_monthly_bills_and_reading_revisions.py
 migrations/versions/41eb1b88b816_full_payment_receipts.py
 migrations/versions/a24d09e86c31_single_meter_photo.py
 migrations/versions/a65b2f9c018e_deposit_and_unified_start.py
+migrations/versions/b35e10f97d42_bill_final_amount.py
 migrations/versions/b71c430e92ad_tenancy_rent.py
 migrations/versions/c83e4d16b2a0_tenancy_electricity_price.py
 migrations/versions/d94f512a37b1_reading_price.py
@@ -118,6 +124,7 @@ requirements.txt
 scripts/check_meter_photo_browser.py
 scripts/update_docs.py
 tests/.gitkeep
+tests/test_bill_documents.py
 tests/test_billing.py
 tests/test_contracts.py
 tests/test_photos.py
@@ -126,4 +133,4 @@ tests/test_v1.py
 wsgi.py
 ```
 
-Tổng: 117 file (bao gồm file danh mục này).
+Tổng: 124 file (bao gồm file danh mục này).

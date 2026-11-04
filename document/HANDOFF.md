@@ -1,12 +1,19 @@
 # Bàn giao
 
+## 2026-11-04 — Phiếu tiền phòng V1.5.0
+
+Kiểm tra: 73 unittest OK (44.715s), db check không phát sinh thay đổi, Node syntax đạt; dữ liệu các cột cũ so với backup giữ nguyên, SQLite integrity_check=ok.
+
+V1.5.0: Đã triển khai trên dev trang phiếu riêng khi bấm ID, tổng tự tính và số thu cuối cùng kèm lý do bắt buộc khi khác tổng gốc; lịch sử phòng có cả phiếu hủy/đã thu. Máy chủ kiểm tra số nguyên không âm, giữ giá 0; Receipt thu theo số cuối cùng đã chốt. Phiếu cũ dùng tổng snapshot, không đổi tiền đã thu. Phiếu đã chốt bất biến, muốn đổi dùng hủy/lập lại theo quyền hiện có. Trang cần đăng nhập, có tiền bằng chữ, responsive và CSS in ẩn toolbar; chưa có link công khai/xuất ảnh tự động. Migration b35e10f97d42 đã áp dụng DEV sau backup backups/pre-bill-final-20261104-v150.sqlite3. Edge headless đạt desktop/390px/in; ảnh giả ở exports/receipt-preview-desktop.png và exports/receipt-preview-mobile.png. Chưa thử máy in giấy/điện thoại thật hoặc cập nhật VPS. Bước tiếp: restart web dev, Ctrl+F5; triển khai VPS cần upgrade DB trước mở web.
+
+
 Cập nhật: 2026-11-04 (Asia/Saigon).
 
 ## Phiên bản hội thoại
 
-- Phiên bản phản hồi gần nhất: V1.4.13.
-- Nội dung: Sửa chọn phòng lập phiếu bằng form GET gửi ID về server, không lệ thuộc JS đổi href. Dropdown đủ mã phòng, phiếu hiệu lực cùng kỳ disabled/không đề xuất; lỗi giữ phòng đã chọn. 67 tests và Edge (bật/tắt JS) đạt, Node/docs đạt; không đổi DB hoặc VPS.
-- Phản hồi tiếp theo tối thiểu V1.4.14; có thể tăng minor/major theo quy tắc mới trong AGENTS.md.
+- Phiên bản phản hồi gần nhất: V1.5.0.
+- Nội dung: Quay về dev; người dùng yêu cầu vẽ trước phiếu mở khi click ID để chụp gửi khách, chưa code. Đã tạo mockup imagegen built-in dạng dọc trắng/mint/navy, dữ liệu giả P301/Khách minh họa/tổng 5.011.600 đ; chưa thanh toán dùng Phiếu tiền phòng. Đã hiển thị inline, ghi BILL_RECEIPT_DESIGN.md. Không sửa app/DB/VPS; chưa nhận kết quả cập nhật VPS gói V1.4.13.
+- Phản hồi tiếp theo tối thiểu V1.5.1; có thể tăng minor/major theo quy tắc mới trong AGENTS.md.
 - Quy tắc đầy đủ ở AGENTS.md, mục “Phiên bản ở cuối phản hồi”.
 
 ## Đã làm
@@ -31,6 +38,14 @@ Cập nhật: 2026-11-04 (Asia/Saigon).
 - Chỉ chốt tiền một đợt thuê xác định đủ tháng; thiếu điện, ngày không rõ, vào/trả giữa tháng hoặc đổi khách cùng kỳ bị chặn. Không có engine lịch giá tự động: giá trên form là gợi ý, Admin xác nhận cho từng kỳ.
 
 ## Kiểm tra
+
+- V1.4.17: dùng skill imagegen để vẽ mockup, đã xem ảnh đầu ra: đủ 4 khoản, phép cộng 4.100.000 + 200.000 + 150.000 + 561.600 = 5.011.600 đ, trạng thái Chưa thanh toán, không thông tin khách thật/QR giả. Ảnh preview inline giữ ở đường dẫn mặc định generated_images của Codex, không tích hợp vào app. Chỉ cập nhật tài liệu thiết kế và phiên bản; inventory/check/diff đạt, không chạy suite nghiệp vụ vì chưa code. Khi triển khai phải dùng snapshot phiếu và trạng thái Receipt, phiếu hủy phải phân biệt rõ.
+
+- V1.4.16: tin nhắn không rõ nội dung, đề nghị gửi lại. Không thao tác VPS hoặc thay code; vẫn chưa có kết quả cập nhật gói V1.4.13 trên VPS.
+
+- V1.4.15 (2026-11-04): ảnh VPS xác nhận ZIP V1.4.13 ở /opt/chdv/chdv-v1.4.13.zip; kiểm tra đường dẫn /root báo FileNotFoundError, chưa phải ZIP hỏng. Sửa cả lệnh test và giải nén về /opt/chdv; giữ yêu cầu không backup lần này. Chưa có kết quả CRC/test/cập nhật hoặc restart web. Worker không cần dừng vì patch chỉ code web/billing.
+
+- V1.4.14 (2026-11-04): ZIP code-only 5 file đã kiểm tra CRC và allowlist; chứa room_id/form mới và selected_room, không chứa runtime/migration. Bản VPS đã lên a24d09e86c31 theo log trước nên sửa này không cần nâng DB hoặc cài dependencies. Không tự thao tác VPS, chưa có kết quả upload; inventory/diff đạt, không chạy lại test vì chỉ đóng gói code đã đạt 67 tests/Edge ở lượt trước.
 
 - V1.4.13 (2026-11-04): 67 unittest pass (38.671s), gồm 3 test room picker: gửi đúng ID và giữ chọn khi thiếu dữ liệu, đủ mã nhưng bỏ phiếu hiệu lực khỏi đề xuất theo kỳ/hủy phiếu mở lại, hết phòng khóa nút. Edge headless dùng DB/ảnh tạm: chọn T103 đến /rooms/3/bill đúng cả bật và tắt JS; option phòng đã có phiếu vẫn hiện nhưng disabled, các luồng ảnh cũ vẫn đạt/no pageerror. Node syntax đạt, inventory/diff đạt. Không đổi model/schema/DB thật, không tự cập nhật VPS. Bước tiếp restart dev/Ctrl+F5; gói V1.4.2 cũ không chứa sửa này, cần đóng gói mới nếu triển khai VPS.
 

@@ -212,6 +212,8 @@ class MonthlyBill(db.Model):
     service_price = db.Column(db.Integer, nullable=False)
     electricity_price = db.Column(db.Integer, nullable=False)
     people_count = db.Column(db.Integer, nullable=False)
+    final_amount = db.Column(db.BigInteger)
+    adjustment_reason = db.Column(db.String(500), nullable=False, default="", server_default="")
     due_date = db.Column(db.Date, nullable=False)
     created_by = db.Column(db.Integer, db.ForeignKey("user.id", ondelete="RESTRICT"), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=utcnow)
@@ -220,12 +222,33 @@ class MonthlyBill(db.Model):
     cancel_reason = db.Column(db.String(500))
     receipts = db.relationship("Receipt", back_populates="bill", order_by="Receipt.id")
     __table_args__ = (
+        db.CheckConstraint("final_amount IS NULL OR final_amount >= 0", name="ck_bill_final_amount"),
         db.CheckConstraint("start_value >= 0 AND end_value >= start_value AND rent_price >= 0 AND water_price >= 0 AND service_price >= 0 AND electricity_price >= 0 AND people_count BETWEEN 1 AND 31", name="ck_bill_values"),
     )
 
     @property
+    def computed_total(self):
+        return self.rent_price + self.water_total + self.service_price + self.electricity_total
+
+    @property
+    def consumption(self):
+        return self.end_value - self.start_value
+
+    @property
+    def water_total(self):
+        return self.water_price * self.people_count
+
+    @property
+    def electricity_total(self):
+        return self.consumption * self.electricity_price
+
+    @property
     def total(self):
-        return self.rent_price + self.water_price * self.people_count + self.service_price + (self.end_value - self.start_value) * self.electricity_price
+        return self.final_amount if self.final_amount is not None else self.computed_total
+
+    @property
+    def adjustment_amount(self):
+        return self.total - self.computed_total
 
     @property
     def paid_receipt(self):

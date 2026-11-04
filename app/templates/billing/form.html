@@ -1,11 +1,24 @@
 {% extends 'base.html' %}
 {% block content %}
 <header class="page-header"><div><a class="back-link" href="{{ url_for('billing.index', period=period) }}">← Chốt tiền</a><h1>Chốt tiền {{ room.code }} · {{ period }}</h1><p class="muted">Phòng và điện cùng kỳ tháng. Kiểm tra giá kỳ này trước khi xác nhận.</p></div></header>
-<section class="card form-card bill-card"><form method="post" class="stack bill-layout {{ 'has-preview' if preview }} d-grid">
+<section class="card form-card bill-card"><form method="post" class="stack bill-layout {{ 'has-preview' if preview }} d-grid" id="bill-amount-form" data-consumption="{{ reading.consumption if reading else '' }}">
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 {% for key in ['period', 'tenancy_id', 'tenancy_version', 'stamp'] %}<input type="hidden" name="{{ key }}" value="{{ values.get(key, '') }}">{% endfor %}
 <div class="bill-fields"><div class="form-grid">{% for key, label, minimum, maximum in [('rent_price','Tiền phòng (đ)',0,2147483647),('water_price','Nước (đ/người)',0,2147483647),('service_price','Dịch vụ (đ/phòng)',0,2147483647),('electricity_price','Điện (đ/kWh)',0,2147483647),('people_count','Số người tính nước',1,31),('payment_day','Ngày đến hạn trong tháng',1,31)] %}<label>{{ label }}<input class="form-control" type="number" name="{{ key }}" value="{{ values.get(key, '') }}" min="{{ minimum }}" max="{{ maximum }}" step="1" required {{ 'readonly' if preview }}></label>{% endfor %}</div>
-<p class="notice">Giá chỉ áp dụng phiếu kỳ này, không đổi phiếu tháng khác hoặc giá hợp đồng. 0 là miễn phí, để trống là chưa cấu hình. Chưa tự chia ngày và chưa ghi nhận thực thu.</p></div>
+<div class="border rounded p-3 my-3">
+  <div class="d-flex justify-content-between gap-3"><span>Tổng tiền tự tính</span><strong id="bill-computed-total">{{ preview.computed_total|vnd if preview else '—' }}</strong></div>
+  <label class="mt-3 d-block">Số tiền thu cuối cùng (đ)
+    <input class="form-control" name="final_amount" inputmode="numeric" pattern="[0-9]*" maxlength="19" value="{{ preview.total if preview else values.get('final_amount', '') }}" {{ 'readonly' if preview }}>
+    <small>Để trống để dùng tổng tự tính. Có thể làm tròn, tăng hoặc giảm tiền của riêng phiếu này.</small>
+  </label>
+  {% if not preview %}<button class="btn btn-sm btn-outline-secondary mt-2" type="button" id="bill-reset-total">Dùng tổng tự tính</button>{% endif %}
+  <p class="small mt-2 mb-2" id="bill-adjustment">{% if preview and preview.adjustment_amount %}Điều chỉnh: {{ '+' if preview.adjustment_amount > 0 else '' }}{{ preview.adjustment_amount|vnd }}{% endif %}</p>
+  <label class="d-block">Lý do điều chỉnh
+    <textarea class="form-control" name="adjustment_reason" maxlength="500" rows="2" {{ 'readonly' if preview }}>{{ values.get('adjustment_reason', '') }}</textarea>
+    <small>Bắt buộc khi số tiền cuối cùng khác tổng tự tính; lưu cùng phiếu để đối chiếu.</small>
+  </label>
+</div>
+<p class="notice">Giá và điều chỉnh chỉ áp dụng phiếu kỳ này, không đổi hợp đồng hoặc phiếu cũ. Chốt tiền chưa xác nhận đã thu.</p></div>
 {% if preview %}<dl class="info-list bill-summary"><div><dt>Khách thuê</dt><dd>{{ preview.tenant_name }}</dd></div><div><dt>Tiền phòng</dt><dd>{{ preview.rent_price|vnd }}</dd></div><div><dt>Nước</dt><dd>{{ preview.people_count }} × {{ preview.water_price|vnd }}</dd></div><div><dt>Dịch vụ</dt><dd>{{ preview.service_price|vnd }}</dd></div><div><dt>Điện</dt><dd>{{ preview.start_value }} → {{ preview.end_value }} = {{ preview.end_value - preview.start_value }} kWh × {{ preview.electricity_price|vnd }}</dd></div><div><dt>Đến hạn</dt><dd>{{ preview.due_date|business_date }}</dd></div><div class="financial-summary"><dt>Tổng kỳ {{ period }}</dt><dd>{{ preview.total|vnd }}<small>Không cộng tiền cọc. Chốt tiền không xác nhận đã thu.</small></dd></div></dl><div class="actions bill-actions d-flex gap-2 align-items-center flex-wrap"><a class="button secondary btn btn-outline-secondary" href="{{ url_for('billing.create', room_id=room.id, period=period) }}">Nhập lại</a><button class="button primary btn btn-primary" type="submit" name="action" value="confirm">Chốt tiền kỳ này</button></div>
 {% else %}<button class="button primary btn btn-primary" type="submit" name="action" value="preview">Xem trước phiếu tiền</button>{% endif %}
 </form></section>

@@ -1,5 +1,10 @@
 # Quyết định và vấn đề cần chốt
 
+## 2026-11-04 — Phiếu tiền phòng V1.5.0
+
+V1.5.0: Đã triển khai trên dev trang phiếu riêng khi bấm ID, tổng tự tính và số thu cuối cùng kèm lý do bắt buộc khi khác tổng gốc; lịch sử phòng có cả phiếu hủy/đã thu. Máy chủ kiểm tra số nguyên không âm, giữ giá 0; Receipt thu theo số cuối cùng đã chốt. Phiếu cũ dùng tổng snapshot, không đổi tiền đã thu. Phiếu đã chốt bất biến, muốn đổi dùng hủy/lập lại theo quyền hiện có. Trang cần đăng nhập, có tiền bằng chữ, responsive và CSS in ẩn toolbar; chưa có link công khai/xuất ảnh tự động. Migration b35e10f97d42 đã áp dụng DEV sau backup backups/pre-bill-final-20261104-v150.sqlite3. Edge headless đạt desktop/390px/in; ảnh giả ở exports/receipt-preview-desktop.png và exports/receipt-preview-mobile.png. Chưa thử máy in giấy/điện thoại thật hoặc cập nhật VPS. Bước tiếp: restart web dev, Ctrl+F5; triển khai VPS cần upgrade DB trước mở web.
+
+
 ## 2026-11-04 — Chọn phòng lập phiếu (V1.4.13)
 
 - Theo yêu cầu, dropdown vẫn có đủ mã phòng nhưng phòng đã có phiếu hiệu lực cùng kỳ không được đề xuất/lập mới. Hiện trạng thái Đã lập phiếu và khóa option; phiếu đã hủy không khóa lập lại. Khi tất cả đã có phiếu, khóa nút lập mới.

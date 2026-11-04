@@ -158,6 +158,37 @@ def main():
                 plain_page.locator('#bill-create').click()
                 plain_page.wait_for_url(f'**/rooms/{room_id}/bill?period=2026-01')
                 plain.close()
+                final = page.locator('[name=final_amount]')
+                assert final.input_value() == '1000'
+                final.fill('1234')
+                assert page.locator('[name=adjustment_reason]').get_attribute('required') is not None
+                page.locator('[name=adjustment_reason]').fill('Browser rounding fixture')
+                page.locator('button[name=action][value=preview]').click()
+                page.locator('button[name=action][value=confirm]').wait_for()
+                assert page.locator('[name=final_amount]').input_value() == '1234'
+                page.locator('button[name=action][value=confirm]').click()
+                page.wait_for_url('**/bills?period=2026-01')
+                with app.app_context():
+                    bill = db.session.scalar(db.select(MonthlyBill).where(MonthlyBill.room_id == room_id))
+                    bill_id = bill.id
+                    assert bill.total == 1234
+                page.locator(f'a[href="/bills/{bill_id}"]').click()
+                page.wait_for_url(f'**/bills/{bill_id}')
+                assert page.locator('.receipt-sheet').is_visible()
+                assert page.locator('.receipt-total b').inner_text().startswith('1.234')
+                assert page.locator('#sidebar').count() == 0
+                page.set_viewport_size({'width': 1000, 'height': 1100})
+                exports = Path(__file__).resolve().parents[1] / 'exports'
+                exports.mkdir(exist_ok=True)
+                page.screenshot(path=str(exports / 'receipt-preview-desktop.png'), full_page=True)
+                page.set_viewport_size({'width': 390, 'height': 844})
+                assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
+                page.screenshot(path=str(exports / 'receipt-preview-mobile.png'), full_page=True)
+                page.emulate_media(media='print')
+                assert not page.locator('.receipt-toolbar').is_visible()
+                page.emulate_media(media='screen')
+                page.goto(base + f'/rooms/{room_id}')
+                assert page.locator(f'a[href="/bills/{bill_id}"]').count() >= 1
                 assert not errors, errors
                 browser.close()
                 print('Browser checks passed: photo upload/replacement/modal, locked photo UI, bill room picker with and without JavaScript, no page errors.')

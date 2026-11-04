@@ -1,5 +1,6 @@
 import calendar
 import hashlib
+import re
 from datetime import date
 
 from app.extensions import db
@@ -99,7 +100,48 @@ def bill_values(room, period, data, user_id, save=False):
                   start_value=reading.start_value, end_value=reading.end_value, created_by=user_id,
                   due_date=date(year, month, min(payment_day, calendar.monthrange(year, month)[1])))
     bill = MonthlyBill(**values)
+    raw_final = data.get("final_amount", "").strip()
+    if raw_final and (not re.fullmatch(r"[0-9]{1,19}", raw_final) or int(raw_final) > 9_223_372_036_854_775_807):
+        raise ValueError("Số tiền thu cuối cùng phải là số nguyên không âm, tối đa 9.223.372.036.854.775.807 đ.")
+    bill.final_amount = int(raw_final) if raw_final else bill.computed_total
+    bill.adjustment_reason = data.get("adjustment_reason", "").strip()
+    if len(bill.adjustment_reason) > 500 or (bill.adjustment_amount != 0 and not bill.adjustment_reason):
+        raise ValueError("Điều chỉnh tổng tiền cần lý do, tối đa 500 ký tự.")
     if save:
         db.session.add(bill)
         db.session.commit()
     return bill
+
+
+def amount_in_words(amount):
+    """Spell non-negative integer VND without floating-point arithmetic."""
+    digits = ('không', 'một', 'hai', 'ba', 'bốn', 'năm', 'sáu', 'bảy', 'tám', 'chín')
+    units = ('', 'nghìn', 'triệu', 'tỷ', 'nghìn tỷ', 'triệu tỷ', 'tỷ tỷ')
+    if amount == 0:
+        return 'Không đồng'
+    groups = []
+    while amount:
+        groups.append(amount % 1000)
+        amount //= 1000
+    result = []
+    for index in range(len(groups) - 1, -1, -1):
+        number = groups[index]
+        if not number:
+            continue
+        hundreds, remainder = divmod(number, 100)
+        tens, ones = divmod(remainder, 10)
+        words = []
+        if hundreds or result:
+            words.extend((digits[hundreds], 'trăm'))
+        if tens >= 2:
+            words.extend((digits[tens], 'mươi'))
+        elif tens == 1:
+            words.append('mười')
+        elif ones and (hundreds or result):
+            words.append('lẻ')
+        if ones:
+            words.append('mốt' if ones == 1 and tens >= 2 else 'lăm' if ones == 5 and tens else digits[ones])
+        if units[index]:
+            words.append(units[index])
+        result.extend(words)
+    return (' '.join(result) + ' đồng').capitalize()

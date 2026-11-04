@@ -1,5 +1,7 @@
 # Kiến trúc hiện tại
 
+V1.5.0: service billing kiểm tra số thu cuối cùng/lý do, giữ tổng tính từ snapshot riêng. JS dùng số nguyên BigInt để xem tổng ngay trên form; máy chủ tính và kiểm tra lại. GET /bills/<id> yêu cầu đăng nhập, trình bày phiếu riêng với CSS in, trạng thái Receipt/hủy và tiền bằng chữ. bill_history_query trả cả phiếu hiệu lực/hủy của phòng; template dùng các subtotal từ model. Không thêm framework/dependency hoặc dịch vụ mới.
+
 V1.4.13: bộ chọn phòng lập phiếu là form GET gửi room_id/period/action về billing.index, máy chủ redirect đúng billing.create; bỏ liên kết mặc định phòng đầu và JS đổi href để tránh phụ thuộc HTMX/JavaScript. Dropdown giữ mọi mã phòng, phiếu hiệu lực trong kỳ được đánh dấu/disabled, đề xuất phòng chưa có phiếu. Lỗi mở form lập phiếu giữ room_id khi quay về danh sách. GET tạo phiếu cũng chặn phòng đã có phiếu hiệu lực; POST vẫn giữ kiểm tra giao dịch hiện có. Không đổi schema.
 
 V1.4.2: Photo có unique reading_id và previous_token. stage_photo dùng lại record điện khi thay ảnh, kiểm tra active MonthlyBill và không thay khi pending. Worker chỉ xóa file cũ sau commit ready, fallback ảnh cũ khi failed; dọn output không còn tham chiếu sau 1 giờ để khôi phục crash. Chốt tiền và upload cùng khóa ghi SQLite; chốt phiếu bị chặn khi ảnh pending. Widget chỉ đọc khi phiếu hiệu lực, AJAX thay toàn bộ wrapper ảnh để không nhân đôi thumbnail. Migration a24d09e86c31 gộp ảnh điện trùng, giữ ảnh hợp đồng.

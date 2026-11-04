@@ -7,7 +7,7 @@ from app.extensions import db
 from app.models import ElectricityReading, MonthlyBill, ReadingRevision, Receipt, Room, utcnow
 from app.services.contracts import local_today, parse_date
 from sqlalchemy.orm import selectinload
-from app.services.billing import bill_tenancy, bill_values, correction, lock_writes, reading_pair, reading_stamp
+from app.services.billing import amount_in_words, bill_tenancy, bill_values, correction, lock_writes, reading_pair, reading_stamp
 from app.services.electricity import current_period, valid_period
 from app.services.photos import meter_photo_locked
 
@@ -62,12 +62,20 @@ def index():
                            billed_room_ids=billed_room_ids, selected_room=selected, today=today)
 
 
+@bp.get("/bills/<int:bill_id>")
+@login_required
+def detail(bill_id):
+    bill = db.get_or_404(MonthlyBill, bill_id)
+    return render_template("billing/detail.html", bill=bill, receipt=bill.paid_receipt,
+                           amount_words=amount_in_words(bill.total))
+
+
 @bp.route("/rooms/<int:room_id>/bill", methods=["GET", "POST"])
 @login_required
 def create(room_id):
     room = db.get_or_404(Room, room_id)
     period = request.form.get("period", "") if request.method == "POST" else request.args.get("period", current_period())
-    preview, values = None, request.form
+    preview, values, reading = None, request.form, None
     try:
         if db.session.scalar(db.select(MonthlyBill.id).where(MonthlyBill.room_id == room.id, MonthlyBill.period == period, MonthlyBill.cancelled_at.is_(None))):
             raise ValueError("Phòng đã có phiếu tiền có hiệu lực trong kỳ này.")
@@ -87,8 +95,11 @@ def create(room_id):
         report(error)
         if request.method == "GET":
             return redirect(url_for("billing.index", period=period if valid_period(period) else current_period(), room_id=room.id))
-        return render_template("billing/form.html", room=room, values=values, preview=None, period=period), 400
-    return render_template("billing/form.html", room=room, values=values, preview=preview, period=period)
+        reading = db.session.scalar(db.select(ElectricityReading).where(ElectricityReading.room_id == room.id, ElectricityReading.period == period))
+        return render_template("billing/form.html", room=room, values=values, preview=None, period=period, reading=reading), 400
+    if reading is None:
+        reading = db.session.scalar(db.select(ElectricityReading).where(ElectricityReading.room_id == room.id, ElectricityReading.period == period))
+    return render_template("billing/form.html", room=room, values=values, preview=preview, period=period, reading=reading)
 
 
 @bp.post("/bills/<int:bill_id>/cancel")
