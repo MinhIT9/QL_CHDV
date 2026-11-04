@@ -72,3 +72,7 @@ Trạng thái và giới hạn thực tế xem `STATUS.md`; quyết định xem 
 ## Điều chỉnh V1.1.6
 
 - Tiền phòng/tháng theo đợt thuê, cho phép 0, hiển thị form/bảng/chi tiết/lịch sử. Tổng dự tính gồm phòng+nước+dịch vụ, không gồm điện/cọc; chưa chia ngày hoặc tạo hóa đơn.
+
+## V1.9.2 — Quyền sửa điện và ảnh công tơ
+
+Admin và root được hủy phiếu chưa thu với lý do để mở khóa sửa điện/ảnh. Phiếu đã thu vẫn chặn hủy; chỉ root có quyền hoàn tác ghi nhận thu. Các mô tả trước đây yêu cầu root hủy cả phiếu chưa thu được thay bằng quy tắc này. Link sửa điện và ô chọn/thay ảnh luôn hiện; còn phiếu hiệu lực thì service từ chối lưu với thông báo cần hủy trước. Bảo toàn kiểm tra kỳ sau, serializing ghi SQLite và snapshot phiếu cũ. Không thay schema.

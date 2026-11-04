@@ -56,7 +56,7 @@ def correction(reading, data, user_id, save=False, upload=None):
         raise ValueError("Chỉ số mới không thay đổi.")
     periods = [r.period for r, _, _ in changes]
     if db.session.scalar(db.select(MonthlyBill.id).where(MonthlyBill.room_id == reading.room_id, MonthlyBill.period.in_(periods), MonthlyBill.cancelled_at.is_(None))):
-        raise ValueError("Có phiếu tiền đã chốt trong các kỳ bị ảnh hưởng. Root cần hủy phiếu với lý do trước khi sửa điện.")
+        raise ValueError("Có phiếu tiền còn hiệu lực trong các kỳ bị ảnh hưởng. Hãy hủy phiếu chưa thu trước khi sửa điện; phiếu đã thu cần root xử lý.")
     preview = [{"period": r.period, "old_start": r.start_value, "old_end": r.end_value, "new_start": a, "new_end": b} for r, a, b in changes]
     if save:
         with upload_batch() as staged:

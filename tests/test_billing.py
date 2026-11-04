@@ -150,7 +150,7 @@ class BillingTests(AppTestCase):
         self.assertEqual(self.post(path, self.bill_data(self.next, electricity_price="5000", water_price="120000", rent_price="3500000")).status_code, 302)
         self.assertEqual(bill.total, 3750000)
 
-    def test_billed_readings_require_root_cancel_and_keep_old_bill(self):
+    def test_billed_readings_require_admin_cancel_and_keep_old_bill(self):
         path = f"/rooms/{self.room_obj.id}/bill"
         self.post(path, self.bill_data(self.next))
         bill = db.session.scalar(db.select(MonthlyBill))
@@ -158,10 +158,15 @@ class BillingTests(AppTestCase):
         self.assertEqual(self.next.start_value, 1350)
         other = self.app.test_client()
         self.login("manager", "AdminTest123!", other)
-        self.assertEqual(self.post(f"/bills/{bill.id}/cancel", {"reason": "Fix"}, client=other).status_code, 403)
-        self.assertEqual(self.post(f"/bills/{bill.id}/cancel", {"reason": "Fix"}).status_code, 302)
+        page = other.get('/bills?period=2026-02').get_data(as_text=True)
+        self.assertIn(f'action="/bills/{bill.id}/cancel"', page)
+        self.post(f'/bills/{bill.id}/cancel', {'reason': ''}, client=other)
+        self.assertIsNone(bill.cancelled_at)
+        self.assertEqual(self.post(f"/electricity/{self.first.id}/correct", self.correction_data(), client=other).status_code, 400)
+        self.assertEqual(self.post(f"/bills/{bill.id}/cancel", {"reason": "Fix"}, client=other).status_code, 302)
         self.assertIsNotNone(bill.cancelled_at)
-        self.assertEqual(self.post(f"/electricity/{self.first.id}/correct", self.correction_data()).status_code, 302)
+        self.assertEqual(bill.cancelled_by, self.admin_id)
+        self.assertEqual(self.post(f"/electricity/{self.first.id}/correct", self.correction_data(), client=other).status_code, 302)
         self.assertEqual(bill.start_value, 1350)
         self.post(path, self.bill_data(self.next))
         self.assertEqual(db.session.scalar(db.select(db.func.count()).select_from(MonthlyBill)), 2)

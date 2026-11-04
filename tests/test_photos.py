@@ -297,17 +297,21 @@ class PhotoTests(AppTestCase):
         photo = db.session.scalar(db.select(Photo))
         token, photo_id = photo.token, photo.id
         for username, password in (('root', 'RootTest123!'), ('manager', 'AdminTest123!')):
+            self.post('/logout')
             self.login(username, password)
             response = self.client.post(f'/photos/electricity/{reading_id}', data={'photo': self.image_upload(), 'upload_token': 'e' * 32, 'csrf_token': self.token()}, headers={'X-Photo-Upload': '1'})
             self.assertEqual(response.status_code, 400)
             self.assertEqual(db.session.get(Photo, photo_id).token, token)
         html = self.client.get('/electricity/?period=2026-01').get_data(as_text=True)
-        self.assertNotIn('name="photo_' + str(room.id) + '"', html)
+        self.assertIn('name="photo_' + str(room.id) + '"', html)
         self.assertIn('meter-photo-widget', html)
+        edit_page = self.client.get(f'/electricity/{reading_id}/correct').get_data(as_text=True)
+        self.assertIn('Cần hủy phiếu chưa thu trước khi sửa số điện hoặc ảnh công tơ.', edit_page)
+        self.assertIn('name="photo"', edit_page)
         # Cancelling the effective bill unlocks the image; an ordinary receipt is not required to freeze it.
         bill = db.session.scalar(db.select(MonthlyBill))
-        bill.cancelled_at = datetime.now()
-        db.session.commit()
+        self.assertEqual(self.post(f'/bills/{bill.id}/cancel', {'reason': 'Correct meter fixture'}).status_code, 302)
+        self.assertEqual(bill.cancelled_by, self.admin_id)
         response = self.client.post(f'/photos/electricity/{reading_id}', data={'photo': self.image_upload(), 'upload_token': 'f' * 32, 'csrf_token': self.token()}, headers={'X-Photo-Upload': '1'})
         self.assertEqual(response.status_code, 200)
 

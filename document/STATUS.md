@@ -1,5 +1,16 @@
 # Tiến độ thực tế
 
+V1.9.3: Bỏ cảnh báo lặp trên trang sửa điện. GET giữ một banner hướng dẫn hủy phiếu; khi có flash danger thì không render banner vàng. Widget ảnh không lặp hướng dẫn trên billing.correct, vẫn hiện nhắc khóa ở bảng điện. Không ẩn lỗi máy chủ hoặc đổi quyền/guard. Kiểm tra fixture: GET một cảnh báo, POST bị chặn một lỗi đỏ/không cảnh báo vàng; 16 photo tests OK (9.347s). Không đổi DB/VPS.
+
+## 2026-11-04 — Admin hủy phiếu chưa thu để sửa điện
+
+V1.9.2: Admin được hủy phiếu chưa thu với lý do; route cancel dùng login_required và vẫn khóa ghi/kiểm tra lại paid_receipt, lưu cancelled_by/at/reason. Admin không được hoàn tác thu; phiếu đã thu không hủy trực tiếp. Root vẫn xử lý hoàn tác thu có lý do trước khi hủy.
+
+Luôn giữ link Sửa điện và widget chọn/kéo/thay ảnh kể cả khi có phiếu hiệu lực. UI báo cần hủy trước; thử sửa số hoặc lưu ảnh bị máy chủ từ chối khi phiếu còn hiệu lực. Không bỏ guard giao dịch ở correction/stage_photo. Sửa số ảnh hưởng đầu kỳ sau vẫn kiểm tra phiếu khóa tại mọi kỳ bị ảnh hưởng. Sau Admin hủy phiếu chưa thu, Admin sửa số/ảnh được; snapshot phiếu đã hủy giữ nguyên. Fallback upload không JavaScript cũng giữ sẵn và kiểm tra máy chủ.
+
+Không đổi schema/DB runtime/dependencies hoặc cập nhật VPS. Bước tiếp restart web dev/Ctrl+F5. Gói ZIP V1.7.0 cũ không chứa thay đổi này.
+
+
 ## 2026-11-04 — Một lý do sửa giá và nhật ký phiếu
 
 V1.9.0: Form sửa phiếu chỉ còn một ô Lý do sửa giá (adjustment_reason), bỏ edit_reason. Client hiện/bắt buộc ô này khi đơn giá hoặc tiền thu cuối cùng khác bản gốc; máy chủ kiểm tra lại độc lập. Đổi ngày đến hạn không bắt lý do, giữ lý do làm tròn/điều chỉnh đã có trên snapshot khi không nhập lý do mới. Không tự điền lại lý do cũ vào ô nhập để tránh dùng nhầm làm lý do cho lần sửa mới. Giá đổi nhưng tổng được giữ nguyên vẫn cần lý do.
@@ -52,7 +63,7 @@ Kiểm tra: 73 unittest OK (44.715s), db check không phát sinh thay đổi, No
 V1.5.0: Đã triển khai trên dev trang phiếu riêng khi bấm ID, tổng tự tính và số thu cuối cùng kèm lý do bắt buộc khi khác tổng gốc; lịch sử phòng có cả phiếu hủy/đã thu. Máy chủ kiểm tra số nguyên không âm, giữ giá 0; Receipt thu theo số cuối cùng đã chốt. Phiếu cũ dùng tổng snapshot, không đổi tiền đã thu. Phiếu đã chốt bất biến, muốn đổi dùng hủy/lập lại theo quyền hiện có. Trang cần đăng nhập, có tiền bằng chữ, responsive và CSS in ẩn toolbar; chưa có link công khai/xuất ảnh tự động. Migration b35e10f97d42 đã áp dụng DEV sau backup backups/pre-bill-final-20261104-v150.sqlite3. Edge headless đạt desktop/390px/in; ảnh giả ở exports/receipt-preview-desktop.png và exports/receipt-preview-mobile.png. Chưa thử máy in giấy/điện thoại thật hoặc cập nhật VPS. Bước tiếp: restart web dev, Ctrl+F5; triển khai VPS cần upgrade DB trước mở web.
 
 
-Cập nhật: 2026-11-04 (Asia/Saigon). Phiên bản hội thoại: V1.9.0.
+Cập nhật: 2026-11-04 (Asia/Saigon). Phiên bản hội thoại: V1.9.2.
 
 V1.4.17: vẽ mockup phiếu gửi khách bằng imagegen built-in theo yêu cầu chỉ thiết kế, chưa code. Phiếu dọc trắng/mint/navy, tổng tiền nổi bật, bảng kê, dữ liệu minh họa; phân biệt chưa thanh toán với đã thu. Đã hiển thị ảnh và ghi BILL_RECEIPT_DESIGN.md, kiểm tra trực quan/số tiền, inventory/diff đạt. Chưa có route click ID/xuất phiếu trong app; không chạy test nghiệp vụ hoặc thao tác VPS.
 
@@ -255,3 +266,5 @@ Kiểm tra V1.7.0: 78 unittest OK (50.165s), DB check/integrity đạt, cột d�
 V1.7.2 — Edge headless đạt kiểm tra bật/tắt công tắc qua giao diện, lưu rồi đọc lại; ZXing đọc QR sau khi tắt không còn mã nội dung, số tiền vẫn 1.234. Không pageerror.
 
 Kiểm tra V1.9.0: 88 unittest OK (50.065s); Edge đạt kiểm tra chỉ một ô lý do, ẩn khi không đổi giá/đổi hạn, hiện và bắt buộc khi đổi tiền, lưu xong thấy nhật ký dưới form. Ảnh fixture exports/bill-change-history.png. Node syntax, db check, integrity_check và foreign_key_check đạt; dữ liệu các cột cũ giữ nguyên so với backup. Chưa quét ngân hàng/điện thoại thật hoặc triển khai VPS.
+
+Kiểm tra V1.9.2: 88 unittest OK (50.854s), đăng nhập tách root/Admin để kiểm tra quyền thực tế. Admin bị chặn sửa điện/ảnh khi còn phiếu, hủy có lý do và audit đúng Admin rồi sửa được; phiếu đã thu không hủy được, reverse vẫn 403 cho Admin. Edge đạt widget vẫn hiện, thử lưu khi khóa nhận lỗi, ảnh đã lưu không đổi; regression QR/form/nhật ký đạt. Không thay schema hoặc thao tác VPS.

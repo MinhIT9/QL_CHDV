@@ -1,9 +1,9 @@
 <div class="meter-photo-widget" data-upload-url="{{ url_for('photos.add', kind='electricity', owner_id=reading.id) if reading else '' }}">
   <div class="saved-photos">{% if reading %}{{ photo_list(reading.photos) }}{% endif %}</div>
   {% set locked = row.photo_locked if row is defined else photo_locked|default(false) %}
-  {% if locked %}
-    <span class="small text-muted">Đã chốt phiếu · ảnh công tơ đã khóa</span>
-  {% else %}
+  {% if locked and request.endpoint != 'billing.correct' %}
+    <span class="small text-warning">Cần hủy phiếu chưa thu trước khi sửa ảnh công tơ.</span>
+  {% endif %}
   <label class="photo-drop border rounded p-2 d-block small text-muted" tabindex="0">
     Kéo ảnh vào đây hoặc chọn ảnh
     <input class="form-control form-control-sm meter-photo" type="file" name="{{ 'photo_' ~ room.id if room is defined else 'photo' }}" accept="image/jpeg,image/png,image/webp">
@@ -13,5 +13,4 @@
   {% if reading %}<button class="btn btn-sm btn-primary photo-save" type="button" hidden>{{ 'Lưu ảnh thay thế' if reading.photos else 'Lưu ảnh' }}</button>{% endif %}
   <progress class="photo-progress w-100" max="100" value="0" hidden></progress>
   <div class="photo-message small" role="status" aria-live="polite"></div>
-  {% endif %}
 </div>

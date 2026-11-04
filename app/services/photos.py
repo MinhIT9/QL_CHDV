@@ -59,7 +59,7 @@ def stage_photo(upload, user_id, staged, *, tenancy=None, reading=None, token=No
     existing = None
     if reading and reading.id is not None:
         if meter_photo_locked(reading):
-            raise ValueError("Đã chốt phiếu tiền kỳ này. Không thể thêm hoặc thay ảnh công tơ.")
+            raise ValueError("Phiếu tiền kỳ này còn hiệu lực. Hãy hủy phiếu chưa thu trước khi sửa ảnh công tơ; phiếu đã thu cần root xử lý.")
         existing = db.session.scalar(db.select(Photo).where(Photo.reading_id == reading.id))
         if existing and existing.status == "pending":
             raise ValueError("Ảnh công tơ đang xử lý. Hãy chờ hoàn tất trước khi thay ảnh.")

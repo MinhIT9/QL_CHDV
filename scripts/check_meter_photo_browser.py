@@ -130,7 +130,11 @@ def main():
                         due_date=date(2026, 1, 31), created_by=reading.created_by))
                     db.session.commit()
                 page.goto(base + '/electricity/?period=2026-01')
-                assert first.locator('input[type=file]').count() == 0
+                assert first.locator('input[type=file]').count() == 1
+                first.locator('input[type=file]').set_input_files({'name': 'blocked.jpg', 'mimeType': 'image/jpeg', 'buffer': image.getvalue()})
+                first.locator('.photo-save').click()
+                page.wait_for_function("document.querySelector('.reading-row .photo-message').textContent.includes('hủy phiếu chưa thu')")
+                first.locator('.photo-clear').click()
                 assert first.locator('.saved-photos img').count() == 1
                 assert second.locator('input[type=file]').count() == 1
                 with app.app_context():

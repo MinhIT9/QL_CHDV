@@ -1,5 +1,16 @@
 # Lịch sử thay đổi
 
+V1.9.3: Bỏ cảnh báo lặp trên trang sửa điện. GET giữ một banner hướng dẫn hủy phiếu; khi có flash danger thì không render banner vàng. Widget ảnh không lặp hướng dẫn trên billing.correct, vẫn hiện nhắc khóa ở bảng điện. Không ẩn lỗi máy chủ hoặc đổi quyền/guard. Kiểm tra fixture: GET một cảnh báo, POST bị chặn một lỗi đỏ/không cảnh báo vàng; 16 photo tests OK (9.347s). Không đổi DB/VPS.
+
+## 2026-11-04 — Admin hủy phiếu chưa thu để sửa điện
+
+V1.9.2: Admin được hủy phiếu chưa thu với lý do; route cancel dùng login_required và vẫn khóa ghi/kiểm tra lại paid_receipt, lưu cancelled_by/at/reason. Admin không được hoàn tác thu; phiếu đã thu không hủy trực tiếp. Root vẫn xử lý hoàn tác thu có lý do trước khi hủy.
+
+Luôn giữ link Sửa điện và widget chọn/kéo/thay ảnh kể cả khi có phiếu hiệu lực. UI báo cần hủy trước; thử sửa số hoặc lưu ảnh bị máy chủ từ chối khi phiếu còn hiệu lực. Không bỏ guard giao dịch ở correction/stage_photo. Sửa số ảnh hưởng đầu kỳ sau vẫn kiểm tra phiếu khóa tại mọi kỳ bị ảnh hưởng. Sau Admin hủy phiếu chưa thu, Admin sửa số/ảnh được; snapshot phiếu đã hủy giữ nguyên. Fallback upload không JavaScript cũng giữ sẵn và kiểm tra máy chủ.
+
+Không đổi schema/DB runtime/dependencies hoặc cập nhật VPS. Bước tiếp restart web dev/Ctrl+F5. Gói ZIP V1.7.0 cũ không chứa thay đổi này.
+
+
 ## 2026-11-04 — Một lý do sửa giá và nhật ký phiếu
 
 V1.9.0: Form sửa phiếu chỉ còn một ô Lý do sửa giá (adjustment_reason), bỏ edit_reason. Client hiện/bắt buộc ô này khi đơn giá hoặc tiền thu cuối cùng khác bản gốc; máy chủ kiểm tra lại độc lập. Đổi ngày đến hạn không bắt lý do, giữ lý do làm tròn/điều chỉnh đã có trên snapshot khi không nhập lý do mới. Không tự điền lại lý do cũ vào ô nhập để tránh dùng nhầm làm lý do cho lần sửa mới. Giá đổi nhưng tổng được giữ nguyên vẫn cần lý do.

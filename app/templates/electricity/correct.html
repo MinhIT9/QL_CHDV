@@ -2,11 +2,12 @@
 {% block content %}
 {% from 'partials/photos.html' import photo_list, photo_upload with context %}
 <header class="page-header"><div><a class="back-link" href="{{ url_for('electricity.index', period=reading.period) }}">← Chỉ số điện</a><h1>Sửa điện · {{ reading.room.code }}</h1><p class="muted">Kỳ {{ reading.period|period_label }} · Kiểm tra ảnh hưởng kỳ sau trước khi lưu.</p></div></header>
+{% if photo_locked and not get_flashed_messages(category_filter=['danger']) %}<div class="alert alert-warning" role="alert">Phiếu tiền kỳ này còn hiệu lực. Cần hủy phiếu chưa thu trước khi sửa số điện hoặc ảnh công tơ. Phiếu đã thu cần root xử lý. <a href="{{ url_for('billing.index', period=reading.period) }}">Mở chốt tiền</a></div>{% endif %}
 <section class="card narrow mb-3" id="meter-photos">
   <h2>Ảnh công tơ điện · kỳ {{ reading.period|period_label }}</h2>
   <p class="text-muted small">Có thể bổ sung ảnh cho kỳ này mà không cần thay đổi chỉ số điện.</p>
   {% include 'electricity/photo_widget.html' %}
-  {% if not photo_locked %}<noscript>{{ photo_upload('electricity', reading.id) }}</noscript>{% endif %}
+  <noscript>{{ photo_upload('electricity', reading.id) }}</noscript>
 </section>
 <section class="card narrow"><form method="post" enctype="multipart/form-data" class="stack d-grid">
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="stamp" value="{{ values.get('stamp', '') }}">

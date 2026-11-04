@@ -147,7 +147,7 @@ def edit(bill_id):
 
 
 @bp.post("/bills/<int:bill_id>/cancel")
-@root_required
+@login_required
 def cancel(bill_id):
     try:
         lock_writes()
@@ -156,7 +156,7 @@ def cancel(bill_id):
         if bill.cancelled_at or not reason or len(reason) > 500:
             raise ValueError("Phiếu đã hủy hoặc thiếu lý do hợp lệ (tối đa 500 ký tự).")
         if bill.paid_receipt:
-            raise ValueError("Phiếu đã thu tiền. Root cần hoàn tác ghi nhận thu có lý do trước khi hủy phiếu.")
+            raise ValueError("Phiếu đã thu tiền, không thể hủy trực tiếp. Root cần hoàn tác ghi nhận thu có lý do trước.")
         bill.cancelled_at, bill.cancelled_by, bill.cancel_reason = utcnow(), current_user.id, reason
         db.session.commit()
         flash("Đã hủy hiệu lực phiếu và giữ nguyên bản cũ. Có thể sửa điện rồi lập phiếu mới.", "success")
