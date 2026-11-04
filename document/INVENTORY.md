@@ -60,6 +60,7 @@ app/templates/auth/accounts.html
 app/templates/auth/change_password.html
 app/templates/auth/login.html
 app/templates/base.html
+app/templates/billing/change_history.html
 app/templates/billing/detail.html
 app/templates/billing/form.html
 app/templates/billing/index.html
@@ -132,6 +133,7 @@ migrations/versions/dd7493777e83_fees_and_contracts.py
 migrations/versions/e68143c20a75_optional_transfer_content.py
 migrations/versions/e9329a770fe9_initial_schema.py
 migrations/versions/f13a98c52b70_private_photos.py
+migrations/versions/f79254d31b86_bill_change_log.py
 requirements-dev.txt
 requirements.txt
 scripts/check_meter_photo_browser.py
@@ -149,4 +151,4 @@ tests/test_vietqr.py
 wsgi.py
 ```
 
-Tổng: 140 file (bao gồm file danh mục này).
+Tổng: 142 file (bao gồm file danh mục này).

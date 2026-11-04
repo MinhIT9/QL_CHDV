@@ -245,8 +245,15 @@ def main():
                 page.locator(f'a[href="/bills/{bill_id}/edit"]').click()
                 # Edit starts from bill snapshot, not the newly changed contract price.
                 assert page.locator('[name=rent_price]').input_value() == '1.000 đ'
+                page.locator('[data-price-reason]').wait_for(state='hidden', timeout=5000)
+                page.locator('[name=payment_day]').fill('6')
+                assert not page.locator('[data-price-reason]').is_visible()
                 page.locator('[name=final_amount]').fill('2000')
-                page.locator('[name=edit_reason]').fill('Browser bill correction fixture')
+                assert page.locator('[data-price-reason]').is_visible()
+                assert page.locator('[name=adjustment_reason]').get_attribute('required') is not None
+                assert page.locator('[name=edit_reason]').count() == 0
+                assert page.locator('[name=adjustment_reason]').count() == 1
+                page.locator('[name=adjustment_reason]').fill('Browser bill correction fixture')
                 page.locator('button[name=action][value=preview]').click()
                 page.locator('button[name=action][value=confirm]').wait_for()
                 assert page.locator('[name=final_amount]').input_value() == '2.000 đ'
@@ -259,7 +266,10 @@ def main():
                     replacement_id = replacement.id
                     assert replacement.total == 2000
                     assert db.session.get(MonthlyBill, bill_id).cancelled_at is not None
-                page.wait_for_url(f'**/bills/{replacement_id}')
+                page.wait_for_url(f'**/bills/{replacement_id}/edit')
+                assert page.locator('#bill-change-history').is_visible()
+                assert 'Browser bill correction fixture' in page.locator('#bill-change-history').inner_text()
+                page.screenshot(path=str(exports / 'bill-change-history.png'), full_page=True)
                 assert not errors, errors
                 browser.close()
                 print('Browser checks passed: photo upload/replacement/modal, locked photo UI, bill room picker with and without JavaScript, no page errors.')

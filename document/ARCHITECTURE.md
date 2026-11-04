@@ -96,3 +96,7 @@ Bật/tắt qua PaymentSettings.auto_transfer_content, mặc định bật cho c
 ## V1.8.0 — Phiếu thay thế và định dạng chung
 
 Admin được sửa phiếu chưa thu bằng edit_bill: khóa ghi/kiểm tra stamp và trạng thái, tạo bản mới từ snapshot cũ, hủy bản gốc có audit trong cùng transaction. Không cập nhật đè snapshot hoặc đổi hợp đồng. Chỉ root được hủy riêng/hoàn tác thu. app/utils/formatting.py tập trung parse/format tiền và ngày, UTC+7 cho hiển thị/đồng hồ nghiệp vụ; formats.js xử lý input và app.js dùng helper này để tính trước. Chuỗi đẹp gửi về máy chủ được kiểm tra lại, tiền vẫn số nguyên, timestamp lưu UTC. ISO chỉ giữ ở giao thức/URL và dữ liệu máy; giao diện dùng dd/mm/yyyy và mm/yyyy. Không thêm dependency/schema. Xem LOCALIZATION.md.
+
+## V1.9.0 — Nhật ký sửa giá
+
+Chỉ dùng adjustment_reason trên form. Chỉ yêu cầu khi đơn giá hoặc tổng tiền thu thay đổi; thay ngày đến hạn không bắt lý do. Lý do điều chỉnh cũ được giữ trên snapshot khi sửa thông tin không liên quan đến giá. BillChange liên kết bản trước/sau, reason mới và actor/time, ghi nguyên tử cùng thao tác thay phiếu. bill_change_query đọc theo room/kỳ; change_history_rows tạo diff có định dạng, template chỉ trình bày. Nhật ký hiển thị dưới form và trong phòng, không nằm trong phiếu gửi khách. Chưa có log chi tiết trước migration f79254d31b86; không suy diễn từ chuỗi cancel_reason cũ.

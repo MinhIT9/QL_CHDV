@@ -1,6 +1,6 @@
 # Mô hình dữ liệu V1
 
-Đã triển khai tại app/models/__init__.py; migration mới nhất e68143c20a75 (nội dung chuyển khoản tùy chọn).
+Đã triển khai tại app/models/__init__.py; migration mới nhất f79254d31b86 (nhật ký thay đổi phiếu).
 
 ## Điều chỉnh tổng phiếu — V1.5.0
 
@@ -83,3 +83,7 @@ V1.7.2: PaymentSettings.auto_transfer_content Boolean NOT NULL DEFAULT true. Mig
 ## V1.8.0 — Lưu lịch sử sửa phiếu
 
 Không thêm cột: bản cũ dùng cancelled_at/by/reason (ghi ID bản thay thế), bản mới dùng created_at/by và snapshot. Lý do sửa tối đa 450 để đủ chỗ ghi liên kết trong cancel_reason 500. Cặp room/period chỉ có một bản hiệu lực; hủy bản cũ và chèn bản mới cùng transaction. Tiền lưu nguyên VND, dates là business dates, timestamps UTC; định dạng chỉ nằm ở biên input/output.
+
+## BillChange — V1.9.0
+
+old_bill_id và new_bill_id là FK RESTRICT tới MonthlyBill, mỗi cột unique để giữ chuỗi thay thế. reason String(500) không null (rỗng nếu không cần lý do), created_by FK User RESTRICT, created_at UTC. Snapshot trước/sau nằm ở hai phiếu bất biến; nhật ký không nhân bản các giá trị tiền. Chỉ thêm record sau sửa thành công trong cùng transaction; preview/rollback không tạo nhật ký. Không backfill dữ liệu legacy.

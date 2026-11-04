@@ -1,0 +1,19 @@
+<section class="card table-card mt-4" id="bill-change-history">
+  <div class="section-heading"><h2>Nhật ký thay đổi phiếu tiền</h2></div>
+  <div class="table-scroll">
+    <table class="table table-striped align-middle mb-0">
+      <thead><tr><th>Thời điểm / người sửa</th><th>Phiếu / kỳ</th><th>Thay đổi trước → sau</th><th>Lý do sửa giá</th></tr></thead>
+      <tbody>
+        {% for entry in change_history %}{% set record = entry.record %}
+        <tr>
+          <td class="text-nowrap">{{ record.created_at|local_datetime }}<small>{{ record.author.username }}</small></td>
+          <td><a href="{{ url_for('billing.detail', bill_id=record.old_bill_id) }}" hx-boost="false">#{{ record.old_bill_id }}</a> → <a href="{{ url_for('billing.detail', bill_id=record.new_bill_id) }}" hx-boost="false">#{{ record.new_bill_id }}</a><small>{{ record.new_bill.period|period_label }}</small></td>
+          <td>{% for change in entry.changes %}<div><strong>{{ change.label }}:</strong> {{ change.before }} → {{ change.after }}</div>{% endfor %}</td>
+          <td>{{ record.reason or '—' }}</td>
+        </tr>
+        {% else %}<tr><td colspan="4" class="empty">Chưa có thay đổi được ghi nhật ký.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p class="small text-muted px-3 mt-2">Nhật ký chi tiết được ghi từ bản cập nhật này. Các phiếu cũ vẫn được giữ trong lịch sử chốt tiền.</p>
+</section>

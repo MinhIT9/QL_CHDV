@@ -19,3 +19,7 @@ AppFormat.money dùng BigInt, moneyDigits đọc chuỗi đã nhóm; không dùn
 ## Kiểm tra
 
 85 unittest đạt; timezone qua ranh giới ngày/tháng, leap day, tiền 0/thiếu/int64, reject format sai, snapshot/paid/stale/repeat/rollback được kiểm tra. Edge QA trong scripts/check_meter_photo_browser.py dùng dữ liệu giả, kiểm tra nhập/lưu tiền/ngày và sửa phiếu. Không thao tác dữ liệu thật hoặc VPS trong QA.
+
+## V1.9.0 — Nhật ký sửa giá
+
+Chỉ dùng adjustment_reason trên form. Chỉ yêu cầu khi đơn giá hoặc tổng tiền thu thay đổi; thay ngày đến hạn không bắt lý do. Lý do điều chỉnh cũ được giữ trên snapshot khi sửa thông tin không liên quan đến giá. BillChange liên kết bản trước/sau, reason mới và actor/time, ghi nguyên tử cùng thao tác thay phiếu. bill_change_query đọc theo room/kỳ; change_history_rows tạo diff có định dạng, template chỉ trình bày. Nhật ký hiển thị dưới form và trong phòng, không nằm trong phiếu gửi khách. Chưa có log chi tiết trước migration f79254d31b86; không suy diễn từ chuỗi cancel_reason cũ.

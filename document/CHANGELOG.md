@@ -1,5 +1,14 @@
 # Lịch sử thay đổi
 
+## 2026-11-04 — Một lý do sửa giá và nhật ký phiếu
+
+V1.9.0: Form sửa phiếu chỉ còn một ô Lý do sửa giá (adjustment_reason), bỏ edit_reason. Client hiện/bắt buộc ô này khi đơn giá hoặc tiền thu cuối cùng khác bản gốc; máy chủ kiểm tra lại độc lập. Đổi ngày đến hạn không bắt lý do, giữ lý do làm tròn/điều chỉnh đã có trên snapshot khi không nhập lý do mới. Không tự điền lại lý do cũ vào ô nhập để tránh dùng nhầm làm lý do cho lần sửa mới. Giá đổi nhưng tổng được giữ nguyên vẫn cần lý do.
+
+Thêm BillChange với FK old_bill_id/new_bill_id duy nhất, reason tối đa 500, created_by/created_at; ghi cùng transaction thay phiếu, rollback không để lại log/bản mới. Nhật ký dưới form và chi tiết phòng có các trường trước → sau, ID phiếu/kỳ, người sửa và giờ Việt Nam. Lưu xong chuyển về form bản mới để thấy nhật ký ngay. Nhật ký quản trị không đưa vào phiếu gửi khách. Không suy đoán/backfill nhật ký cho các lần sửa trước nâng cấp; lịch sử snapshot cũ vẫn giữ.
+
+DEV đã backup backups/pre-bill-change-log-v190.sqlite3 và migrate e68143c20a75 → f79254d31b86; db check đạt. Chưa cập nhật VPS. Bước tiếp restart web dev/Ctrl+F5; khi triển khai VPS phải chạy migration mới. ZIP V1.7.0 cũ không chứa sửa này.
+
+
 ## 2026-11-04 — Sửa phiếu và định dạng Việt Nam
 
 V1.8.0: Thêm nút Sửa tại bảng chốt tiền cho phiếu chưa thu/còn hiệu lực. Root/Admin xem trước rồi xác nhận, bắt buộc lý do tối đa 450 ký tự. Sửa tạo bản thay thế trong cùng giao dịch, đánh dấu bản cũ hủy và ghi ID bản mới/người sửa/thời điểm/lý do; giữ giá, người thuê và chỉ số từ snapshot cũ, không lấy lại giá hợp đồng hiện tại. Chặn phiếu đã thu/đã hủy, dữ liệu form cũ và gửi lặp; rollback khôi phục bản cũ nếu commit lỗi. Hủy riêng và hoàn tác thu vẫn chỉ root. Không đổi schema.

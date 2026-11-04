@@ -255,6 +255,18 @@ class MonthlyBill(db.Model):
         return next((r for r in self.receipts if r.reversed_at is None), None)
 
 
+class BillChange(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    old_bill_id = db.Column(db.Integer, db.ForeignKey('monthly_bill.id', ondelete='RESTRICT'), nullable=False, unique=True)
+    new_bill_id = db.Column(db.Integer, db.ForeignKey('monthly_bill.id', ondelete='RESTRICT'), nullable=False, unique=True)
+    reason = db.Column(db.String(500), nullable=False, default='')
+    created_by = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='RESTRICT'), nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=utcnow)
+    old_bill = db.relationship('MonthlyBill', foreign_keys=[old_bill_id])
+    new_bill = db.relationship('MonthlyBill', foreign_keys=[new_bill_id])
+    author = db.relationship('User')
+
+
 class Receipt(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     bill_id = db.Column(db.Integer, db.ForeignKey("monthly_bill.id", ondelete="RESTRICT"), nullable=False)

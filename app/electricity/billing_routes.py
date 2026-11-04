@@ -7,7 +7,8 @@ from app.extensions import db
 from app.models import ElectricityReading, MonthlyBill, ReadingRevision, Receipt, Room, utcnow
 from app.services.contracts import local_today, parse_date
 from sqlalchemy.orm import selectinload
-from app.services.billing import amount_in_words, bill_tenancy, bill_values, bill_stamp, edit_bill, correction, lock_writes, reading_pair, reading_stamp
+from app.services.billing import amount_in_words, bill_tenancy, bill_values, bill_stamp, change_history_rows, edit_bill, correction, lock_writes, reading_pair, reading_stamp
+from app.services.queries import bill_change_query
 from app.services.electricity import current_period, valid_period
 from app.services.photos import meter_photo_locked
 from app.services.payment_settings import payment_settings
@@ -125,7 +126,7 @@ def edit(bill_id):
     if request.method == 'GET' and (original.cancelled_at or original.paid_receipt):
         abort(409, description='Phiếu đã thu hoặc đã hủy, không thể sửa.')
     values = request.form if request.method == 'POST' else {
-        **{key: getattr(original, key) for key in ('rent_price', 'water_price', 'service_price', 'electricity_price', 'people_count', 'adjustment_reason')},
+        **{key: getattr(original, key) for key in ('rent_price', 'water_price', 'service_price', 'electricity_price', 'people_count')},
         'payment_day': original.due_date.day, 'period': original.period,
         'final_amount': original.total if original.adjustment_amount else '', 'edit_stamp': bill_stamp(original),
     }
@@ -135,13 +136,14 @@ def edit(bill_id):
             preview = edit_bill(original, values, current_user.id, values.get('action') == 'confirm')
             if values.get('action') == 'confirm':
                 flash('Đã sửa phiếu. Bản cũ được giữ trong lịch sử phòng.', 'success')
-                return redirect(url_for('billing.detail', bill_id=preview.id))
+                return redirect(url_for('billing.edit', bill_id=preview.id))
         except WRITE_ERRORS as error:
             report(error)
             status = 400
     return render_template('billing/form.html', room=db.get_or_404(Room, original.room_id),
                            values=values, preview=preview, period=original.period, reading=original,
-                           editing=original), status
+                           editing=original, change_history=change_history_rows(
+                               db.session.scalars(bill_change_query(original.room_id, original.period)).all())), status
 
 
 @bp.post("/bills/<int:bill_id>/cancel")

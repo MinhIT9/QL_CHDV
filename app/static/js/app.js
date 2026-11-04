@@ -47,7 +47,11 @@ if (amountForm && !amountForm.dataset.amountBound) {
     const valid = /^\d{1,19}$/.test(finalRaw) && BigInt(finalRaw) <= 9223372036854775807n;
     final.setCustomValidity(valid ? "" : "Số tiền thu cuối cùng phải là số nguyên không âm trong giới hạn cho phép.");
     const difference = valid ? BigInt(finalRaw) - computed : 0n;
-    reason.required = valid && difference !== 0n;
+    const priceChanged = amountForm.dataset.editing
+      ? names.slice(0, 4).some((name, index) => BigInt(raw[index]) !== BigInt(amountForm.getAttribute(`data-original-${name.replaceAll('_', '-')}`))) || (valid && BigInt(finalRaw) !== BigInt(amountForm.dataset.originalTotal))
+      : valid && difference !== 0n;
+    reason.required = Boolean(priceChanged);
+    reason.closest('[data-price-reason]').hidden = !priceChanged;
     amountForm.querySelector("#bill-adjustment").textContent = valid ? `Điều chỉnh: ${difference > 0n ? '+' : ''}${money(difference)}` : "";
   };
   final.addEventListener("input", () => { manual = final.value !== ""; updateAmount(); });

@@ -3,9 +3,9 @@ import hashlib
 from datetime import date
 
 from app.extensions import db
-from app.models import ElectricityReading, MonthlyBill, Photo, ReadingRevision, utcnow
+from app.models import BillChange, ElectricityReading, MonthlyBill, Photo, ReadingRevision, utcnow
 from app.services.contracts import parse_integer
-from app.utils.formatting import parse_money
+from app.utils.formatting import business_date, parse_money, vnd
 from app.services.electricity import current_period, integer_reading, valid_period
 from app.services.photos import stage_photo, upload_batch
 
@@ -114,11 +114,11 @@ def bill_values(room, period, data, user_id, save=False):
 
 
 
-def apply_final_amount(bill, data):
+def apply_final_amount(bill, data, require_reason=True):
     final = parse_money(data.get('final_amount', '').strip(), 'Số tiền thu cuối cùng', maximum=9_223_372_036_854_775_807)
     bill.final_amount = final if final is not None else bill.computed_total
     bill.adjustment_reason = data.get('adjustment_reason', '').strip()
-    if len(bill.adjustment_reason) > 500 or (bill.adjustment_amount != 0 and not bill.adjustment_reason):
+    if len(bill.adjustment_reason) > 500 or (require_reason and bill.adjustment_amount != 0 and not bill.adjustment_reason):
         raise ValueError('Điều chỉnh tổng tiền cần lý do, tối đa 500 ký tự.')
 
 
@@ -137,9 +137,6 @@ def edit_bill(original, data, user_id, save=False):
         raise ValueError('Chỉ sửa phiếu chưa thu và còn hiệu lực.')
     if data.get('edit_stamp') != bill_stamp(original):
         raise ValueError('Phiếu hoặc lịch sử thu đã thay đổi. Hãy tải lại trang.')
-    reason = data.get('edit_reason', '').strip()
-    if not reason or len(reason) > 450:
-        raise ValueError('Cần lý do sửa phiếu, tối đa 450 ký tự.')
     fields = ('room_id', 'tenancy_id', 'period', 'room_code', 'tenant_name', 'start_value', 'end_value')
     values = {key: getattr(original, key) for key in fields}
     values.update(bill_prices(data))
@@ -148,19 +145,37 @@ def edit_bill(original, data, user_id, save=False):
     year, month = map(int, original.period.split('-'))
     values['due_date'] = date(year, month, min(day, calendar.monthrange(year, month)[1]))
     bill = MonthlyBill(**values, created_by=user_id)
-    apply_final_amount(bill, data)
+    apply_final_amount(bill, data, require_reason=False)
+    reason = bill.adjustment_reason
+    price_changed = any(getattr(original, key) != getattr(bill, key) for key, _ in BILL_PRICES) or original.total != bill.total
+    if price_changed and not reason:
+        raise ValueError('Cần lý do sửa giá khi thay đổi giá hoặc số tiền thu.')
+    if not reason:
+        bill.adjustment_reason = original.adjustment_reason
     changed = ('rent_price', 'water_price', 'service_price', 'electricity_price', 'people_count', 'due_date', 'adjustment_reason')
     if all(getattr(original, key) == getattr(bill, key) for key in changed) and original.total == bill.total:
         raise ValueError('Phiếu mới chưa có thay đổi.')
     if save:
         original.cancelled_at, original.cancelled_by = utcnow(), user_id
-        original.cancel_reason = f'Sửa phiếu: {reason}'
+        original.cancel_reason = 'Đang thay thế phiếu'
         db.session.flush()  # Release the active room/period unique key before inserting replacement.
         db.session.add(bill)
         db.session.flush()
-        original.cancel_reason = f'Thay bằng phiếu #{bill.id}: {reason}'
+        original.cancel_reason = f'Thay bằng phiếu #{bill.id}' + (f': {reason[:450]}' if reason else '')
+        db.session.add(BillChange(old_bill=original, new_bill=bill, reason=reason, created_by=user_id))
         db.session.commit()
     return bill
+
+
+def change_history_rows(records):
+    fields = [(key, label, vnd) for key, label in BILL_PRICES] + [
+        ('people_count', 'Số người tính nước', str), ('due_date', 'Ngày đến hạn', business_date),
+        ('computed_total', 'Tổng tự tính', vnd), ('total', 'Tiền thu cuối cùng', vnd),
+        ('adjustment_reason', 'Lý do giá trên phiếu', lambda value: value or '—')]
+    return [{'record': record, 'changes': [
+        {'label': label, 'before': formatter(getattr(record.old_bill, key)), 'after': formatter(getattr(record.new_bill, key))}
+        for key, label, formatter in fields if getattr(record.old_bill, key) != getattr(record.new_bill, key)
+    ]} for record in records]
 
 def amount_in_words(amount):
     """Spell non-negative integer VND without floating-point arithmetic."""

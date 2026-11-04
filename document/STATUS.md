@@ -1,5 +1,14 @@
 # Tiến độ thực tế
 
+## 2026-11-04 — Một lý do sửa giá và nhật ký phiếu
+
+V1.9.0: Form sửa phiếu chỉ còn một ô Lý do sửa giá (adjustment_reason), bỏ edit_reason. Client hiện/bắt buộc ô này khi đơn giá hoặc tiền thu cuối cùng khác bản gốc; máy chủ kiểm tra lại độc lập. Đổi ngày đến hạn không bắt lý do, giữ lý do làm tròn/điều chỉnh đã có trên snapshot khi không nhập lý do mới. Không tự điền lại lý do cũ vào ô nhập để tránh dùng nhầm làm lý do cho lần sửa mới. Giá đổi nhưng tổng được giữ nguyên vẫn cần lý do.
+
+Thêm BillChange với FK old_bill_id/new_bill_id duy nhất, reason tối đa 500, created_by/created_at; ghi cùng transaction thay phiếu, rollback không để lại log/bản mới. Nhật ký dưới form và chi tiết phòng có các trường trước → sau, ID phiếu/kỳ, người sửa và giờ Việt Nam. Lưu xong chuyển về form bản mới để thấy nhật ký ngay. Nhật ký quản trị không đưa vào phiếu gửi khách. Không suy đoán/backfill nhật ký cho các lần sửa trước nâng cấp; lịch sử snapshot cũ vẫn giữ.
+
+DEV đã backup backups/pre-bill-change-log-v190.sqlite3 và migrate e68143c20a75 → f79254d31b86; db check đạt. Chưa cập nhật VPS. Bước tiếp restart web dev/Ctrl+F5; khi triển khai VPS phải chạy migration mới. ZIP V1.7.0 cũ không chứa sửa này.
+
+
 ## 2026-11-04 — Sửa phiếu và định dạng Việt Nam
 
 V1.8.0: Thêm nút Sửa tại bảng chốt tiền cho phiếu chưa thu/còn hiệu lực. Root/Admin xem trước rồi xác nhận, bắt buộc lý do tối đa 450 ký tự. Sửa tạo bản thay thế trong cùng giao dịch, đánh dấu bản cũ hủy và ghi ID bản mới/người sửa/thời điểm/lý do; giữ giá, người thuê và chỉ số từ snapshot cũ, không lấy lại giá hợp đồng hiện tại. Chặn phiếu đã thu/đã hủy, dữ liệu form cũ và gửi lặp; rollback khôi phục bản cũ nếu commit lỗi. Hủy riêng và hoàn tác thu vẫn chỉ root. Không đổi schema.
@@ -43,7 +52,7 @@ Kiểm tra: 73 unittest OK (44.715s), db check không phát sinh thay đổi, No
 V1.5.0: Đã triển khai trên dev trang phiếu riêng khi bấm ID, tổng tự tính và số thu cuối cùng kèm lý do bắt buộc khi khác tổng gốc; lịch sử phòng có cả phiếu hủy/đã thu. Máy chủ kiểm tra số nguyên không âm, giữ giá 0; Receipt thu theo số cuối cùng đã chốt. Phiếu cũ dùng tổng snapshot, không đổi tiền đã thu. Phiếu đã chốt bất biến, muốn đổi dùng hủy/lập lại theo quyền hiện có. Trang cần đăng nhập, có tiền bằng chữ, responsive và CSS in ẩn toolbar; chưa có link công khai/xuất ảnh tự động. Migration b35e10f97d42 đã áp dụng DEV sau backup backups/pre-bill-final-20261104-v150.sqlite3. Edge headless đạt desktop/390px/in; ảnh giả ở exports/receipt-preview-desktop.png và exports/receipt-preview-mobile.png. Chưa thử máy in giấy/điện thoại thật hoặc cập nhật VPS. Bước tiếp: restart web dev, Ctrl+F5; triển khai VPS cần upgrade DB trước mở web.
 
 
-Cập nhật: 2026-11-04 (Asia/Saigon). Phiên bản hội thoại: V1.8.0.
+Cập nhật: 2026-11-04 (Asia/Saigon). Phiên bản hội thoại: V1.9.0.
 
 V1.4.17: vẽ mockup phiếu gửi khách bằng imagegen built-in theo yêu cầu chỉ thiết kế, chưa code. Phiếu dọc trắng/mint/navy, tổng tiền nổi bật, bảng kê, dữ liệu minh họa; phân biệt chưa thanh toán với đã thu. Đã hiển thị ảnh và ghi BILL_RECEIPT_DESIGN.md, kiểm tra trực quan/số tiền, inventory/diff đạt. Chưa có route click ID/xuất phiếu trong app; không chạy test nghiệp vụ hoặc thao tác VPS.
 
@@ -244,3 +253,5 @@ Cách chạy và bằng chứng xem DEVELOPMENT.md, HANDOFF.md.
 Kiểm tra V1.7.0: 78 unittest OK (50.165s), DB check/integrity đạt, cột dữ liệu cũ giữ nguyên so với backup. Edge đọc được QR ảnh gốc/crop mobile qua ZXing; không pageerror. Chưa quét app ngân hàng thật.
 
 V1.7.2 — Edge headless đạt kiểm tra bật/tắt công tắc qua giao diện, lưu rồi đọc lại; ZXing đọc QR sau khi tắt không còn mã nội dung, số tiền vẫn 1.234. Không pageerror.
+
+Kiểm tra V1.9.0: 88 unittest OK (50.065s); Edge đạt kiểm tra chỉ một ô lý do, ẩn khi không đổi giá/đổi hạn, hiện và bắt buộc khi đổi tiền, lưu xong thấy nhật ký dưới form. Ảnh fixture exports/bill-change-history.png. Node syntax, db check, integrity_check và foreign_key_check đạt; dữ liệu các cột cũ giữ nguyên so với backup. Chưa quét ngân hàng/điện thoại thật hoặc triển khai VPS.
