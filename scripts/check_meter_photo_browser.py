@@ -13,7 +13,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from PIL import Image
 import zxingcpp
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import expect, sync_playwright
 from werkzeug.serving import make_server
 
 from app import create_app
@@ -43,6 +43,16 @@ def main():
             with sync_playwright() as playwright:
                 browser = playwright.chromium.launch(channel='msedge', headless=True)
                 page = browser.new_page()
+                asset_cache = Path(__file__).resolve().parents[1] / 'exports' / 'browser-assets'
+                for suffix, name, content_type in [
+                    ('dist/css/bootstrap.min.css', 'bootstrap-5.3.8.min.css', 'text/css'),
+                    ('dist/js/bootstrap.bundle.min.js', 'bootstrap-5.3.8.bundle.min.js', 'application/javascript'),
+                ]:
+                    if (asset_cache / name).is_file():
+                        page.route('https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/' + suffix,
+                                   lambda route, request, name=name, content_type=content_type: route.fulfill(
+                                       path=str(asset_cache / name), content_type=content_type,
+                                       headers={'Access-Control-Allow-Origin': '*'}))
                 errors = []
                 page.on('pageerror', lambda error: errors.append(str(error)))
                 base = f'http://127.0.0.1:{server.server_port}'
@@ -51,7 +61,7 @@ def main():
                 page.locator('[name=password]').fill('BrowserTest123!')
                 page.locator('button[type=submit]').click()
                 page.goto(base + '/electricity/?period=2026-01')
-                page.wait_for_function("document.querySelector('#electricity-form').dataset.photoBound === '1'")
+                expect(page.locator('#electricity-form')).to_have_attribute('data-photo-bound', '1')
                 page.evaluate('window.testPageMarker = 123')
                 save_requests = []
                 page.on('request', lambda request: save_requests.append(request.post_data_buffer) if request.method == 'POST' and '/electricity/?' in request.url else None)
@@ -89,7 +99,7 @@ def main():
                 first.locator('.saved-photos img').wait_for(timeout=15000)
                 assert page.evaluate('window.testPageMarker') == 123
                 assert second.locator('input[type=file]').evaluate('(input) => input.files.length') == 1
-                page.wait_for_function('Boolean(window.bootstrap)', timeout=15000)
+                assert page.evaluate('() => Boolean(window.bootstrap)')
                 first.locator('.saved-photos .photo-open').click()
                 page.locator('#meter-photo-modal.show').wait_for()
                 page.evaluate('''() => new Promise(resolve => {
@@ -133,7 +143,7 @@ def main():
                 assert first.locator('input[type=file]').count() == 1
                 first.locator('input[type=file]').set_input_files({'name': 'blocked.jpg', 'mimeType': 'image/jpeg', 'buffer': image.getvalue()})
                 first.locator('.photo-save').click()
-                page.wait_for_function("document.querySelector('.reading-row .photo-message').textContent.includes('hủy phiếu chưa thu')")
+                expect(first.locator('.photo-message')).to_contain_text('hủy phiếu chưa thu')
                 first.locator('.photo-clear').click()
                 assert first.locator('.saved-photos img').count() == 1
                 assert second.locator('input[type=file]').count() == 1
@@ -180,7 +190,7 @@ def main():
                 page.locator('[name=auto_transfer_content]').check()
                 page.locator('[name=note]').fill('Ghi mã phòng và tháng thanh toán')
                 page.get_by_role('button', name='Lưu thông tin nhận tiền').click()
-                assert page.locator('img[alt="QR nhận tiền hiện tại"]').is_visible()
+                expect(page.locator('img[alt="QR nhận tiền hiện tại"]')).to_be_visible()
                 page.goto(base + '/bills?period=2026-01')
                 with app.app_context():
                     bill = db.session.scalar(db.select(MonthlyBill).where(MonthlyBill.room_id == room_id))
@@ -202,11 +212,63 @@ def main():
                 exports = Path(__file__).resolve().parents[1] / 'exports'
                 exports.mkdir(exist_ok=True)
                 page.screenshot(path=str(exports / 'receipt-preview-desktop.png'), full_page=True)
+                assert 'Bằng chữ:' not in page.locator('.receipt-sheet').inner_text()
+                assert page.locator('.receipt-state').bounding_box()['height'] < 25
+                export_requests = []
+                def record_export_request(request):
+                    export_requests.append(request.method)
+                page.on('request', record_export_request)
+                page.evaluate("""() => {
+                    Object.defineProperty(navigator, 'canShare', {configurable: true, value: () => true});
+                    Object.defineProperty(navigator, 'share', {configurable: true, value: async data => {
+                        window.sharedImage = {name: data.files[0].name, size: data.files[0].size, type: data.files[0].type};
+                    }});
+                }""")
+                page.locator('#save-receipt').click()
+                page.locator('#receipt-image-dialog').wait_for(state='visible')
+                page.locator('#share-receipt-image').click()
+                assert page.evaluate('window.sharedImage.type') == 'image/png'
+                with page.expect_download() as download_info:
+                    page.locator('#download-receipt-image').click()
+                exported = exports / 'receipt-export-desktop.png'
+                download_info.value.save_as(str(exported))
+                with Image.open(exported) as png:
+                    assert png.width == 1600
+                    exported_qr = zxingcpp.read_barcode(png)
+                    assert exported_qr is not None
+                    assert '54041234' in exported_qr.text
+                assert not any(method != 'GET' for method in export_requests), export_requests
+                page.remove_listener('request', record_export_request)
+                page.locator('#close-receipt-image').click()
                 page.set_viewport_size({'width': 390, 'height': 844})
                 assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
                 qr_crop = page.locator('.receipt-payment img').screenshot()
                 assert zxingcpp.read_barcode(Image.open(BytesIO(qr_crop))) is not None
                 page.screenshot(path=str(exports / 'receipt-preview-mobile.png'), full_page=True)
+                assert page.locator('.receipt-total b').evaluate('(element) => element.scrollWidth <= element.clientWidth')
+                page.locator('#save-receipt').click()
+                page.locator('#receipt-image-dialog').wait_for(state='visible')
+                with page.expect_download() as mobile_download:
+                    page.locator('#download-receipt-image').click()
+                mobile_download.value.save_as(str(exports / 'receipt-export-mobile.png'))
+                with Image.open(exports / 'receipt-export-mobile.png') as png:
+                    assert png.width == 1600
+                    assert zxingcpp.read_barcode(png) is not None
+                page.evaluate("Object.defineProperty(navigator, 'share', {configurable:true, value:async () => { throw new DOMException('cancel', 'AbortError'); }})")
+                page.locator('#share-receipt-image').click()
+                assert page.locator('#receipt-share-message').inner_text() == ''
+                page.locator('#close-receipt-image').click()
+                page.evaluate("Object.defineProperty(navigator, 'canShare', {configurable:true, value:() => false})")
+                page.locator('.receipt-payment img').evaluate("image => { image.decode = () => Promise.reject(new Error('fixture')); }")
+                page.locator('#save-receipt').click()
+                expect(page.locator('#receipt-export-message')).to_contain_text('Không tạo được ảnh phiếu')
+                expect(page.locator('#save-receipt')).to_be_enabled()
+                page.locator('.receipt-payment img').evaluate('image => { delete image.decode; }')
+                page.locator('#save-receipt').click()
+                page.locator('#receipt-image-dialog').wait_for(state='visible')
+                assert not page.locator('#share-receipt-image').is_visible()
+                assert page.locator('#download-receipt-image').is_visible()
+                page.locator('#close-receipt-image').click()
                 page.emulate_media(media='print')
                 assert not page.locator('.receipt-toolbar').is_visible()
                 page.emulate_media(media='screen')

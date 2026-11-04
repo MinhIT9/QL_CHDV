@@ -1,5 +1,36 @@
 # Bàn giao
 
+## 2026-11-04 — Lưu ảnh phiếu tại client
+
+V1.10.0: Thêm nút Lưu ảnh phiếu trên trang phiếu. Dùng html2canvas 1.4.1 vendored (MIT, kèm LICENSE) tạo PNG rộng 1600 px hoàn toàn trong trình duyệt; chỉ chụp card, không toolbar/modal/nhật ký. Chờ font và ảnh QR decode, đưa pixel QR đã tải vào bản clone để tránh lấy lại QR khác với tài khoản đang hiển thị. Không thêm endpoint upload, không lưu file trên server/localStorage. Blob URL được thu hồi khi tạo ảnh mới/rời trang.
+
+Mở dialog ảnh xem trước, có tải PNG; nếu navigator.canShare({files}) hỗ trợ thì hiện Chia sẻ / Lưu ảnh để người dùng chọn đích lưu. Tách bước tạo ảnh và chia sẻ để giữ user activation của lần bấm chia sẻ. Hủy share không báo lỗi; share không được có tải ảnh dự phòng; thiếu QR/không tạo ảnh được thì báo lỗi và giữ In phiếu. Không thể tự ghi vào album trên mọi trình duyệt; cần người dùng chọn lưu/chia sẻ/nhấn giữ ảnh. Chưa kiểm tra menu album trên iPhone/Android thật.
+
+Thu nhỏ trạng thái nằm cạnh tháng, bỏ tiền bằng chữ khỏi phiếu và bỏ tính amount_words trong route; tổng tiền là một dòng lớn, co cỡ chữ khi màn hình hẹp/số dài. Giữ rõ trạng thái đã thu/hủy, QR và quy tắc tính tiền. Không đổi schema/dependencies Python hoặc thao tác VPS. Restart web dev/Ctrl+F5 để thử; các ZIP triển khai cũ không có tính năng này.
+
+Kiểm tra hiện có: 88 unittest OK (49.117s); Node syntax đạt. Edge đã tạo/tải PNG desktop và mobile viewport, kích thước 1600 px, ZXing đọc được QR/số tiền; theo dõi request không có POST/upload trong export. Mock Web Share kiểm tra file và nhánh hủy; không coi mock là xác minh menu hệ điều hành. Ảnh fixture: exports/receipt-export-desktop.png, exports/receipt-export-mobile.png. QA dùng cache đúng Bootstrap 5.3.8 từ exports/browser-assets nếu có; không nới CSP và không cài thư viện QA lên VPS.
+
+
+V1.9.13: Theo yêu cầu đã xóa toàn bộ mục tmux khỏi document/Lệnh Hay Dùng.md, giữ các hướng dẫn screen. Đã kiểm tra file không còn chuỗi tmux; chỉ sửa tài liệu, không gỡ phần mềm hoặc thao tác VPS.
+
+V1.9.12: Người dùng xác nhận muốn screen quản lý phiên giữ chính pipeline log Nginx rút gọn trong ảnh. Hướng dẫn tạo shell screen -S chdv-web rồi chạy pipeline bên trong, detach Ctrl+A d, screen -ls/-r, -d -r khi Attached, chuyển phiên bằng detach/attach; đóng hẳn bằng Ctrl+C rồi exit. Phân biệt giữ phiên qua SSH với reboot. Không thay cấu hình/code/VPS; ghi lệnh vào Lệnh Hay Dùng.md.
+
+V1.9.11: Người dùng xác nhận ảnh tail access.log vẫn không phải màn hình mong muốn. Dừng suy đoán và hỏi phân biệt terminal Python/Flask, log truy cập rút gọn hay chia ô terminal. Chưa đổi Gunicorn/systemd hoặc chạy web thứ hai; chờ người dùng xác định loại terminal. Không thao tác VPS/code.
+
+V1.9.10: Ảnh người dùng có [screen is terminating], prompt root rồi tail chạy trực tiếp và ^Ad in ra, chứng tỏ không còn ở screen. Hướng dẫn Ctrl+C về shell, tạo screen -dmS chdv-log bash -c với tail access.log và exec bash, attach rồi Ctrl+A thả tay nhấn d để detach. Không thay VPS/code; Ctrl+C chỉ dừng tail.
+
+V1.9.9: Ảnh screen của người dùng đang xem journalctl (startup/stop Gunicorn), không phải request. Hướng dẫn Ctrl+C rồi tail -F access.log Nginx có awk rút gọn ngay trong screen hiện tại; giữ attach/detach cũ. Ảnh có log Started chdv/chdv-photos lúc 14:19:21, nhưng chưa có kiểm tra HTTPS/upload sau deploy. Không sửa code/cấu hình/VPS.
+
+V1.9.8: Người dùng muốn GNU screen theo lệnh nhớ dạng -m -d. Hướng dẫn screen -dmS chdv-log bash -c với journalctl web/worker, screen -r, Ctrl+A d và screen -ls; phân biệt phiên nền với chia ô. Chỉ bổ sung tài liệu, không cài/chạy trên VPS.
+
+V1.9.7: Hướng dẫn tmux chia hai ô terminal, một ô journalctl theo dõi chdv/chdv-photos, ô còn lại thao tác hoặc tail access.log. Có detach/attach giữ phiên SSH và phân biệt với service systemd; không chạy thêm web thủ công. Ghi lệnh vào Lệnh Hay Dùng.md. Chưa cài/chạy tmux trên VPS; vẫn chưa có log người dùng xác nhận start/status/HTTPS sau cập nhật.
+
+V1.9.6: Người dùng gửi kết quả VPS 88 tests OK trong 65.208s sau khối cập nhật. Chưa gửi riêng db current/check nên không xác nhận trực tiếp head từ log mới. Backup giữ tại /root/chdv-before-v193-Vh5xOts7. Bước tiếp start chdv/chdv-photos, kiểm tra status và HTTPS /login; chưa có bằng chứng dịch vụ đã mở lại hoặc kiểm tra trình duyệt. Không thao tác SSH hoặc sửa code.
+
+V1.9.5: Người dùng xác nhận VPS kiểm tra ZIP Done testing, backup-db thành công và tar -tzf đạt. Backup thực tế /root/chdv-before-v193-Vh5xOts7 gồm database.sqlite3 104K, project.tar.gz 410K, chdv.service/chdv-photos.service/nginx-chdv.conf. Hai service đã được dừng bởi khối backup. Bước tiếp: giải nén /opt/chdv/chdv-v1.9.3.zip vào /opt/chdv, cấp owner/quyền code, pip install, db upgrade/check/current và unittest. Chưa có kết quả thay code/migrate/test/start VPS; không tự thao tác SSH. Head cần đạt f79254d31b86.
+
+V1.9.4: Chuẩn bị triển khai bản code V1.9.3 lên VPS theo yêu cầu có backup. Thống nhất upload /opt/chdv/chdv-v1.9.3.zip, app /opt/chdv, VPS 103.167.88.214/domain chdv.alominh.homes. Ghi DEPLOY_V193.md đủ bước CRC, dừng chdv/chdv-photos, backup-db + tar code/.env/instance/uploads + cấu hình, thay code/cài requirements/migrate đến f79254d31b86/test/start/HTTPS. Full suite local 88 tests OK (55.539s). Chưa thao tác SSH hoặc xác nhận VPS đã backup/cập nhật; bước tiếp người dùng upload đúng đường dẫn, kiểm tra ZIP và gửi kết quả backup. Không đổi code/DB local trong lượt đóng gói.
+
 V1.9.3: Bỏ cảnh báo lặp trên trang sửa điện. GET giữ một banner hướng dẫn hủy phiếu; khi có flash danger thì không render banner vàng. Widget ảnh không lặp hướng dẫn trên billing.correct, vẫn hiện nhắc khóa ở bảng điện. Không ẩn lỗi máy chủ hoặc đổi quyền/guard. Kiểm tra fixture: GET một cảnh báo, POST bị chặn một lỗi đỏ/không cảnh báo vàng; 16 photo tests OK (9.347s). Không đổi DB/VPS.
 
 ## 2026-11-04 — Admin hủy phiếu chưa thu để sửa điện
@@ -67,9 +98,9 @@ Cập nhật: 2026-11-04 (Asia/Saigon).
 
 ## Phiên bản hội thoại
 
-- Phiên bản phản hồi gần nhất: V1.9.3.
-- Nội dung: Admin hủy phiếu chưa thu để sửa điện/ảnh; giữ thao tác hiển thị và báo lỗi máy chủ khi còn phiếu. Hoàn tác thu vẫn chỉ root.
-- Phản hồi tiếp theo tối thiểu V1.9.4; có thể tăng minor/major theo quy tắc mới trong AGENTS.md.
+- Phiên bản phản hồi gần nhất: V1.10.0.
+- Nội dung: Xuất ảnh phiếu tại client với xem trước/tải/chia sẻ, trạng thái gọn và tổng một dòng bỏ tiền bằng chữ. DEV đã kiểm tra Edge, chưa mobile thật/VPS.
+- Phản hồi tiếp theo tối thiểu V1.10.1; có thể tăng minor/major theo quy tắc mới trong AGENTS.md.
 - Quy tắc đầy đủ ở AGENTS.md, mục “Phiên bản ở cuối phản hồi”.
 
 ## Đã làm
@@ -237,3 +268,5 @@ Kiểm tra V1.9.0: 88 unittest OK (50.065s); Edge đạt kiểm tra chỉ một 
 V1.9.1: Giải thích luồng sửa chỉ số điện hiện có: nếu có phiếu hiệu lực thì root hủy phiếu trước; vào Chỉ số điện/Sửa điện, nhập lý do, preview/xác nhận rồi lập lại phiếu. Nếu đã thu cần root hoàn tác ghi nhận thu trước hủy; không tự hoàn tiền thật. Kỳ sau bị đồng bộ đầu kỳ cũng phải gỡ phiếu khóa liên quan. Chỉ hướng dẫn, đã đối chiếu service/route/template, không sửa code/DB/VPS hoặc chạy lại suite.
 
 Kiểm tra V1.9.2: 88 unittest OK (50.854s), đăng nhập tách root/Admin để kiểm tra quyền thực tế. Admin bị chặn sửa điện/ảnh khi còn phiếu, hủy có lý do và audit đúng Admin rồi sửa được; phiếu đã thu không hủy được, reverse vẫn 403 cho Admin. Edge đạt widget vẫn hiện, thử lưu khi khóa nhận lỗi, ảnh đã lưu không đổi; regression QR/form/nhật ký đạt. Không thay schema hoặc thao tác VPS.
+
+V1.10.0 — Kiểm tra cuối Edge: xuất PNG desktop/mobile thành công, QR đọc lại được; nhánh canShare=false vẫn có tải ảnh, hủy share không báo lỗi, lỗi decode QR hiện thông báo và nút lưu dùng lại được. Không pageerror, không POST/upload trong xuất ảnh; đã xem trực tiếp PNG và screenshot mobile. Chưa kiểm tra album native trên điện thoại thật.

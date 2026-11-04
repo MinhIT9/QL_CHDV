@@ -104,3 +104,9 @@ Chỉ dùng adjustment_reason trên form. Chỉ yêu cầu khi đơn giá hoặc
 ## V1.9.2 — Quyền sửa điện và ảnh công tơ
 
 Admin và root được hủy phiếu chưa thu với lý do để mở khóa sửa điện/ảnh. Phiếu đã thu vẫn chặn hủy; chỉ root có quyền hoàn tác ghi nhận thu. Các mô tả trước đây yêu cầu root hủy cả phiếu chưa thu được thay bằng quy tắc này. Link sửa điện và ô chọn/thay ảnh luôn hiện; còn phiếu hiệu lực thì service từ chối lưu với thông báo cần hủy trước. Bảo toàn kiểm tra kỳ sau, serializing ghi SQLite và snapshot phiếu cũ. Không thay schema.
+
+## V1.10.0 — Xuất PNG tại client
+
+receipt.js dùng html2canvas 1.4.1 nội bộ + Canvas/Blob để chụp .receipt-sheet, rộng 800 CSS px/scale 2; QR dùng pixel ảnh đã decode. Dialog ngoài card chứa preview/download/Web Share theo capability detection. Không upload hoặc lưu ảnh tại máy chủ. Tạo ảnh trước rồi bấm share riêng để đáp ứng transient user activation. Tải PNG là fallback; không hứa tự ghi vào album trên mọi điện thoại. Không thay CSP, quyền, dữ liệu hoặc API. Bỏ bằng chữ trên phiếu, trạng thái nhỏ cạnh kỳ và tổng một dòng.
+
+Nguồn: https://html2canvas.hertzen.com/configuration ; https://developer.mozilla.org/en-US/docs/Web/API/Navigator/share ; https://developer.mozilla.org/en-US/docs/Web/API/Navigator/canShare . Thư viện: app/static/vendor/html2canvas.min.js, MIT tại HTML2CANVAS-LICENSE.txt; SHA256 e87e550794322e574a1fda0c1549a3c70dae5a93d9113417a429016838eab8cb. Chưa thử native album iOS/Android, không tuyên bố đã triển khai VPS.

@@ -5,22 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Phiếu #{{ bill.id }} · {{ bill.room_code }} · {{ bill.period|period_label }}</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/receipt.css', v='1.7.0') }}">
-  <script src="{{ url_for('static', filename='js/receipt.js', v='1.5.0') }}" defer></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/receipt.css', v='1.10.0') }}">
+  <script src="{{ url_for('static', filename='vendor/html2canvas.min.js', v='1.4.1') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/receipt.js', v='1.10.0') }}" defer></script>
 </head>
 <body>
   <nav class="receipt-toolbar" aria-label="Thao tác phiếu">
     <a class="btn btn-outline-secondary" href="{{ url_for('billing.index', period=bill.period) }}">← Chốt tiền</a>
-    <div class="d-flex gap-2"><a class="btn btn-outline-secondary" href="{{ url_for('rooms.detail', room_id=bill.room_id) }}">Phòng {{ bill.room_code }}</a><button class="btn btn-outline-success" id="print-receipt" type="button">In phiếu</button></div>
+    <div class="d-flex gap-2 flex-wrap"><a class="btn btn-outline-secondary" href="{{ url_for('rooms.detail', room_id=bill.room_id) }}">Phòng {{ bill.room_code }}</a><button class="btn btn-outline-success" id="print-receipt" type="button">In phiếu</button><button class="btn btn-success" id="save-receipt" type="button">Lưu ảnh phiếu</button></div>
   </nav>
-  <main class="receipt-sheet">
+  <p class="receipt-export-message" id="receipt-export-message" role="status" aria-live="polite"></p>
+  <main class="receipt-sheet" data-image-name="phieu-{{ bill.id }}-{{ bill.period }}.png">
     <header class="receipt-brand"><strong>CHDV MANAGER</strong><span>Phiếu #{{ bill.id }}</span></header>
     <section class="receipt-heading">
       <h1>{{ 'PHIẾU THU TIỀN' if receipt and not bill.cancelled_at else 'PHIẾU TIỀN PHÒNG' }}</h1>
-      <p>Tháng {{ bill.period[5:] }} / {{ bill.period[:4] }}</p>
+      <div class="receipt-meta"><p>Tháng {{ bill.period[5:] }} / {{ bill.period[:4] }}</p>
       {% if bill.cancelled_at %}<span class="receipt-state cancelled">ĐÃ HỦY HIỆU LỰC</span>
       {% elif receipt %}<span class="receipt-state paid">ĐÃ THANH TOÁN</span>
-      {% else %}<span class="receipt-state unpaid">CHƯA THANH TOÁN</span>{% endif %}
+      {% else %}<span class="receipt-state unpaid">CHƯA THANH TOÁN</span>{% endif %}</div>
     </section>
     <dl class="receipt-info">
       <div><dt>Phòng</dt><dd>{{ bill.room_code }}</dd></div>
@@ -43,8 +45,7 @@
       </tbody>
     </table>
     <section class="receipt-total">
-      <div><strong>{{ 'TỔNG TIỀN PHIẾU ĐÃ HỦY' if bill.cancelled_at else 'TỔNG ĐÃ THANH TOÁN' if receipt else 'TỔNG CẦN THANH TOÁN' }}</strong><b>{{ bill.total|vnd }}</b></div>
-      <p>Bằng chữ: {{ amount_words }}.</p>
+      <div><strong>{{ 'PHIẾU ĐÃ HỦY' if bill.cancelled_at else 'ĐÃ THANH TOÁN' if receipt else 'TỔNG THANH TOÁN' }}</strong><b>{{ bill.total|vnd }}</b></div>
     </section>
     {% if payment and not receipt and not bill.cancelled_at and bill.total > 0 %}
     <section class="receipt-payment" aria-label="Thông tin chuyển khoản">
@@ -56,5 +57,18 @@
     {% if bill.cancelled_at %}<p class="receipt-cancel-note">Phiếu này đã hủy ngày {{ bill.cancelled_at|local_date }}. Lý do: {{ bill.cancel_reason }}. Không dùng để yêu cầu thanh toán.</p>{% endif %}
     <footer class="receipt-footer"><strong>Cảm ơn bạn đã đồng hành cùng chúng tôi!</strong><p>Phiếu tính tiền nội bộ · Không phải hóa đơn thuế</p></footer>
   </main>
+  <dialog class="receipt-image-dialog" id="receipt-image-dialog" aria-labelledby="receipt-image-title">
+    <div class="d-flex align-items-center justify-content-between gap-3 mb-2">
+      <h2 class="fs-5 mb-0" id="receipt-image-title">Ảnh phiếu</h2>
+      <button class="btn btn-sm btn-outline-secondary" id="close-receipt-image" type="button">Đóng</button>
+    </div>
+    <div class="d-flex flex-wrap gap-2 mb-2">
+      <a class="btn btn-success" id="download-receipt-image">Tải ảnh PNG</a>
+      <button class="btn btn-outline-success" id="share-receipt-image" type="button" hidden>Chia sẻ / Lưu ảnh</button>
+    </div>
+    <p class="small text-muted">Trên điện thoại: dùng chia sẻ hoặc nhấn giữ ảnh để lưu vào Ảnh. Máy tính lưu vào thư mục tải xuống.</p>
+    <p class="small text-danger" id="receipt-share-message" role="status"></p>
+    <img class="img-fluid" id="receipt-image-preview" alt="Ảnh phiếu tiền phòng để lưu hoặc chia sẻ">
+  </dialog>
 </body>
 </html>

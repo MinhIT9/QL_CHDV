@@ -7,7 +7,7 @@ from app.extensions import db
 from app.models import ElectricityReading, MonthlyBill, ReadingRevision, Receipt, Room, utcnow
 from app.services.contracts import local_today, parse_date
 from sqlalchemy.orm import selectinload
-from app.services.billing import amount_in_words, bill_tenancy, bill_values, bill_stamp, change_history_rows, edit_bill, correction, lock_writes, reading_pair, reading_stamp
+from app.services.billing import bill_tenancy, bill_values, bill_stamp, change_history_rows, edit_bill, correction, lock_writes, reading_pair, reading_stamp
 from app.services.queries import bill_change_query
 from app.services.electricity import current_period, valid_period
 from app.services.photos import meter_photo_locked
@@ -71,7 +71,7 @@ def detail(bill_id):
     bill = db.get_or_404(MonthlyBill, bill_id)
     payment = payment_settings()
     return render_template("billing/detail.html", bill=bill, receipt=bill.paid_receipt,
-                           amount_words=amount_in_words(bill.total), payment=payment,
+                           payment=payment,
                            generated_qr=bill_qr_enabled(payment, bill),
                            transfer_content=transfer_content(bill, payment.auto_transfer_content) if payment else '')
 

@@ -70,6 +70,8 @@ class BillDocumentTests(AppTestCase):
         self.assertIn('CHƯA THANH TOÁN', html)
         self.assertNotIn('id="sidebar"', html)
         self.assertIn('print-receipt', html)
+        self.assertIn('save-receipt', html)
+        self.assertNotIn('Bằng chữ:', html)
         self.assertIn('hx-boost="false"', self.client.get('/bills?period=2026-01').get_data(as_text=True))
         self.assertEqual(self.client.get('/bills/999999').status_code, 404)
 

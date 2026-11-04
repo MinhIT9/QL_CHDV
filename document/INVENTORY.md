@@ -53,7 +53,9 @@ app/static/js/meter-photos.js
 app/static/js/receipt.js
 app/static/js/sidebar-state.js
 app/static/vendor/.gitkeep
+app/static/vendor/HTML2CANVAS-LICENSE.txt
 app/static/vendor/HTMX-LICENSE.txt
+app/static/vendor/html2canvas.min.js
 app/static/vendor/htmx.min.js
 app/templates/auth/.gitkeep
 app/templates/auth/accounts.html
@@ -100,6 +102,7 @@ document/CHANGELOG.md
 document/DATA_MODEL.md
 document/DECISIONS.md
 document/DEPLOY_UBUNTU.md
+document/DEPLOY_V193.md
 document/DEVELOPMENT.md
 document/FEES_CONTRACTS_PROPOSAL.md
 document/HANDOFF.md
@@ -151,4 +154,4 @@ tests/test_vietqr.py
 wsgi.py
 ```
 
-Tổng: 142 file (bao gồm file danh mục này).
+Tổng: 145 file (bao gồm file danh mục này).
