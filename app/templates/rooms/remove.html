@@ -4,7 +4,7 @@
 <header class="page-header"><div><h1>{{ 'Ngừng sử dụng' if room.tenancies or room.readings else 'Xóa' }} phòng {{ room.code }}</h1></div></header>
 <section class="card narrow"><form method="post" class="stack d-grid">
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-{% if tenant %}<input type="hidden" name="tenancy_id" value="{{ tenant.id }}"><input type="hidden" name="tenancy_version" value="{{ tenant.version }}"><p>Khách hiện tại: <strong>{{ tenant.tenant_name }}</strong>. Thao tác này kết thúc đợt thuê và giữ lịch sử.</p><label>Ngày trả phòng thực tế<input class="form-control" type="date" name="move_out_date" required max="{{ today }}" value="{{ request.form.get('move_out_date', '') }}"></label>{% endif %}
+{% if tenant %}<input type="hidden" name="tenancy_id" value="{{ tenant.id }}"><input type="hidden" name="tenancy_version" value="{{ tenant.version }}"><p>Khách hiện tại: <strong>{{ tenant.tenant_name }}</strong>. Thao tác này kết thúc đợt thuê và giữ lịch sử.</p><label>Ngày trả phòng thực tế<input class="form-control" type="text" data-date inputmode="numeric" placeholder="dd/mm/yyyy" maxlength="10" name="move_out_date" required max="{{ today }}" value="{{ (request.form.get('move_out_date', ''))|date_input }}"></label>{% endif %}
 <p class="notice">{{ 'Lịch sử được giữ nguyên. Thao tác này không xác nhận khách đã thanh toán.' if room.tenancies or room.readings else 'Phòng chưa có lịch sử sẽ được xóa vĩnh viễn.' }}</p>
 <div class="actions d-flex gap-2 align-items-center flex-wrap"><a class="button secondary btn btn-outline-secondary" href="{{ url_for('rooms.detail', room_id=room.id) }}">Hủy</a><button class="button danger btn btn-outline-danger" type="submit">Xác nhận</button></div>
 </form></section>

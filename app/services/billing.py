@@ -1,13 +1,20 @@
 import calendar
 import hashlib
-import re
 from datetime import date
 
 from app.extensions import db
 from app.models import ElectricityReading, MonthlyBill, Photo, ReadingRevision, utcnow
 from app.services.contracts import parse_integer
+from app.utils.formatting import parse_money
 from app.services.electricity import current_period, integer_reading, valid_period
 from app.services.photos import stage_photo, upload_batch
+
+BILL_PRICES = (('rent_price', 'Tiền phòng'), ('water_price', 'Giá nước'),
+               ('service_price', 'Dịch vụ'), ('electricity_price', 'Đơn giá điện'))
+
+
+def bill_prices(data):
+    return {key: parse_money(data.get(key, ''), label, required=True) for key, label in BILL_PRICES}
 
 
 def lock_writes():
@@ -91,8 +98,7 @@ def bill_values(room, period, data, user_id, save=False):
         raise ValueError("Thông tin khách hoặc số điện đã thay đổi. Hãy tải lại và xem trước.")
     if db.session.scalar(db.select(MonthlyBill.id).where(MonthlyBill.room_id == room.id, MonthlyBill.period == period, MonthlyBill.cancelled_at.is_(None))):
         raise ValueError("Phòng đã có phiếu tiền có hiệu lực trong kỳ này.")
-    values = {key: parse_integer(data.get(key, ""), label, required=True) for key, label in (
-        ("rent_price", "Tiền phòng"), ("water_price", "Giá nước"), ("service_price", "Dịch vụ"), ("electricity_price", "Đơn giá điện"))}
+    values = bill_prices(data)
     values["people_count"] = parse_integer(data.get("people_count", ""), "Số người tính nước", 1, 31, True)
     payment_day = parse_integer(data.get("payment_day", ""), "Ngày đến hạn", 1, 31, True)
     year, month = map(int, period.split("-"))
@@ -100,18 +106,61 @@ def bill_values(room, period, data, user_id, save=False):
                   start_value=reading.start_value, end_value=reading.end_value, created_by=user_id,
                   due_date=date(year, month, min(payment_day, calendar.monthrange(year, month)[1])))
     bill = MonthlyBill(**values)
-    raw_final = data.get("final_amount", "").strip()
-    if raw_final and (not re.fullmatch(r"[0-9]{1,19}", raw_final) or int(raw_final) > 9_223_372_036_854_775_807):
-        raise ValueError("Số tiền thu cuối cùng phải là số nguyên không âm, tối đa 9.223.372.036.854.775.807 đ.")
-    bill.final_amount = int(raw_final) if raw_final else bill.computed_total
-    bill.adjustment_reason = data.get("adjustment_reason", "").strip()
-    if len(bill.adjustment_reason) > 500 or (bill.adjustment_amount != 0 and not bill.adjustment_reason):
-        raise ValueError("Điều chỉnh tổng tiền cần lý do, tối đa 500 ký tự.")
+    apply_final_amount(bill, data)
     if save:
         db.session.add(bill)
         db.session.commit()
     return bill
 
+
+
+def apply_final_amount(bill, data):
+    final = parse_money(data.get('final_amount', '').strip(), 'Số tiền thu cuối cùng', maximum=9_223_372_036_854_775_807)
+    bill.final_amount = final if final is not None else bill.computed_total
+    bill.adjustment_reason = data.get('adjustment_reason', '').strip()
+    if len(bill.adjustment_reason) > 500 or (bill.adjustment_amount != 0 and not bill.adjustment_reason):
+        raise ValueError('Điều chỉnh tổng tiền cần lý do, tối đa 500 ký tự.')
+
+
+def bill_stamp(bill):
+    fields = ('id', 'rent_price', 'water_price', 'service_price', 'electricity_price', 'people_count',
+              'final_amount', 'adjustment_reason', 'due_date', 'cancelled_at')
+    state = [getattr(bill, key) for key in fields]
+    state += [(r.id, r.reversed_at) for r in bill.receipts]
+    return hashlib.sha256(str(state).encode()).hexdigest()
+
+
+def edit_bill(original, data, user_id, save=False):
+    if save:
+        lock_writes()
+    if original.cancelled_at or original.paid_receipt:
+        raise ValueError('Chỉ sửa phiếu chưa thu và còn hiệu lực.')
+    if data.get('edit_stamp') != bill_stamp(original):
+        raise ValueError('Phiếu hoặc lịch sử thu đã thay đổi. Hãy tải lại trang.')
+    reason = data.get('edit_reason', '').strip()
+    if not reason or len(reason) > 450:
+        raise ValueError('Cần lý do sửa phiếu, tối đa 450 ký tự.')
+    fields = ('room_id', 'tenancy_id', 'period', 'room_code', 'tenant_name', 'start_value', 'end_value')
+    values = {key: getattr(original, key) for key in fields}
+    values.update(bill_prices(data))
+    values['people_count'] = parse_integer(data.get('people_count', ''), 'Số người tính nước', 1, 31, True)
+    day = parse_integer(data.get('payment_day', ''), 'Ngày đến hạn', 1, 31, True)
+    year, month = map(int, original.period.split('-'))
+    values['due_date'] = date(year, month, min(day, calendar.monthrange(year, month)[1]))
+    bill = MonthlyBill(**values, created_by=user_id)
+    apply_final_amount(bill, data)
+    changed = ('rent_price', 'water_price', 'service_price', 'electricity_price', 'people_count', 'due_date', 'adjustment_reason')
+    if all(getattr(original, key) == getattr(bill, key) for key in changed) and original.total == bill.total:
+        raise ValueError('Phiếu mới chưa có thay đổi.')
+    if save:
+        original.cancelled_at, original.cancelled_by = utcnow(), user_id
+        original.cancel_reason = f'Sửa phiếu: {reason}'
+        db.session.flush()  # Release the active room/period unique key before inserting replacement.
+        db.session.add(bill)
+        db.session.flush()
+        original.cancel_reason = f'Thay bằng phiếu #{bill.id}: {reason}'
+        db.session.commit()
+    return bill
 
 def amount_in_words(amount):
     """Spell non-negative integer VND without floating-point arithmetic."""

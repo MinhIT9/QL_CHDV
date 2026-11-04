@@ -1,5 +1,5 @@
 import re
-from datetime import datetime, timedelta, timezone
+from app.utils.formatting import local_today, period_label
 
 from app.extensions import db
 from app.models import ElectricityReading, Room
@@ -23,7 +23,7 @@ def reading_cost(reading, bill=None, fallback_price=None):
 
 
 def current_period():
-    return datetime.now(timezone(timedelta(hours=7))).strftime("%Y-%m")
+    return local_today().strftime("%Y-%m")
 
 
 def valid_period(value):
@@ -44,7 +44,7 @@ def reading_context(room, period):
     if not existing and later:
         error = "Đã có kỳ sau. V1 không cho chèn ngược lịch sử."
     elif not existing and latest and latest.period != previous_period(period):
-        error = f"Cần chốt kỳ {previous_period(period)} trước (kỳ gần nhất: {latest.period})."
+        error = f"Cần chốt kỳ {period_label(previous_period(period))} trước (kỳ gần nhất: {period_label(latest.period)})."
     return {"room": room, "existing": existing, "start": latest.end_value if latest else None, "error": error}
 
 

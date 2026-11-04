@@ -20,7 +20,8 @@ def save_payment_settings(form):
     bank = BANK_BY_BIN.get(form.get('bank_bin', ''))
     if not bank:
         raise ValueError('Chọn ngân hàng trong danh sách.')
-    values = {'bank_bin': bank['bin'], 'bank_name': bank['short_name']}
+    values = {'bank_bin': bank['bin'], 'bank_name': bank['short_name'],
+              'auto_transfer_content': form.get('auto_transfer_content') == '1'}
     for key, limit in [('account_number', 19), ('account_name', 150), ('note', 300)]:
         value = form.get(key, '').strip()
         if len(value) > limit:

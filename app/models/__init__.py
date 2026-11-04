@@ -278,6 +278,7 @@ db.Index("uq_active_receipt", Receipt.bill_id, unique=True,
 
 class PaymentSettings(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    auto_transfer_content = db.Column(db.Boolean, nullable=False, default=True, server_default=db.true())
     bank_bin = db.Column(db.String(6))
     bank_name = db.Column(db.String(100), nullable=False)
     account_number = db.Column(db.String(50), nullable=False)

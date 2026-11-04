@@ -1,5 +1,5 @@
 import os
-from datetime import timedelta, timezone
+from datetime import timedelta
 from pathlib import Path
 
 import click
@@ -98,27 +98,8 @@ def create_app(test_config=None):
             response.headers["Cache-Control"] = "no-store"
         return response
 
-    @app.template_filter("local_date")
-    def local_date(value):
-        if value.tzinfo is None:
-            value = value.replace(tzinfo=timezone.utc)
-        return value.astimezone(timezone(timedelta(hours=7))).strftime("%d/%m/%Y")
-
-    @app.template_filter("business_date")
-    def business_date(value):
-        return value.strftime("%d/%m/%Y") if value else "Chưa cập nhật"
-
-    @app.template_filter("local_datetime")
-    def local_datetime(value):
-        if value is None:
-            return "—"
-        if value.tzinfo is None:
-            value = value.replace(tzinfo=timezone.utc)
-        return value.astimezone(timezone(timedelta(hours=7))).strftime("%d/%m/%Y %H:%M:%S")
-
-    @app.template_filter("vnd")
-    def vnd(value):
-        return f"{value:,}".replace(",", ".") + " đ" if value is not None else "Chưa cập nhật"
+    from app.utils.formatting import register_filters
+    register_filters(app)
 
     @app.errorhandler(HTTPException)
     def http_error(error):

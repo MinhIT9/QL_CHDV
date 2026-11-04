@@ -48,6 +48,7 @@ app/static/images/favicon.svg
 app/static/images/residence.svg
 app/static/js/.gitkeep
 app/static/js/app.js
+app/static/js/formats.js
 app/static/js/meter-photos.js
 app/static/js/receipt.js
 app/static/js/sidebar-state.js
@@ -87,6 +88,8 @@ app/templates/rooms/renew.html
 app/templates/rooms/table_filters.html
 app/templates/rooms/vehicle_cell.html
 app/templates/rooms/water_cell.html
+app/utils/__init__.py
+app/utils/formatting.py
 backups/.gitkeep
 deploy/chdv-photos.service
 document/ARCHITECTURE.md
@@ -100,6 +103,7 @@ document/DEVELOPMENT.md
 document/FEES_CONTRACTS_PROPOSAL.md
 document/HANDOFF.md
 document/INVENTORY.md
+document/LOCALIZATION.md
 document/LOCAL_VIETQR.md
 document/Lệnh Hay Dùng.md
 document/METER_PHOTO_UX_PROPOSAL.md
@@ -125,6 +129,7 @@ migrations/versions/c83e4d16b2a0_tenancy_electricity_price.py
 migrations/versions/d57032b19f64_local_vietqr.py
 migrations/versions/d94f512a37b1_reading_price.py
 migrations/versions/dd7493777e83_fees_and_contracts.py
+migrations/versions/e68143c20a75_optional_transfer_content.py
 migrations/versions/e9329a770fe9_initial_schema.py
 migrations/versions/f13a98c52b70_private_photos.py
 requirements-dev.txt
@@ -135,6 +140,7 @@ tests/.gitkeep
 tests/test_bill_documents.py
 tests/test_billing.py
 tests/test_contracts.py
+tests/test_formats_and_bill_edit.py
 tests/test_payment_settings.py
 tests/test_photos.py
 tests/test_receipts.py
@@ -143,4 +149,4 @@ tests/test_vietqr.py
 wsgi.py
 ```
 
-Tổng: 134 file (bao gồm file danh mục này).
+Tổng: 140 file (bao gồm file danh mục này).

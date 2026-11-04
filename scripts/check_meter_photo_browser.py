@@ -160,19 +160,20 @@ def main():
                 plain_page.wait_for_url(f'**/rooms/{room_id}/bill?period=2026-01')
                 plain.close()
                 final = page.locator('[name=final_amount]')
-                assert final.input_value() == '1000'
+                assert final.input_value() == '1.000 đ'
                 final.fill('1234')
                 assert page.locator('[name=adjustment_reason]').get_attribute('required') is not None
                 page.locator('[name=adjustment_reason]').fill('Browser rounding fixture')
                 page.locator('button[name=action][value=preview]').click()
                 page.locator('button[name=action][value=confirm]').wait_for()
-                assert page.locator('[name=final_amount]').input_value() == '1234'
+                assert page.locator('[name=final_amount]').input_value() == '1.234 đ'
                 page.locator('button[name=action][value=confirm]').click()
                 page.wait_for_url('**/bills?period=2026-01')
                 page.goto(base + '/settings/payment')
                 page.locator('[name=bank_bin]').select_option('970436')
                 page.locator('[name=account_number]').fill('00123456789')
                 page.locator('[name=account_name]').fill('DEMO ACCOUNT')
+                page.locator('[name=auto_transfer_content]').check()
                 page.locator('[name=note]').fill('Ghi mã phòng và tháng thanh toán')
                 page.get_by_role('button', name='Lưu thông tin nhận tiền').click()
                 assert page.locator('img[alt="QR nhận tiền hiện tại"]').is_visible()
@@ -205,8 +206,60 @@ def main():
                 page.emulate_media(media='print')
                 assert not page.locator('.receipt-toolbar').is_visible()
                 page.emulate_media(media='screen')
+                page.goto(base + '/settings/payment')
+                page.locator('[name=auto_transfer_content]').uncheck()
+                page.get_by_role('button', name='Lưu thông tin nhận tiền').click()
+                assert not page.locator('[name=auto_transfer_content]').is_checked()
+                page.goto(base + f'/bills/{bill_id}')
+                assert 'Nội dung:' not in page.locator('.receipt-payment').inner_text()
+                without_content = page.request.get(base + f'/bills/{bill_id}/qr')
+                decoded_without_content = zxingcpp.read_barcode(Image.open(BytesIO(without_content.body())))
+                assert decoded_without_content is not None
+                assert '54041234' in decoded_without_content.text
+                assert f'P{bill_id} T103 T012026' not in decoded_without_content.text
                 page.goto(base + f'/rooms/{room_id}')
                 assert page.locator(f'a[href="/bills/{bill_id}"]').count() >= 1
+                # Shared input formatting roundtrips through the room form.
+                page.goto(base + f'/rooms/{room_id}/edit')
+                rent = page.locator('[name=rent_price]')
+                rent.fill('')
+                rent.press_sequentially('1000000')
+                assert rent.input_value() == '1.000.000 đ'
+                rent.evaluate('(input) => input.setSelectionRange(0, 1)')
+                rent.press('2')
+                assert rent.input_value() == '2.000.000 đ'
+                rent.fill('1.234.567 đ')
+                date_field = page.locator('[name=contract_start]')
+                assert date_field.input_value() == '01/01/2025'
+                date_field.fill('31/02/2025')
+                assert not date_field.evaluate('(input) => input.checkValidity()')
+                date_field.fill('')
+                date_field.press_sequentially('01012025')
+                assert date_field.input_value() == '01/01/2025'
+                assert date_field.evaluate('(input) => input.checkValidity()')
+                page.get_by_role('button', name='Lưu phòng', exact=True).click()
+                page.wait_for_url(f'**/rooms/{room_id}')
+                with app.app_context():
+                    assert db.session.get(Room, room_id).current_tenancy.rent_price == 1234567
+                page.goto(base + '/bills?period=2026-01')
+                page.locator(f'a[href="/bills/{bill_id}/edit"]').click()
+                # Edit starts from bill snapshot, not the newly changed contract price.
+                assert page.locator('[name=rent_price]').input_value() == '1.000 đ'
+                page.locator('[name=final_amount]').fill('2000')
+                page.locator('[name=edit_reason]').fill('Browser bill correction fixture')
+                page.locator('button[name=action][value=preview]').click()
+                page.locator('button[name=action][value=confirm]').wait_for()
+                assert page.locator('[name=final_amount]').input_value() == '2.000 đ'
+                page.set_viewport_size({'width': 1200, 'height': 900})
+                assert page.locator('.bill-fields').bounding_box()['x'] < page.locator('.bill-summary').bounding_box()['x']
+                page.screenshot(path=str(exports / 'bill-edit-preview.png'), full_page=True)
+                page.locator('button[name=action][value=confirm]').click()
+                with app.app_context():
+                    replacement = db.session.scalar(db.select(MonthlyBill).where(MonthlyBill.room_id == room_id, MonthlyBill.cancelled_at.is_(None)))
+                    replacement_id = replacement.id
+                    assert replacement.total == 2000
+                    assert db.session.get(MonthlyBill, bill_id).cancelled_at is not None
+                page.wait_for_url(f'**/bills/{replacement_id}')
                 assert not errors, errors
                 browser.close()
                 print('Browser checks passed: photo upload/replacement/modal, locked photo UI, bill room picker with and without JavaScript, no page errors.')

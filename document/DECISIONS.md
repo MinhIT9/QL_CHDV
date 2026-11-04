@@ -135,3 +135,11 @@ Không cần giải quyết các mục trên chỉ để tạo sườn.
 - Phòng và điện cùng kỳ tháng, thông báo giả định trước triển khai và trên UI. Kỳ khách vào/trả giữa tháng hoặc thay khách chưa được chốt để tránh gán sai điện/tiền.
 - Admin được sửa điện chưa bị phiếu hiệu lực khóa; root hủy hiệu lực phiếu có lý do trước khi sửa, rồi lập mới. Giữ nguyên dữ liệu phiếu cũ, không tính là hoàn/cấn tiền thực tế.
 - Giá theo từng phiếu; điều khoản hiện tại chỉ gợi ý, Admin xác nhận giá kỳ. Số người tính nước được nhập kiểm tra; tiền cọc không thuộc tổng tháng.
+
+## V1.7.2 — Nội dung chuyển khoản tùy chọn
+
+Bật/tắt qua PaymentSettings.auto_transfer_content, mặc định bật cho cấu hình cũ. Máy chủ dùng công tắc để quyết định sinh tag 62/08; khi tắt phiếu cũng ẩn dòng nội dung. Bỏ nội dung QR để ngân hàng/người chuyển xử lý mặc định, không ép nội dung trống ở ứng dụng ngân hàng. Tiền và tài khoản giữ nguyên. Migration e68143c20a75; không áp dụng để sửa nội dung ảnh QR legacy do admin upload.
+
+## V1.8.0 — Phiếu thay thế và định dạng chung
+
+Admin được sửa phiếu chưa thu bằng edit_bill: khóa ghi/kiểm tra stamp và trạng thái, tạo bản mới từ snapshot cũ, hủy bản gốc có audit trong cùng transaction. Không cập nhật đè snapshot hoặc đổi hợp đồng. Chỉ root được hủy riêng/hoàn tác thu. app/utils/formatting.py tập trung parse/format tiền và ngày, UTC+7 cho hiển thị/đồng hồ nghiệp vụ; formats.js xử lý input và app.js dùng helper này để tính trước. Chuỗi đẹp gửi về máy chủ được kiểm tra lại, tiền vẫn số nguyên, timestamp lưu UTC. ISO chỉ giữ ở giao thức/URL và dữ liệu máy; giao diện dùng dd/mm/yyyy và mm/yyyy. Không thêm dependency/schema. Xem LOCALIZATION.md.

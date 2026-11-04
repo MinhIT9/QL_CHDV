@@ -1,5 +1,7 @@
 # Phạm vi V1
 
+V1.8.0 mở sửa phiếu tiền chưa thu cho root/Admin: preview/xác nhận/lý do, tạo bản thay thế và giữ nguyên bản cũ; phiếu đã thu/hủy không sửa. Giao diện toàn web dùng tiền nhóm dấu chấm + đ, ngày dd/mm/yyyy, giờ UTC+7; lưu trữ vẫn số nguyên/UTC. Các mô tả V1 cũ bên dưới là mốc phạm vi trước khi bổ sung này.
+
 V1.4.2: một ảnh công tơ mỗi ID chốt điện; lưu ảnh mới thay ảnh cũ sau nén thành công. Phiếu tiền hiệu lực khóa thêm/thay ảnh cho Root/Admin, kể cả ảnh đang trống. Chờ xử lý ảnh xong mới chốt phiếu. Ảnh vẫn không bắt buộc, ảnh hợp đồng không đổi.
 
 V1.4.0 thay yêu cầu bắt buộc ảnh điện trước đây: chốt/sửa được phép không ảnh, bổ sung ngay trong bảng; kéo thả chọn trước, lưu mới upload, progress và tự hiện thumbnail/modal không reload. Giữ worker/quyền xem riêng tư, không đổi DB. Ảnh hợp đồng vẫn tùy chọn.

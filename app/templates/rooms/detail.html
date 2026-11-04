@@ -9,7 +9,7 @@
 <div class="detail-grid"><dl class="info-list">
 <div><dt>Bắt đầu hợp đồng</dt><dd>{{ tenant.contract_start|business_date }}</dd></div>
 <div><dt>Hết hạn</dt><dd>{{ tenant.contract_end|business_date }} {% if tenant.contract_end and tenant.contract_end < today %}<span class="badge vacant">Đã hết hạn</span>{% endif %}</dd></div>
-<div><dt>Lịch đóng tiền</dt><dd>{{ ('Ngày ' ~ tenant.payment_day ~ ' hằng tháng') if tenant.payment_day is not none else 'Chưa cập nhật' }}<small>Hạn của kỳ {{ period }}: {{ payment_due|business_date }}. Chưa ghi nhận thực thu.</small></dd></div>
+<div><dt>Lịch đóng tiền</dt><dd>{{ ('Ngày ' ~ tenant.payment_day ~ ' hằng tháng') if tenant.payment_day is not none else 'Chưa cập nhật' }}<small>Hạn của kỳ {{ period|period_label }}: {{ payment_due|business_date }}. Chưa ghi nhận thực thu.</small></dd></div>
 </dl><dl class="info-list">
 <div><dt>Giá nước/người</dt><dd>{{ tenant.water_price|vnd }} / tháng</dd></div>
 <div><dt>Giá điện</dt><dd>{{ tenant.electricity_price|vnd }} / kWh</dd></div>
@@ -34,7 +34,7 @@
         {% for reading in room.readings|reverse %}
         {% set cost = costs[reading.id] %}
         <tr>
-          <td>{{ reading.period }}{{ photo_list(reading.photos) }}</td>
+          <td>{{ reading.period|period_label }}{{ photo_list(reading.photos) }}</td>
           <td class="number text-end text-nowrap">{{ reading.start_value }}</td>
           <td class="number text-end text-nowrap">{{ reading.end_value }}</td>
           <td class="number text-end text-nowrap">{{ reading.consumption }}</td>

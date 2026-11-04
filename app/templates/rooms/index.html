@@ -6,9 +6,9 @@
   <div class="overview-item"><span class="overview-icon">{{ icon('building') }}</span><div><small>Phòng trong kết quả</small><strong>{{ rooms|length }} <span>phòng</span></strong></div></div>
   <div class="overview-item"><span class="overview-icon">{{ icon('users') }}</span><div><small>Đang có khách thuê</small><strong>{{ rooms|selectattr('current_tenancy')|list|length }} <span>phòng</span></strong></div></div>
   <div class="overview-item"><span class="overview-icon">{{ icon('rooms') }}</span><div><small>Phòng trống đang dùng</small><strong>{{ rooms|selectattr('active')|rejectattr('current_tenancy')|list|length }} <span>phòng</span></strong></div></div>
-  <div class="overview-item"><span class="overview-icon">{{ icon('bolt') }}</span><div><small>Điện đã chốt · {{ period }}</small><strong>{{ total_consumption }} <span>kWh</span></strong></div></div>
+  <div class="overview-item"><span class="overview-icon">{{ icon('bolt') }}</span><div><small>Điện đã chốt · {{ period|period_label }}</small><strong>{{ total_consumption }} <span>kWh</span></strong></div></div>
 </div>
 <section class="card table-card"><form class="toolbar" method="get"><label class="search">Tìm phòng / khách thuê<input class="form-control" type="search" name="q" value="{{ q }}" placeholder="Mã phòng hoặc tên khách…"></label><label>Kỳ xem{% include 'partials/period_select.html' %}</label>{% include 'rooms/table_filters.html' %}<button class="button secondary btn btn-outline-secondary" type="submit">Xem</button></form>
 {% include 'rooms/full_table.html' if full_view else 'rooms/compact_table.html' %}
-<div class="table-summary"><span>Kết quả: <strong>{{ rooms|length }} phòng</strong> · Đang thuê: <strong>{{ rooms|selectattr('current_tenancy')|list|length }}</strong> · Kỳ: <strong>{{ period }}</strong></span><span>Điện đã chốt: <strong class="blue">{{ total_consumption }} kWh</strong></span></div></section>
+<div class="table-summary"><span>Kết quả: <strong>{{ rooms|length }} phòng</strong> · Đang thuê: <strong>{{ rooms|selectattr('current_tenancy')|list|length }}</strong> · Kỳ: <strong>{{ period|period_label }}</strong></span><span>Điện đã chốt: <strong class="blue">{{ total_consumption }} kWh</strong></span></div></section>
 {% endblock %}

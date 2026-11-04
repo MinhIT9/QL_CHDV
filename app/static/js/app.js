@@ -23,6 +23,7 @@ window.addEventListener("resize", repositionPaymentPanels);
 window.addEventListener("scroll", repositionPaymentPanels, true);
 
 function enhancePage() {
+window.AppFormat.enhance();
 window.enhanceMeterPhotos?.();
 const amountForm = document.querySelector("#bill-amount-form");
 if (amountForm && !amountForm.dataset.amountBound) {
@@ -30,10 +31,10 @@ if (amountForm && !amountForm.dataset.amountBound) {
   const final = amountForm.elements.final_amount;
   const reason = amountForm.elements.adjustment_reason;
   let manual = final.value !== "";
-  const money = value => `${value.toLocaleString("vi-VN")} đ`;
+  const money = window.AppFormat.money;
   const updateAmount = () => {
     const names = ["rent_price", "water_price", "service_price", "electricity_price", "people_count"];
-    const raw = names.map(name => amountForm.elements[name].value);
+    const raw = names.map(name => amountForm.elements[name].matches("[data-money]") ? window.AppFormat.moneyDigits(amountForm.elements[name].value) : amountForm.elements[name].value);
     if (!raw.every(value => /^\d+$/.test(value)) || !/^\d+$/.test(amountForm.dataset.consumption)) {
       amountForm.querySelector("#bill-computed-total").textContent = "Chưa đủ dữ liệu";
       return;
@@ -41,10 +42,11 @@ if (amountForm && !amountForm.dataset.amountBound) {
     const [rent, water, service, electricity, people] = raw.map(BigInt);
     const computed = rent + water * people + service + electricity * BigInt(amountForm.dataset.consumption);
     amountForm.querySelector("#bill-computed-total").textContent = money(computed);
-    if (!manual) final.value = computed.toString();
-    const valid = /^\d{1,19}$/.test(final.value) && BigInt(final.value) <= 9223372036854775807n;
+    if (!manual) final.value = money(computed);
+    const finalRaw = window.AppFormat.moneyDigits(final.value);
+    const valid = /^\d{1,19}$/.test(finalRaw) && BigInt(finalRaw) <= 9223372036854775807n;
     final.setCustomValidity(valid ? "" : "Số tiền thu cuối cùng phải là số nguyên không âm trong giới hạn cho phép.");
-    const difference = valid ? BigInt(final.value) - computed : 0n;
+    const difference = valid ? BigInt(finalRaw) - computed : 0n;
     reason.required = valid && difference !== 0n;
     amountForm.querySelector("#bill-adjustment").textContent = valid ? `Điều chỉnh: ${difference > 0n ? '+' : ''}${money(difference)}` : "";
   };
@@ -152,13 +154,13 @@ if (meterForm && !meterForm.dataset.bound) {
         } else {
           const cost = BigInt(consumption) * BigInt(row.dataset.price);
           money += cost;
-          if (amount) amount.textContent = `${cost.toLocaleString("vi-VN")} đ`;
+          if (amount) amount.textContent = window.AppFormat.money(cost);
         }
       }
     });
     document.querySelector("#draft-total").textContent = `${total.toLocaleString("vi-VN")} kWh`;
     const draftMoney = document.querySelector("#draft-money");
-    if (draftMoney) draftMoney.textContent = missingPrice ? "Chưa đủ đơn giá" : `${money.toLocaleString("vi-VN")} đ`;
+    if (draftMoney) draftMoney.textContent = missingPrice ? "Chưa đủ đơn giá" : window.AppFormat.money(money);
   };
   meterForm.addEventListener("input", updateConsumption);
   updateConsumption();

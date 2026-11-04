@@ -20,7 +20,9 @@ def field(tag, value):
     return f'{tag}{length:02d}{value}'
 
 
-def transfer_content(bill):
+def transfer_content(bill, enabled=True):
+    if not enabled:
+        return ''
     room = unicodedata.normalize('NFKD', bill.room_code.replace('đ', 'd').replace('Đ', 'D')).encode('ascii', 'ignore').decode()
     room = re.sub(r'[^A-Za-z0-9]', '', room).upper()[:12]
     return f'P{bill.id} {room} T{bill.period[5:]}{bill.period[:4]}'[:50]

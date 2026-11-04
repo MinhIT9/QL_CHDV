@@ -1,6 +1,6 @@
 # Mô hình dữ liệu V1
 
-Đã triển khai tại app/models/__init__.py; migration mới nhất d57032b19f64 (BIN ngân hàng cho QR cục bộ).
+Đã triển khai tại app/models/__init__.py; migration mới nhất e68143c20a75 (nội dung chuyển khoản tùy chọn).
 
 ## Điều chỉnh tổng phiếu — V1.5.0
 
@@ -77,3 +77,9 @@ Bản ghi chung id=1: bank_name(100), account_number(50), account_name(150), not
 ## V1.7.0 — BIN ngân hàng
 
 PaymentSettings.bank_bin String(6), nullable legacy; lưu mã từ danh sách ngân hàng nội bộ. Không thay đổi tổng/Receipt hoặc xóa qr_token/file cũ. QR mới tạo theo phiếu trong bộ nhớ, không thêm blob hoặc bảng ảnh.
+
+V1.7.2: PaymentSettings.auto_transfer_content Boolean NOT NULL DEFAULT true. Migration giữ bật cho bản ghi cũ; lưu false khi admin bỏ chọn. Không thay đổi dữ liệu phiếu/thu tiền.
+
+## V1.8.0 — Lưu lịch sử sửa phiếu
+
+Không thêm cột: bản cũ dùng cancelled_at/by/reason (ghi ID bản thay thế), bản mới dùng created_at/by và snapshot. Lý do sửa tối đa 450 để đủ chỗ ghi liên kết trong cancel_reason 500. Cặp room/period chỉ có một bản hiệu lực; hủy bản cũ và chèn bản mới cùng transaction. Tiền lưu nguyên VND, dates là business dates, timestamps UTC; định dạng chỉ nằm ở biên input/output.

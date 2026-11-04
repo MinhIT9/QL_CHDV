@@ -1,6 +1,6 @@
 <select name="period" class="form-select period-select" required aria-label="Chọn tháng và năm">
 {% set selected_year = period[:4]|int %}
 {% for year in range(selected_year - 3, selected_year + 4) if 1000 <= year <= 2999 %}
-<optgroup label="Năm {{ year }}">{% for month in range(1, 13) %}{% set value = '%04d-%02d'|format(year, month) %}<option value="{{ value }}" {{ 'selected' if value == period }}>Tháng {{ month }} / {{ year }}</option>{% endfor %}</optgroup>
+<optgroup label="Năm {{ year }}">{% for month in range(1, 13) %}{% set value = '%04d-%02d'|format(year, month) %}<option value="{{ value }}" {{ 'selected' if value == period }}>Tháng {{ value|period_label }}</option>{% endfor %}</optgroup>
 {% endfor %}
 </select>

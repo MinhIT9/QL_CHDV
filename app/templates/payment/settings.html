@@ -13,7 +13,14 @@
       {% for key, label, limit in [('account_number', 'Số tài khoản', 19), ('account_name', 'Tên chủ tài khoản', 150)] %}
       <div class="col-md-4"><label class="form-label" for="{{ key }}">{{ label }}</label><input class="form-control" id="{{ key }}" name="{{ key }}" maxlength="{{ limit }}" value="{{ values[key] if values else '' }}" required {% if key == 'account_number' %}pattern="[A-Za-z0-9]{1,19}"{% endif %}></div>
       {% endfor %}
-      <div class="col-md-8"><label class="form-label" for="note">Ghi chú hiển thị trên phiếu</label><textarea class="form-control" id="note" name="note" maxlength="300" rows="2">{{ values.note if values else '' }}</textarea><p class="form-text">Nội dung chuyển khoản tự điền mã phiếu, phòng và tháng. Ghi chú này hiển thị cạnh QR.</p></div>
+      <div class="col-md-8">
+        <div class="form-check form-switch mb-3">
+          <input class="form-check-input" type="checkbox" role="switch" id="auto_transfer_content" name="auto_transfer_content" value="1" {% if (request.method == 'GET' and not values) or (values and values.auto_transfer_content in [true, '1']) %}checked{% endif %}>
+          <label class="form-check-label" for="auto_transfer_content">Tự điền nội dung chuyển khoản</label>
+          <p class="form-text">Bật: điền mã phiếu, phòng và tháng. Tắt: để ứng dụng ngân hàng dùng nội dung mặc định của người chuyển.</p>
+        </div>
+        <label class="form-label" for="note">Ghi chú hiển thị trên phiếu</label><textarea class="form-control" id="note" name="note" maxlength="300" rows="2">{{ values.note if values else '' }}</textarea><p class="form-text">Ghi chú chỉ hiển thị cạnh QR, không đưa vào nội dung chuyển khoản.</p>
+      </div>
       {% if settings and settings.bank_bin %}<div class="col-md-4 text-center"><img src="{{ url_for('payment.generated_qr') }}" width="180" height="180" alt="QR nhận tiền hiện tại"><p class="form-text">QR tài khoản đã lưu, chưa kèm số tiền.</p></div>
       {% elif settings and settings.qr_token %}<div class="col-md-4"><p class="form-text">Đang dùng ảnh QR cũ. Chọn đúng ngân hàng và lưu để chuyển sang QR tự tạo.</p></div>{% endif %}
     </div>

@@ -7,7 +7,7 @@ from app.extensions import db
 from app.models import ElectricityReading, MonthlyBill, ReadingRevision, Receipt, Room, utcnow
 from app.services.contracts import local_today, parse_date
 from sqlalchemy.orm import selectinload
-from app.services.billing import amount_in_words, bill_tenancy, bill_values, correction, lock_writes, reading_pair, reading_stamp
+from app.services.billing import amount_in_words, bill_tenancy, bill_values, bill_stamp, edit_bill, correction, lock_writes, reading_pair, reading_stamp
 from app.services.electricity import current_period, valid_period
 from app.services.photos import meter_photo_locked
 from app.services.payment_settings import payment_settings
@@ -71,7 +71,8 @@ def detail(bill_id):
     payment = payment_settings()
     return render_template("billing/detail.html", bill=bill, receipt=bill.paid_receipt,
                            amount_words=amount_in_words(bill.total), payment=payment,
-                           generated_qr=bill_qr_enabled(payment, bill), transfer_content=transfer_content(bill))
+                           generated_qr=bill_qr_enabled(payment, bill),
+                           transfer_content=transfer_content(bill, payment.auto_transfer_content) if payment else '')
 
 
 @bp.get('/bills/<int:bill_id>/qr')
@@ -81,7 +82,7 @@ def payment_qr(bill_id):
     settings = payment_settings()
     if not bill_qr_enabled(settings, bill):
         abort(404)
-    value = payload(settings.bank_bin, settings.account_number, bill.total, transfer_content(bill))
+    value = payload(settings.bank_bin, settings.account_number, bill.total, transfer_content(bill, settings.auto_transfer_content))
     return send_file(qr_png(value), mimetype='image/png', max_age=0)
 
 
@@ -115,6 +116,32 @@ def create(room_id):
     if reading is None:
         reading = db.session.scalar(db.select(ElectricityReading).where(ElectricityReading.room_id == room.id, ElectricityReading.period == period))
     return render_template("billing/form.html", room=room, values=values, preview=preview, period=period, reading=reading)
+
+
+@bp.route('/bills/<int:bill_id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit(bill_id):
+    original = db.get_or_404(MonthlyBill, bill_id)
+    if request.method == 'GET' and (original.cancelled_at or original.paid_receipt):
+        abort(409, description='Phiếu đã thu hoặc đã hủy, không thể sửa.')
+    values = request.form if request.method == 'POST' else {
+        **{key: getattr(original, key) for key in ('rent_price', 'water_price', 'service_price', 'electricity_price', 'people_count', 'adjustment_reason')},
+        'payment_day': original.due_date.day, 'period': original.period,
+        'final_amount': original.total if original.adjustment_amount else '', 'edit_stamp': bill_stamp(original),
+    }
+    preview, status = None, 200
+    if request.method == 'POST':
+        try:
+            preview = edit_bill(original, values, current_user.id, values.get('action') == 'confirm')
+            if values.get('action') == 'confirm':
+                flash('Đã sửa phiếu. Bản cũ được giữ trong lịch sử phòng.', 'success')
+                return redirect(url_for('billing.detail', bill_id=preview.id))
+        except WRITE_ERRORS as error:
+            report(error)
+            status = 400
+    return render_template('billing/form.html', room=db.get_or_404(Room, original.room_id),
+                           values=values, preview=preview, period=original.period, reading=original,
+                           editing=original), status
 
 
 @bp.post("/bills/<int:bill_id>/cancel")

@@ -1,9 +1,11 @@
 from io import BytesIO
+from unittest.mock import patch
 
 from PIL import Image
 
 from app.extensions import db
 from app.models import PaymentSettings, ElectricityReading
+from app.services.vietqr import qr_png
 import test_bill_documents
 from test_v1 import AppTestCase
 
@@ -21,7 +23,7 @@ class PaymentSettingsTests(AppTestCase):
         db.session.commit()
 
     def payment_data(self, **extra):
-        values = dict(bank_bin='970436', account_number='0012345678', account_name='FIXTURE OWNER', note='Room and month')
+        values = dict(bank_bin='970436', account_number='0012345678', account_name='FIXTURE OWNER', note='Room and month', auto_transfer_content='1')
         return {**values, **extra}
 
     def test_generated_qr_uses_final_bill_and_hides_after_payment(self):
@@ -56,6 +58,30 @@ class PaymentSettingsTests(AppTestCase):
         for extra in ({'bank_bin':'999999'}, {'account_number':'123 456'}, {'account_number':'1'*20}, {'account_name':''}):
             self.assertEqual(self.post('/settings/payment', self.payment_data(**extra)).status_code, 400)
         self.assertEqual(db.session.get(PaymentSettings, 1).bank_bin, '970436')
+
+    def test_content_switch_changes_payload_and_document_but_keeps_amount(self):
+        self.post('/settings/payment', self.payment_data())
+        bill = self.create_bill()
+        for enabled in (False, True):
+            values = self.payment_data()
+            if not enabled:
+                values.pop('auto_transfer_content')
+            self.assertEqual(self.post('/settings/payment', values).status_code, 302)
+            self.assertEqual(db.session.get(PaymentSettings, 1).auto_transfer_content, enabled)
+            with patch('app.electricity.billing_routes.qr_png', wraps=qr_png) as render:
+                with self.client.get(f'/bills/{bill.id}/qr') as response:
+                    self.assertEqual(response.status_code, 200)
+                value = render.call_args.args[0]
+            tags = {}
+            position = 0
+            while position < len(value):
+                tag, length = value[position:position+2], int(value[position+2:position+4])
+                tags[tag] = value[position+4:position+4+length]
+                position += 4 + length
+            self.assertEqual(tags['54'], str(bill.total))
+            self.assertEqual('62' in tags, enabled)
+            html = self.client.get(f'/bills/{bill.id}').get_data(as_text=True)
+            self.assertEqual('Nội dung: <strong>' in html, enabled)
 
     def test_zero_cancelled_and_excessive_amount_do_not_generate_qr(self):
         self.post('/settings/payment', self.payment_data())

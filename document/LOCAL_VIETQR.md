@@ -26,3 +26,7 @@ QR không chứa tên khách/ghi chú tùy ý. Tên chủ tài khoản chỉ đ�
 Gói exports/chdv-v1.7.0.zip gồm code, dependencies, migrations, tests và tài liệu; không chứa .env, SQLite, uploads hay venv. Khi cập nhật: dừng chdv và chdv-photos, backup nhất quán DB/uploads nếu cần, giải nén vào /opt/chdv, cấp lại owner chdv cho code, cài requirements.txt, flask db upgrade và db check, chạy tests, mở lại hai service. Giữ .env và instance trên VPS. Không cài script QA browser trên VPS. Chưa tự chạy các bước này qua SSH.
 
 Kiểm tra V1.7.0: 78 unittest OK (50.165s), DB check/integrity đạt, cột dữ liệu cũ giữ nguyên so với backup. Edge đọc được QR ảnh gốc/crop mobile qua ZXing; không pageerror. Chưa quét app ngân hàng thật.
+
+## V1.7.2 — Nội dung chuyển khoản tùy chọn
+
+Bật/tắt qua PaymentSettings.auto_transfer_content, mặc định bật cho cấu hình cũ. Máy chủ dùng công tắc để quyết định sinh tag 62/08; khi tắt phiếu cũng ẩn dòng nội dung. Bỏ nội dung QR để ngân hàng/người chuyển xử lý mặc định, không ép nội dung trống ở ứng dụng ngân hàng. Tiền và tài khoản giữ nguyên. Migration e68143c20a75; không áp dụng để sửa nội dung ảnh QR legacy do admin upload.

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Phiếu #{{ bill.id }} · {{ bill.room_code }} · {{ bill.period }}</title>
+  <title>Phiếu #{{ bill.id }} · {{ bill.room_code }} · {{ bill.period|period_label }}</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/receipt.css', v='1.7.0') }}">
   <script src="{{ url_for('static', filename='js/receipt.js', v='1.5.0') }}" defer></script>
@@ -50,7 +50,7 @@
     <section class="receipt-payment" aria-label="Thông tin chuyển khoản">
       {% if generated_qr %}<img src="{{ url_for('billing.payment_qr', bill_id=bill.id) }}" alt="QR nhận tiền" width="160" height="160">
       {% elif payment.qr_token and not payment.bank_bin and bill.total > 0 %}<img src="{{ url_for('payment.qr', token=payment.qr_token) }}" alt="QR nhận tiền" width="160" height="160">{% endif %}
-      <div><h2>Thông tin chuyển khoản</h2><p><strong>{{ payment.bank_name }}</strong> · {{ payment.account_name }}</p><p class="receipt-account">{{ payment.account_number }}</p>{% if generated_qr %}<p>Nội dung: <strong>{{ transfer_content }}</strong></p>{% endif %}{% if payment.note %}<p class="receipt-payment-note">{{ payment.note }}</p>{% endif %}</div>
+      <div><h2>Thông tin chuyển khoản</h2><p><strong>{{ payment.bank_name }}</strong> · {{ payment.account_name }}</p><p class="receipt-account">{{ payment.account_number }}</p>{% if generated_qr and transfer_content %}<p>Nội dung: <strong>{{ transfer_content }}</strong></p>{% endif %}{% if payment.note %}<p class="receipt-payment-note">{{ payment.note }}</p>{% endif %}</div>
     </section>
     {% endif %}
     {% if bill.cancelled_at %}<p class="receipt-cancel-note">Phiếu này đã hủy ngày {{ bill.cancelled_at|local_date }}. Lý do: {{ bill.cancel_reason }}. Không dùng để yêu cầu thanh toán.</p>{% endif %}

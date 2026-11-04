@@ -146,7 +146,7 @@ class BillingTests(AppTestCase):
         self.assertEqual(self.post(path, data).status_code, 400)
         page = self.client.get(path + "?period=2026-02").get_data(as_text=True)
         for key, value in (("electricity_price", "5000"), ("water_price", "120000"), ("rent_price", "3500000")):
-            self.assertRegex(page, 'name="' + key + '" value="' + value + '"')
+            self.assertIn('name="' + key + '" value="' + format(int(value), ',').replace(',', '.') + ' đ"', page)
         self.assertEqual(self.post(path, self.bill_data(self.next, electricity_price="5000", water_price="120000", rent_price="3500000")).status_code, 302)
         self.assertEqual(bill.total, 3750000)
 

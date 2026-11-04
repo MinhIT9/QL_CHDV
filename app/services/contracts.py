@@ -1,13 +1,10 @@
 import calendar
 import re
-from datetime import date, datetime, timedelta, timezone
+from datetime import date
 
 from app.extensions import db
 from app.models import ContractRenewal, utcnow
-
-
-def local_today():
-    return datetime.now(timezone(timedelta(hours=7))).date()
+from app.utils.formatting import local_today, parse_money, read_date
 
 
 def parse_date(value, label, required=False):
@@ -16,11 +13,9 @@ def parse_date(value, label, required=False):
             raise ValueError(f"{label} là bắt buộc.")
         return None
     try:
-        if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
-            raise ValueError
-        return date.fromisoformat(value)
+        return read_date(value)
     except ValueError:
-        raise ValueError(f"{label} không hợp lệ.") from None
+        raise ValueError(f"{label} không hợp lệ; dùng dd/mm/yyyy.") from None
 
 
 def parse_integer(value, label, minimum=0, maximum=2147483647, required=False):
@@ -40,7 +35,8 @@ def contract_values(data, current=None):
         result[key] = parse_date(data.get(key, "").strip(), label, required)
     for key, label in (("electricity_price", "Giá điện"), ("rent_price", "Tiền phòng"), ("water_price", "Giá nước"), ("service_price", "Phí dịch vụ"), ("deposit_amount", "Tiền cọc"), ("payment_day", "Ngày đóng tiền")):
         required = current is None or getattr(current, key) is not None
-        result[key] = parse_integer(data.get(key, "").strip(), label, 1 if key == "payment_day" else 0, 31 if key == "payment_day" else 2147483647, required)
+        result[key] = (parse_integer(data.get(key, "").strip(), label, 1, 31, required) if key == "payment_day"
+                       else parse_money(data.get(key, "").strip(), label, required=required))
     start, end = result["contract_start"], result["contract_end"]
     if bool(start) != bool(end) or (start and end < start):
         raise ValueError("Cần nhập đủ ngày bắt đầu/hết hạn; hết hạn không được trước ngày bắt đầu.")

@@ -1,5 +1,21 @@
 # Tiến độ thực tế
 
+## 2026-11-04 — Sửa phiếu và định dạng Việt Nam
+
+V1.8.0: Thêm nút Sửa tại bảng chốt tiền cho phiếu chưa thu/còn hiệu lực. Root/Admin xem trước rồi xác nhận, bắt buộc lý do tối đa 450 ký tự. Sửa tạo bản thay thế trong cùng giao dịch, đánh dấu bản cũ hủy và ghi ID bản mới/người sửa/thời điểm/lý do; giữ giá, người thuê và chỉ số từ snapshot cũ, không lấy lại giá hợp đồng hiện tại. Chặn phiếu đã thu/đã hủy, dữ liệu form cũ và gửi lặp; rollback khôi phục bản cũ nếu commit lỗi. Hủy riêng và hoàn tác thu vẫn chỉ root. Không đổi schema.
+
+Dùng app/utils/formatting.py cho tiền nguyên VND, ngày dd/mm/yyyy, kỳ mm/yyyy, timestamp Việt Nam UTC+7; app/static/js/formats.js dùng chung cho mọi ô tiền/ngày, có HTMX enhancement và giữ vị trí gõ. Ô tiền hiển thị dấu chấm và đ ngay lúc nhập; máy chủ nhận cả số nguyên canonical và chuỗi nhóm hợp lệ, giữ phân biệt 0/thiếu. Không áp định dạng tiền cho STK hoặc chỉ số kWh. Ngày nhập hiển thị cố định dd/mm/yyyy bằng text input, kiểm tra ngày lịch/max cả client và server; vẫn nhận ISO khi gửi trực tiếp để tương thích dữ liệu/giao thức cũ. Không đổi UTC lưu trữ, không đổi timezone OS/VPS hoặc log hệ thống.
+
+Kiểm tra: 85 unittest OK (50.161s); sau gom helper giá chạy lại 15 billing + 6 formatting/edit đạt. Node syntax và db check đạt, head vẫn e68143c20a75. Edge đã kiểm tra gõ số thành 1.000.000 đ, sửa số đầu, gửi giá/ngày qua form phòng lưu đúng, chặn ngày không tồn tại, preview/confirm sửa phiếu và giữ snapshot; QR/ảnh điện regression vẫn đạt. Chưa thử điện thoại thật, chưa triển khai VPS. Restart web dev/Ctrl+F5 để dùng. Gói ZIP V1.7.0 cũ không chứa bản sửa này.
+
+
+## 2026-11-04 — Nội dung QR tùy chọn
+
+V1.7.2: Thêm công tắc Tự điền nội dung chuyển khoản ở Nhận tiền cho root/Admin. Bật: tạo nội dung theo mã phiếu/phòng/tháng. Tắt: bỏ hoàn toàn tag 62/08 trong QR và ẩn dòng nội dung trên phiếu, để app ngân hàng/người chuyển dùng mặc định; app không kiểm soát chuỗi mặc định của ngân hàng. Số tiền cuối cùng, BIN/STK và ghi chú hiển thị không đổi. Cấu hình chung áp dụng ngay cho phiếu chưa thu.
+
+Migration e68143c20a75 thêm PaymentSettings.auto_transfer_content Boolean non-null, mặc định true để giữ hành vi cấu hình cũ; checkbox bỏ chọn được máy chủ lưu false. DEV đã backup backups/pre-content-switch-v172.sqlite3 rồi upgrade/db check đạt. 79 unittest OK (49.330s), gồm kiểm tra cả bật/tắt, tag nội dung có/vắng và số tiền không đổi. Chưa triển khai VPS hoặc quét bằng app ngân hàng thật. Gói chdv-v1.7.0.zip cũ chưa chứa sửa này. Bước tiếp: restart web dev/Ctrl+F5, mở Nhận tiền đổi công tắc và lưu.
+
+
 ## 2026-11-04 — QR tạo cục bộ V1.7.0
 
 V1.7.0: Đã hiện thực QR chuyển khoản tạo cục bộ bằng qrcode 8.2, TLV NAPAS/QRIBFTTA, CRC16-CCITT. Không gọi dịch vụ bên ngoài hoặc lưu ảnh cho từng phiếu. Dropdown 48 ngân hàng từ snapshot API Banks ngày 2026-11-04 ở app/data/banks.json; không có tác vụ mạng runtime. Admin chọn BIN và điền STK (giữ số 0 đầu, 1–19 ký tự ASCII chữ/số), tên chủ tài khoản, ghi chú. Máy chủ lấy ngân hàng từ allowlist, không tin tên ngân hàng gửi từ form. Ghi chú chỉ hiển thị trên phiếu, nội dung QR tự tạo theo P{id} {room} T{mmyyyy}; tiền dùng bill.total sau điều chỉnh, không nhận override từ query string.
@@ -27,7 +43,7 @@ Kiểm tra: 73 unittest OK (44.715s), db check không phát sinh thay đổi, No
 V1.5.0: Đã triển khai trên dev trang phiếu riêng khi bấm ID, tổng tự tính và số thu cuối cùng kèm lý do bắt buộc khi khác tổng gốc; lịch sử phòng có cả phiếu hủy/đã thu. Máy chủ kiểm tra số nguyên không âm, giữ giá 0; Receipt thu theo số cuối cùng đã chốt. Phiếu cũ dùng tổng snapshot, không đổi tiền đã thu. Phiếu đã chốt bất biến, muốn đổi dùng hủy/lập lại theo quyền hiện có. Trang cần đăng nhập, có tiền bằng chữ, responsive và CSS in ẩn toolbar; chưa có link công khai/xuất ảnh tự động. Migration b35e10f97d42 đã áp dụng DEV sau backup backups/pre-bill-final-20261104-v150.sqlite3. Edge headless đạt desktop/390px/in; ảnh giả ở exports/receipt-preview-desktop.png và exports/receipt-preview-mobile.png. Chưa thử máy in giấy/điện thoại thật hoặc cập nhật VPS. Bước tiếp: restart web dev, Ctrl+F5; triển khai VPS cần upgrade DB trước mở web.
 
 
-Cập nhật: 2026-11-04 (Asia/Saigon). Phiên bản hội thoại: V1.7.0.
+Cập nhật: 2026-11-04 (Asia/Saigon). Phiên bản hội thoại: V1.8.0.
 
 V1.4.17: vẽ mockup phiếu gửi khách bằng imagegen built-in theo yêu cầu chỉ thiết kế, chưa code. Phiếu dọc trắng/mint/navy, tổng tiền nổi bật, bảng kê, dữ liệu minh họa; phân biệt chưa thanh toán với đã thu. Đã hiển thị ảnh và ghi BILL_RECEIPT_DESIGN.md, kiểm tra trực quan/số tiền, inventory/diff đạt. Chưa có route click ID/xuất phiếu trong app; không chạy test nghiệp vụ hoặc thao tác VPS.
 
@@ -226,3 +242,5 @@ V1.1.14 thêm ghi nhận thu đủ/hoàn tác có lịch sử, sort phiếu và 
 Cách chạy và bằng chứng xem DEVELOPMENT.md, HANDOFF.md.
 
 Kiểm tra V1.7.0: 78 unittest OK (50.165s), DB check/integrity đạt, cột dữ liệu cũ giữ nguyên so với backup. Edge đọc được QR ảnh gốc/crop mobile qua ZXing; không pageerror. Chưa quét app ngân hàng thật.
+
+V1.7.2 — Edge headless đạt kiểm tra bật/tắt công tắc qua giao diện, lưu rồi đọc lại; ZXing đọc QR sau khi tắt không còn mã nội dung, số tiền vẫn 1.234. Không pageerror.

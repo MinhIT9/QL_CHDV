@@ -88,3 +88,11 @@ V1.7.0: Đã hiện thực QR chuyển khoản tạo cục bộ bằng qrcode 8.
 Migration d57032b19f64 thêm bank_bin nullable, không đoán BIN từ tên cũ; admin cấu hình ngân hàng để bật QR mới. Ảnh QR cũ được giữ và dùng fallback khi chưa có BIN, không xóa dữ liệu cũ. QR đã thu/hủy/0 đồng không được phát; tổng trên 13 chữ số không sinh QR nhưng vẫn mở phiếu được. Thông tin nhận tiền là cấu hình chung hiện tại. Tên chủ TK không tự xác minh; không tự ghi nhận đã thu khi tạo/quét QR.
 
 DEV đã backup backups/pre-local-vietqr-v162.sqlite3 và upgrade/db check đạt. QR đối chiếu vector nguồn độc lập và đọc ngược PNG bằng ZXing-C++; Edge kiểm tra QR từng phiếu chứa số cuối cùng 1.234 thay vì query giả 1, STK/nội dung đúng, QR crop trên mobile đọc được, responsive/in và regression ảnh điện đạt. ZXing-C++ chỉ dùng QA, không cần cài trên VPS. Chưa quét bằng app ngân hàng thật hoặc triển khai VPS, không xác nhận tương thích thực tế với mọi ngân hàng. Cần cài requirements mới, migration rồi restart web/worker khi đưa lên VPS; quét thử bằng ngân hàng để đối chiếu người nhận/số tiền/nội dung trước khi dùng gửi khách.
+
+## V1.7.2 — Nội dung chuyển khoản tùy chọn
+
+Bật/tắt qua PaymentSettings.auto_transfer_content, mặc định bật cho cấu hình cũ. Máy chủ dùng công tắc để quyết định sinh tag 62/08; khi tắt phiếu cũng ẩn dòng nội dung. Bỏ nội dung QR để ngân hàng/người chuyển xử lý mặc định, không ép nội dung trống ở ứng dụng ngân hàng. Tiền và tài khoản giữ nguyên. Migration e68143c20a75; không áp dụng để sửa nội dung ảnh QR legacy do admin upload.
+
+## V1.8.0 — Phiếu thay thế và định dạng chung
+
+Admin được sửa phiếu chưa thu bằng edit_bill: khóa ghi/kiểm tra stamp và trạng thái, tạo bản mới từ snapshot cũ, hủy bản gốc có audit trong cùng transaction. Không cập nhật đè snapshot hoặc đổi hợp đồng. Chỉ root được hủy riêng/hoàn tác thu. app/utils/formatting.py tập trung parse/format tiền và ngày, UTC+7 cho hiển thị/đồng hồ nghiệp vụ; formats.js xử lý input và app.js dùng helper này để tính trước. Chuỗi đẹp gửi về máy chủ được kiểm tra lại, tiền vẫn số nguyên, timestamp lưu UTC. ISO chỉ giữ ở giao thức/URL và dữ liệu máy; giao diện dùng dd/mm/yyyy và mm/yyyy. Không thêm dependency/schema. Xem LOCALIZATION.md.
