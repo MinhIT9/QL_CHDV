@@ -1,4 +1,5 @@
 from datetime import date
+import re
 from types import SimpleNamespace
 
 from app.extensions import db
@@ -9,6 +10,47 @@ from test_v1 import AppTestCase
 
 
 class BillingTests(AppTestCase):
+    def option_attributes(self, html, room_id):
+        match = re.search(r'<option value="' + str(room_id) + r'"([^>]*)>', html)
+        self.assertIsNotNone(match)
+        return match.group(1)
+
+    def test_room_picker_uses_requested_room_and_preserves_selection_on_error(self):
+        other = self.room('P102')
+        response = self.client.get(f'/bills?period=2026-01&room_id={other.id}&action=create')
+        self.assertIn(f'/rooms/{other.id}/bill?period=2026-01', response.location)
+        response = self.client.get(response.location)
+        self.assertIn(f'room_id={other.id}', response.location)
+        html = self.client.get(response.location).get_data(as_text=True)
+        self.assertIn('selected', self.option_attributes(html, other.id))
+        self.assertNotIn('selected', self.option_attributes(html, self.room_obj.id))
+        self.assertIn('name="room_id"', html)
+        self.assertIn('hx-boost="false"', html)
+
+    def test_room_picker_keeps_all_codes_but_skips_active_bills_for_period(self):
+        other = self.room('P102')
+        self.assertEqual(self.post(f'/rooms/{self.room_obj.id}/bill', self.bill_data()).status_code, 302)
+        html = self.client.get('/bills?period=2026-01').get_data(as_text=True)
+        self.assertIn('disabled', self.option_attributes(html, self.room_obj.id))
+        self.assertIn('selected', self.option_attributes(html, other.id))
+        self.assertIn('P101', html)
+        self.assertIn('P102', html)
+        response = self.client.get(f'/bills?period=2026-01&room_id={self.room_obj.id}&action=create')
+        self.assertNotIn('/rooms/', response.location)
+        self.assertEqual(self.client.get(f'/rooms/{self.room_obj.id}/bill?period=2026-01').status_code, 302)
+        html = self.client.get('/bills?period=2026-02').get_data(as_text=True)
+        self.assertNotIn('disabled', self.option_attributes(html, self.room_obj.id))
+        bill = db.session.scalar(db.select(MonthlyBill))
+        bill.cancelled_at = date(2026, 2, 1)
+        db.session.commit()
+        html = self.client.get('/bills?period=2026-01').get_data(as_text=True)
+        self.assertNotIn('disabled', self.option_attributes(html, self.room_obj.id))
+
+    def test_room_picker_disables_create_when_all_billed(self):
+        self.post(f'/rooms/{self.room_obj.id}/bill', self.bill_data())
+        html = self.client.get('/bills?period=2026-01').get_data(as_text=True)
+        self.assertRegex(html, r'id="bill-create"[^>]*disabled')
+
     def test_shared_reading_cost_preserves_price_sources(self):
         reading = SimpleNamespace(electricity_price=3600, consumption=100)
         bill = SimpleNamespace(electricity_price=0)

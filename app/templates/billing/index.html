@@ -1,7 +1,22 @@
 {% extends 'base.html' %}
 {% block content %}
 <header class="page-header"><div><p class="eyebrow">GIÁ VÀ TIỀN THEO TỪNG KỲ</p><h1>Chốt tiền & thu tiền</h1><p class="muted">Chưa thu ở trên, đã thu ở dưới. Ghi nhận thu đủ theo từng phiếu, từng tháng.</p></div><form class="inline-form" method="get"><label>Kỳ tháng{% include 'partials/period_select.html' %}</label><button class="button secondary btn btn-outline-secondary" type="submit">Xem kỳ</button></form></header>
-<section class="card"><div class="inline-form"><label>Phòng<select class="form-select" id="bill-room">{% for room in rooms %}<option value="{{ url_for('billing.create', room_id=room.id, period=period) }}">{{ room.code }}</option>{% endfor %}</select></label><a class="button primary btn btn-primary" id="bill-create" href="{{ url_for('billing.create', room_id=rooms[0].id, period=period) if rooms else url_for('rooms.edit') }}">{{ 'Lập phiếu kỳ ' ~ period if rooms else 'Thêm phòng' }}</a></div></section>
+<section class="card">
+  {% if rooms %}
+  <form class="inline-form" method="get" action="{{ url_for('billing.index') }}" hx-boost="false">
+    <input type="hidden" name="period" value="{{ period }}">
+    <label>Phòng
+      <select class="form-select" id="bill-room" name="room_id" required>
+        {% if not selected_room %}<option value="" selected>Không còn phòng để lập phiếu mới</option>{% endif %}
+        {% for room in rooms %}
+        <option value="{{ room.id }}" {{ 'selected' if selected_room and room.id == selected_room.id }} {{ 'disabled' if room.id in billed_room_ids }}>{{ room.code }}{{ ' · Đã lập phiếu' if room.id in billed_room_ids }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <button class="btn btn-primary" id="bill-create" type="submit" name="action" value="create" {{ 'disabled' if not selected_room }}>Lập phiếu kỳ {{ period }}</button>
+  </form>
+  {% else %}<a class="btn btn-primary" href="{{ url_for('rooms.edit') }}">Thêm phòng</a>{% endif %}
+</section>
 <section class="card table-card"><div class="table-scroll"><table class="table table-striped table-hover align-middle mb-0 billing-table"><thead><tr><th>Phòng / khách</th><th>Tiền phòng</th><th>Nước</th><th>Dịch vụ</th><th>Điện</th><th>Tổng</th><th>Đến hạn</th><th>Trạng thái</th></tr></thead><tbody>{% for bill in bills %}<tr class="{{ 'bill-cancelled' if bill.cancelled_at else 'bill-paid' if bill.paid_receipt else '' }}"><td><strong>{{ bill.room_code }}</strong> <span class="bill-customer">· {{ bill.tenant_name }}</span><small>Phiếu #{{ bill.id }} · {{ bill.created_at|local_date }}</small></td><td>{{ bill.rent_price|vnd }}</td><td>{{ bill.people_count }} × {{ bill.water_price|vnd }}</td><td>{{ bill.service_price|vnd }}</td><td>{{ bill.start_value }} → {{ bill.end_value }}<br>{{ bill.end_value - bill.start_value }} kWh × {{ bill.electricity_price|vnd }}</td><td><strong>{{ bill.total|vnd }}</strong></td><td>{{ bill.due_date|business_date }}</td><td>{% include 'billing/payment.html' %}</td></tr>{% else %}<tr><td colspan="8" class="empty">Chưa có phiếu tiền kỳ {{ period }}.</td></tr>{% endfor %}</tbody></table></div></section>
 <p class="notice">Giá điện, nước và tiền phòng lấy từ thông tin phòng hiện tại khi lập phiếu mới. Sửa giá không đổi các phiếu đã chốt. Hãy xác nhận giá đúng cho kỳ đang lập; phiếu lập lại sau khi hủy cũng lấy giá hiện tại. Chưa hỗ trợ kỳ đổi khách/vào/trả phòng giữa tháng hoặc điện khác kỳ tiền phòng.</p>
 {% endblock %}

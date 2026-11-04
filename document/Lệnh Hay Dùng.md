@@ -34,3 +34,7 @@ systemctl reload nginx
 systemctl enable --now chdv-photos
 systemctl start chdv
 
+-----
+chạy project dev
+.\.venv\Scripts\python.exe -m flask --app wsgi run --port 5000
+.\.venv\Scripts\python.exe -m flask --app wsgi process-photos

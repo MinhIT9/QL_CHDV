@@ -48,7 +48,18 @@ def index():
     bills = db.session.scalars(db.select(MonthlyBill).options(selectinload(MonthlyBill.receipts)).where(MonthlyBill.period == period)).all()
     today = local_today()
     bills.sort(key=lambda b: (3 if b.cancelled_at else 2 if b.paid_receipt else 0 if b.due_date < today else 1, b.room_code, b.id))
-    return render_template("billing/index.html", period=period, bills=bills, rooms=db.session.scalars(db.select(Room).order_by(Room.code)).all(), today=today)
+    rooms = db.session.scalars(db.select(Room).order_by(Room.code)).all()
+    billed_room_ids = {bill.room_id for bill in bills if bill.cancelled_at is None}
+    available = [room for room in rooms if room.id not in billed_room_ids]
+    requested = request.args.get("room_id", type=int)
+    selected = next((room for room in available if room.id == requested), available[0] if available else None)
+    if request.args.get("action") == "create":
+        if selected and selected.id == requested:
+            return redirect(url_for("billing.create", room_id=selected.id, period=period))
+        flash("Hãy chọn phòng chưa có phiếu hiệu lực trong kỳ này.", "warning")
+        return redirect(url_for("billing.index", period=period))
+    return render_template("billing/index.html", period=period, bills=bills, rooms=rooms,
+                           billed_room_ids=billed_room_ids, selected_room=selected, today=today)
 
 
 @bp.route("/rooms/<int:room_id>/bill", methods=["GET", "POST"])
@@ -58,6 +69,8 @@ def create(room_id):
     period = request.form.get("period", "") if request.method == "POST" else request.args.get("period", current_period())
     preview, values = None, request.form
     try:
+        if db.session.scalar(db.select(MonthlyBill.id).where(MonthlyBill.room_id == room.id, MonthlyBill.period == period, MonthlyBill.cancelled_at.is_(None))):
+            raise ValueError("Phòng đã có phiếu tiền có hiệu lực trong kỳ này.")
         tenant = bill_tenancy(room, period)
         if request.method == "POST":
             preview = bill_values(room, period, values, current_user.id, values.get("action") == "confirm")
@@ -73,7 +86,7 @@ def create(room_id):
     except WRITE_ERRORS as error:
         report(error)
         if request.method == "GET":
-            return redirect(url_for("billing.index", period=period if valid_period(period) else current_period()))
+            return redirect(url_for("billing.index", period=period if valid_period(period) else current_period(), room_id=room.id))
         return render_template("billing/form.html", room=room, values=values, preview=None, period=period), 400
     return render_template("billing/form.html", room=room, values=values, preview=preview, period=period)
 

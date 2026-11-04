@@ -1,5 +1,10 @@
 # Quyết định và vấn đề cần chốt
 
+## 2026-11-04 — Chọn phòng lập phiếu (V1.4.13)
+
+- Theo yêu cầu, dropdown vẫn có đủ mã phòng nhưng phòng đã có phiếu hiệu lực cùng kỳ không được đề xuất/lập mới. Hiện trạng thái Đã lập phiếu và khóa option; phiếu đã hủy không khóa lập lại. Khi tất cả đã có phiếu, khóa nút lập mới.
+- Gửi room_id bằng form GET do server xử lý thay cho đổi href của link trong JS; lựa chọn hoạt động cả khi không có JS. Nếu phòng thiếu dữ liệu nghiệp vụ để lập phiếu, giữ phòng đã chọn và báo lý do thay vì tự quay phòng đầu. Không thay quy tắc tính tiền hoặc trạng thái phòng cũ.
+
 ## 2026-11-04 — Một ảnh công tơ và khóa theo phiếu (V1.4.2)
 
 - Theo yêu cầu mới, mỗi ElectricityReading có tối đa một Photo ở DB, thay ảnh dùng cùng ID; ảnh hợp đồng không đổi. Thay thế chỉ xóa file cũ khi bản mới nén thành công, lỗi giữ ảnh cũ để không mất chứng cứ hiện tại. File fallback tạm không phải ảnh thứ hai có thể sửa trong UI.

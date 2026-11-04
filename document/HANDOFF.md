@@ -1,12 +1,12 @@
 # Bàn giao
 
-Cập nhật: 2026-11-03 (Asia/Saigon).
+Cập nhật: 2026-11-04 (Asia/Saigon).
 
 ## Phiên bản hội thoại
 
-- Phiên bản phản hồi gần nhất: V1.4.2.
-- Nội dung: Một Photo mỗi ID chốt điện, thay ảnh cùng record và xóa file cũ sau nén thành công; failed giữ fallback. Phiếu tiền hiệu lực khóa thêm/thay cho Root/Admin, chốt tiền chặn ảnh pending. Migration a24d09e86c31 đã backup DB+ảnh và áp dụng dev, giữ dữ liệu nghiệp vụ. 64 tests +16 test ảnh + Edge thay ảnh/khóa UI đạt, db check/Node/docs đạt. Worker dev đã khởi động lại PID 4220; chưa cập nhật VPS.
-- Phản hồi tiếp theo tối thiểu V1.4.3; có thể tăng minor/major theo quy tắc mới trong AGENTS.md.
+- Phiên bản phản hồi gần nhất: V1.4.13.
+- Nội dung: Sửa chọn phòng lập phiếu bằng form GET gửi ID về server, không lệ thuộc JS đổi href. Dropdown đủ mã phòng, phiếu hiệu lực cùng kỳ disabled/không đề xuất; lỗi giữ phòng đã chọn. 67 tests và Edge (bật/tắt JS) đạt, Node/docs đạt; không đổi DB hoặc VPS.
+- Phản hồi tiếp theo tối thiểu V1.4.14; có thể tăng minor/major theo quy tắc mới trong AGENTS.md.
 - Quy tắc đầy đủ ở AGENTS.md, mục “Phiên bản ở cuối phản hồi”.
 
 ## Đã làm
@@ -31,6 +31,26 @@ Cập nhật: 2026-11-03 (Asia/Saigon).
 - Chỉ chốt tiền một đợt thuê xác định đủ tháng; thiếu điện, ngày không rõ, vào/trả giữa tháng hoặc đổi khách cùng kỳ bị chặn. Không có engine lịch giá tự động: giá trên form là gợi ý, Admin xác nhận cho từng kỳ.
 
 ## Kiểm tra
+
+- V1.4.13 (2026-11-04): 67 unittest pass (38.671s), gồm 3 test room picker: gửi đúng ID và giữ chọn khi thiếu dữ liệu, đủ mã nhưng bỏ phiếu hiệu lực khỏi đề xuất theo kỳ/hủy phiếu mở lại, hết phòng khóa nút. Edge headless dùng DB/ảnh tạm: chọn T103 đến /rooms/3/bill đúng cả bật và tắt JS; option phòng đã có phiếu vẫn hiện nhưng disabled, các luồng ảnh cũ vẫn đạt/no pageerror. Node syntax đạt, inventory/diff đạt. Không đổi model/schema/DB thật, không tự cập nhật VPS. Bước tiếp restart dev/Ctrl+F5; gói V1.4.2 cũ không chứa sửa này, cần đóng gói mới nếu triển khai VPS.
+
+- V1.4.12 (2026-11-04): giải thích VPS dùng systemd chdv/chdv-photos nên không cần giữ terminal, khác dev chạy thủ công hai terminal. Hướng dẫn systemctl status/start cho cả hai; nhận định enabled/active dựa log VPS người dùng đã gửi trước, không kiểm tra trực tiếp mới. Không chạy lệnh VPS hoặc đổi cấu hình. Inventory/diff đạt.
+
+- V1.4.11 (2026-11-04): ảnh cho thấy terminal dev đã thoát Flask về prompt rồi chạy process-photos. Giải thích giữ terminal worker hiện tại, mở terminal thứ hai cùng thư mục dự án để chạy .venv Python flask run --port 5000; hai lệnh không chạy tuần tự trong cùng terminal. Không thao tác process/DB hoặc VPS. Inventory/diff đạt.
+
+- V1.4.10 (2026-11-04): ảnh PowerShell xác nhận người dùng chọn y cho Stop-Process 4220, terminal trả prompt. Get-Process kiểm tra PID 4220 không còn chạy. Không suy ra mọi kết nối DB đều đã đóng; WAL/SHM còn có thể tồn tại. Không xóa file hoặc chạy checkpoint, không thay cấu hình. Inventory/diff đạt; nhắc mở lại worker bằng terminal riêng khi cần dùng upload dev.
+
+- V1.4.9 (2026-11-04): người dùng hỏi SQLite dev không dừng, ảnh có WAL/SHM. Get-Process xác nhận worker nền đã tạo trước đó PID 4220 vẫn chạy; code lặp process_pending mỗi 2 giây. Giải thích SQLite không có service riêng và tắt web không dừng worker. Hướng dẫn Stop-Process -Id 4220 trên PowerShell cùng Ctrl+C terminal web để đóng các kết nối dev; chưa tự dừng worker vì lượt này chỉ hỏi nguyên nhân. Không xóa DB/WAL/SHM, không thao tác VPS. Inventory/diff đạt.
+
+- V1.4.8 (2026-11-04): log VPS xác nhận chdv/chdv-photos enabled/active lúc vừa start, HTTPS /login 200 sau đó. Chưa nhận kết quả unittest VPS của bản V1.4.2, không suy ra test đã pass. Hướng dẫn Ctrl+F5 và kiểm tra một thumbnail/ảnh khóa ở kỳ đã có phiếu, thử thay ảnh chỉ trên kỳ chưa chốt với ảnh thật đúng phòng; không tạo/hủy phiếu hoặc sửa số để thử. Chưa có kết quả upload/thay/xóa file cũ trên browser VPS; backup /root/chdv-before-v142-mAvcspH9 cần giữ.
+
+- V1.4.7 (2026-11-04): log VPS xác nhận tar backup kiểm tra không lỗi, giải nén/cấp quyền code/cài requirements, db upgrade f13a98c52b70 → a24d09e86c31, db check không drift và current head đúng. Hướng dẫn unittest, chỉ khi OK mới start chdv/chdv-photos và kiểm tra status/HTTPS. Chưa nhận kết quả tests/start hoặc ảnh trên VPS. Backup quay lui /root/chdv-before-v142-mAvcspH9; ZIP /root/chdv-v1.4.2.zip.
+
+- V1.4.6 (2026-11-04): log VPS xác nhận chdv/chdv-photos inactive, backup-db hoàn tất, thư mục /root/chdv-before-v142-mAvcspH9 có DB, hai service và Nginx; dòng tên archive bị cắt ở project. Hướng dẫn tar -tzf archive >/dev/null trước thay code, sau đó giải nén ZIP /root/chdv-v1.4.2.zip, chown/chmod allowlist, pip requirements, db upgrade/check/current. Chưa nhận kết quả archive hoặc triển khai, dịch vụ còn dừng; chưa hướng dẫn start trước test.
+
+- V1.4.5 (2026-11-04): log xác nhận /root/chdv-v1.4.2.zip zipfile -t Done testing. Hướng dẫn stop chdv/chdv-photos, xác nhận is-active đều inactive, backup-db và tar toàn project gồm uploads/.env (loại venv/cache/backups/ZIP), lưu systemd web/worker và Nginx vào thư mục mktemp riêng /root/chdv-before-v142-XXXXXXXX. Chưa nhận kết quả dừng/backup; chưa giải nén/migrate. Các lệnh tiếp dùng ZIP /root/chdv-v1.4.2.zip.
+
+- V1.4.4 (2026-11-04): ảnh SFTP xác nhận chdv-v1.4.2.zip nằm /root/, lệnh kiểm tra /opt/chdv báo FileNotFoundError. Hướng dẫn zipfile -t /root/chdv-v1.4.2.zip; chưa kiểm tra ZIP thành công, chưa dừng dịch vụ/backup/giải nén. Các bước sau dùng đường dẫn ZIP /root/ nếu không chuyển file.
 
 - V1.4.2 (2026-11-04): 64 unittest pass (46.535s), 16 test_photos pass (9.980s) sau điều chỉnh assertion IntegrityError. Có test unique DB, migration gộp nhóm trùng giữ ready mới nhất, thay thành công/xóa cũ, lỗi giữ fallback, không thay khi pending, khóa Root/Admin sau chốt phiếu và mở khóa khi phiếu bị hủy, không cho chốt tiền khi pending. Edge dữ liệu tạm đạt luồng V1.4.0 và thêm thay ảnh chỉ còn một thumbnail, dòng có phiếu không còn input upload/no JS errors. Đã dừng worker dev PID 4532, backup DB backups/pre-single-meter-photo-20261104.sqlite3 và ảnh backups/pre-single-meter-photo-files-20261104.zip, migrate a24d09e86c31, db check/integrity đạt, toàn bộ dữ liệu bảng nghiệp vụ khớp backup. Bản ghi ảnh điện trùng được gộp; file mồ côi được worker dọn sau 1 giờ, backup vẫn giữ ảnh cũ. Worker mới PID 4220 chạy ẩn cùng log paths cũ. Chưa cập nhật VPS; khi deploy phải backup DB+uploads và dừng cả web/worker trước migrate, sau đó restart cả hai. Chưa thử thực tế hai request song song trên VPS.
 

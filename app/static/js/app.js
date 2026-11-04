@@ -57,11 +57,6 @@ document.querySelectorAll(".payment-panel[popover]:not([data-bound])").forEach((
     if (event.target !== panel && panel.matches(":popover-open")) positionPaymentPanel(panel);
   }, true);
 });
-const billRoom = document.querySelector("#bill-room");
-if (billRoom && !billRoom.dataset.bound) {
-  billRoom.dataset.bound = "true";
-  billRoom.addEventListener("change", () => { document.querySelector("#bill-create").href = billRoom.value; });
-}
 document.querySelectorAll("form").forEach((form) => form.setAttribute("hx-boost", "false"));
 const status = document.querySelector("#room-status");
 if (status && !status.dataset.bound) {

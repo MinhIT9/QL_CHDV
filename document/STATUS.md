@@ -1,6 +1,28 @@
 # Tiến độ thực tế
 
-Cập nhật: 2026-11-04 (Asia/Saigon). Phiên bản hội thoại: V1.4.2.
+Cập nhật: 2026-11-04 (Asia/Saigon). Phiên bản hội thoại: V1.4.13.
+
+V1.4.13: sửa lập phiếu tự quay phòng đầu bằng form GET room_id/period, bỏ JS đổi href. Giữ đủ mã phòng trong dropdown, option đã có phiếu hiệu lực cùng kỳ bị khóa/không đề xuất; hết phòng khóa nút; lỗi dữ liệu giữ lựa chọn. 67 tests và Edge bật/tắt JS đạt, Node/inventory/diff đạt. Không migration, không đổi DB dev hoặc VPS.
+
+V1.4.12: giải thích web/worker VPS do systemd quản lý, không cần giữ hai terminal SSH; cung cấp lệnh kiểm tra hai service. Không có kiểm tra VPS mới, dựa cấu hình/log đã xác nhận trong hội thoại. Chỉ sửa tài liệu, inventory/diff đạt.
+
+V1.4.11: làm rõ chạy web và worker dev ở hai terminal riêng theo ảnh người dùng; terminal đang chạy process-photos có thể đứng chờ bình thường. Chưa có bằng chứng mở lại web; không chạy lệnh/process/DB trong lượt này. Chỉ sửa tài liệu, inventory/diff đạt.
+
+V1.4.10: người dùng đã xác nhận dừng worker dev PID 4220, kiểm tra tiến trình không còn. Không kết luận web/công cụ khác đã đóng DB; không xóa WAL/SHM. Chỉ cập nhật tài liệu, inventory/diff đạt; không chạy test nghiệp vụ hoặc thao tác VPS.
+
+V1.4.9: xác nhận worker ảnh dev PID 4220 vẫn chạy, truy cập DB định kỳ 2 giây. Giải thích SQLite/WAL/SHM và hướng dẫn dừng worker cùng web nếu muốn dev ngừng hoàn toàn; chưa dừng tiến trình hoặc xóa file. Chỉ cập nhật tài liệu, inventory/diff đạt; không chạy test nghiệp vụ.
+
+V1.4.8: log VPS xác nhận web/worker enabled và active sau start, HTTPS /login HTTP 200; dịch vụ đã mở lại. Chưa gửi kết quả unittest của bản cập nhật này hoặc kiểm tra ảnh thực tế, không đánh dấu test VPS đạt. Hướng dẫn xác minh thumbnail/thay ảnh/khóa theo phiếu trên dữ liệu phù hợp. Chỉ sửa tài liệu, inventory/diff đạt.
+
+V1.4.7: log VPS xác nhận backup archive đạt, code/requirements cập nhật, migration a24d09e86c31 head và db check đạt. Hướng dẫn test rồi mở lại cả web/worker nếu OK. Chưa nhận kết quả tests/start/kiểm tra ảnh thực tế, chưa đánh dấu triển khai hoàn tất. Chỉ sửa tài liệu, inventory/diff đạt.
+
+V1.4.6: log VPS xác nhận hai dịch vụ dừng và backup-db thành công, bộ backup tại /root/chdv-before-v142-mAvcspH9. Tên archive trong kết quả bị cắt, hướng dẫn kiểm tra tar trước giải nén code/cài thư viện/migrate a24d09e86c31. Chưa nhận kết quả nâng cấp hoặc mở lại dịch vụ. Chỉ sửa tài liệu, inventory/diff đạt.
+
+V1.4.5: người dùng xác nhận ZIP /root/chdv-v1.4.2.zip kiểm tra đạt. Hướng dẫn dừng web/worker và backup DB+project/uploads/.env/cấu hình trước cập nhật. Chưa nhận bằng chứng backup hoặc thay đổi code/schema VPS. Chỉ sửa tài liệu, inventory/diff đạt.
+
+V1.4.4: ảnh cho thấy gói VPS ở /root/chdv-v1.4.2.zip, khác đường dẫn lệnh /opt/chdv nên không tìm thấy. Hướng dẫn kiểm tra đúng chỗ, chưa xác nhận ZIP hợp lệ hoặc thay đổi VPS. Chỉ sửa tài liệu, inventory/diff đạt.
+
+V1.4.3: đóng gói exports/chdv-v1.4.2.zip từ HEAD sạch cho VPS, kiểm tra ZIP chứa code ảnh mới/migration a24d09e86c31 và không chứa cấu hình bí mật/runtime. Hướng dẫn upload vào /opt/chdv qua MobaXterm rồi kiểm tra ZIP. Chưa có bằng chứng upload/cập nhật VPS; đợt sau phải dừng web và worker, backup DB+ảnh trước migration gộp ảnh trùng. Chỉ đóng gói/tài liệu, inventory/diff đạt; không chạy lại suite đã kiểm thử.
 
 V1.4.2: giới hạn một Photo/ID chốt điện bằng unique DB; lưu ảnh mới thay cùng record, giữ fallback trong lúc nén/lỗi, xóa file cũ sau ready. Phiếu tiền hiệu lực khóa thêm/thay cho Root/Admin, ẩn upload; pending chặn chốt phiếu. 64 tests, 16 test ảnh bổ sung và Edge thay/khóa thumbnail đạt; Node/db check/integrity đạt. Đã backup DB+ảnh rồi migrate dev a24d09e86c31, dữ liệu nghiệp vụ khớp backup; ảnh trùng giữ ready mới nhất. Worker dev khởi động lại PID 4220. Chưa cập nhật VPS hoặc test đồng thời trên VPS. Inventory/diff đạt.
 

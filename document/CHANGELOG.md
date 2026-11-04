@@ -2,6 +2,28 @@
 
 ## 2026-11-04
 
+- V1.4.13: sửa chọn phòng lập phiếu qua form GET server, giữ lựa chọn khi báo lỗi; dropdown đủ phòng nhưng không đề xuất/lập mới phòng đã có phiếu hiệu lực trong kỳ. 67 tests và Edge bật/tắt JS đạt; chưa cập nhật VPS.
+
+- V1.4.12: làm rõ VPS chạy web/worker bằng systemd, không cần hai terminal như dev.
+
+- V1.4.11: hướng dẫn chạy Flask và worker ảnh ở hai terminal dev riêng, giải thích worker chờ không in log là bình thường.
+
+- V1.4.10: xác nhận worker dev PID 4220 đã dừng sau thao tác PowerShell của người dùng.
+
+- V1.4.9: kiểm tra worker dev PID 4220 còn chạy, giải thích SQLite còn truy cập sau khi tắt web và hướng dẫn dừng đúng tiến trình.
+
+- V1.4.8: xác nhận web/worker VPS khởi động và HTTPS 200 từ log; chờ kết quả test và kiểm tra luồng ảnh thực tế.
+
+- V1.4.7: xác nhận migration V1.4.2 VPS đạt head và không drift; hướng dẫn kiểm thử rồi khởi động web/worker, chờ kết quả.
+
+- V1.4.6: ghi nhận dừng dịch vụ/backup VPS V1.4.2 từ log; hướng dẫn kiểm tra archive rồi cập nhật code và schema, chưa xác nhận thực thi.
+
+- V1.4.5: xác nhận ZIP V1.4.2 VPS hợp lệ, hướng dẫn dừng web/worker và backup DB/ảnh/cấu hình trước migration một ảnh công tơ.
+
+- V1.4.4: xác định gói ZIP được upload vào /root qua ảnh, sửa lệnh kiểm tra đường dẫn trước cập nhật VPS.
+
+- V1.4.3: chuẩn bị và kiểm tra gói chdv-v1.4.2.zip cho cập nhật VPS, loại trừ .env/runtime; hướng dẫn upload theo từng đợt, chưa triển khai production.
+
 - V1.4.2: mỗi ID chốt điện một ảnh, lưu ảnh mới thay cũ sau nén thành công và giữ fallback khi lỗi. Khóa ảnh theo phiếu tiền hiệu lực cho mọi vai trò, chặn chốt phiếu lúc pending; thêm unique/migration gộp ảnh cũ trùng. Backup/migrate dev và restart worker, 64 tests/Edge QA đạt; chưa cập nhật VPS.
 
 - V1.4.1: xử lý ảnh dev đang pending bằng worker, xác nhận WebP/gốc tạm; khởi động worker nền dev cho các upload tiếp theo, không thay code hoặc VPS.

@@ -132,9 +132,35 @@ def main():
                 assert first.locator('input[type=file]').count() == 0
                 assert first.locator('.saved-photos img').count() == 1
                 assert second.locator('input[type=file]').count() == 1
+                with app.app_context():
+                    room = Room(code='T103')
+                    db.session.add(room)
+                    db.session.flush()
+                    room_id = room.id
+                    db.session.add(Tenancy(room_id=room.id, tenant_name='Bill picker fixture', contract_start=date(2025, 1, 1),
+                        contract_end=date(2027, 1, 1), rent_price=1000, water_price=0, service_price=0, electricity_price=0, payment_day=1))
+                    db.session.add(ElectricityReading(room_id=room.id, period='2026-01', start_value=0, end_value=1,
+                        created_by=db.session.scalar(db.select(User.id))))
+                    db.session.commit()
+                page.goto(base + '/bills?period=2026-01')
+                assert page.locator('#bill-room option').count() == 3
+                assert page.locator('#bill-room option').first.get_attribute('disabled') is not None, page.locator('#bill-room').inner_html()
+                page.locator('#bill-room').select_option(str(room_id))
+                page.locator('#bill-create').click()
+                page.wait_for_url(f'**/rooms/{room_id}/bill?period=2026-01')
+                assert 'T103' in page.locator('h1').inner_text()
+                # The same room selection works without JavaScript/HTMX.
+                plain = browser.new_context(java_script_enabled=False)
+                plain.add_cookies(page.context.cookies())
+                plain_page = plain.new_page()
+                plain_page.goto(base + '/bills?period=2026-01')
+                plain_page.locator('#bill-room').select_option(str(room_id))
+                plain_page.locator('#bill-create').click()
+                plain_page.wait_for_url(f'**/rooms/{room_id}/bill?period=2026-01')
+                plain.close()
                 assert not errors, errors
                 browser.close()
-                print('Browser checks passed: deferred selection/drop, optional save, preserved other row, async thumbnail, modal/Escape, no reload or JS errors.')
+                print('Browser checks passed: photo upload/replacement/modal, locked photo UI, bill room picker with and without JavaScript, no page errors.')
         finally:
             server.shutdown()
             thread.join()
