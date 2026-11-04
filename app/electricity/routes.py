@@ -41,6 +41,7 @@ def index():
         bill = bills.get(row["room"].id)
         row.update(reading_cost(reading, bill, tenant.electricity_price if tenant else None))
         row["updated_at"] = updated.get(reading.id) if reading else None
+        row["photo_locked"] = bill is not None
     html = render_template("electricity/index.html", contexts=contexts, period=period,
                            done=sum(bool(item["existing"]) for item in contexts),
                            values=request.form if request.method == "POST" else {})

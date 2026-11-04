@@ -1,13 +1,16 @@
 {% macro photo_list(photos) %}
 <div class="d-flex flex-wrap gap-2 my-2">
   {% for photo in photos %}
-    {% if photo.status == 'ready' %}
-      <a href="{{ url_for('photos.view', photo_id=photo.id) }}" hx-boost="false" class="photo-open" title="Xem ảnh {{ loop.index }}"><img class="photo-thumb rounded border" src="{{ url_for('photos.view', photo_id=photo.id) }}" width="72" height="72" loading="lazy" alt="Ảnh {{ loop.index }}"></a>
-    {% elif photo.status == 'pending' %}
+    <span data-photo-item="{{ photo.id }}">
+    {% if photo.display_token %}
+      <a href="{{ url_for('photos.view', photo_id=photo.id, v=photo.display_token) }}" hx-boost="false" class="photo-open" title="Xem ảnh {{ loop.index }}"><img class="photo-thumb rounded border" src="{{ url_for('photos.view', photo_id=photo.id, v=photo.display_token) }}" width="72" height="72" loading="lazy" alt="Ảnh {{ loop.index }}"></a>
+    {% endif %}
+    {% if photo.status == 'pending' %}
       <span class="badge text-bg-secondary" data-photo-pending="{{ photo.id }}">Đang xử lý ảnh…</span>
-    {% else %}
+    {% elif photo.status == 'failed' %}
       <span class="badge text-bg-danger">Ảnh {{ loop.index }} xử lý lỗi · vui lòng tải lại ảnh</span>
     {% endif %}
+    </span>
   {% else %}
     <span class="text-muted small">Chưa có ảnh</span>
   {% endfor %}

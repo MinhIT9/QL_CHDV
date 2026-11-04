@@ -13,7 +13,7 @@ bp = Blueprint("photos", __name__, url_prefix="/photos")
 
 def photo_state(photo):
     return {"id": photo.id, "status": photo.status,
-            "url": url_for("photos.view", photo_id=photo.id) if photo.status == "ready" else None}
+            "url": url_for("photos.view", photo_id=photo.id, v=photo.display_token) if photo.display_token else None}
 
 
 @bp.get("/status")
@@ -29,9 +29,9 @@ def status():
 @login_required
 def view(photo_id):
     photo = db.get_or_404(Photo, photo_id)
-    if photo.status != "ready":
+    if not photo.display_token:
         abort(404)
-    path = photo_path(photo)
+    path = photo_path(photo).with_name(f"{photo.display_token}.webp")
     if not path.is_file():
         abort(404)
     return send_file(path, mimetype="image/webp", max_age=0)
@@ -45,11 +45,11 @@ def add(kind, owner_id):
     owner = db.get_or_404(Tenancy if kind == "contract" else ElectricityReading, owner_id)
     ajax = request.headers.get("X-Photo-Upload") == "1"
     token = request.form.get("upload_token", "")
+    if db.engine.dialect.name == "sqlite":
+        db.session.execute(db.text("BEGIN IMMEDIATE"))
     if ajax:
         if not re.fullmatch(r"[a-f0-9]{32}", token):
             return jsonify(error="Mã tải ảnh không hợp lệ."), 400
-        if db.engine.dialect.name == "sqlite":
-            db.session.execute(db.text("BEGIN IMMEDIATE"))
         existing = db.session.scalar(db.select(Photo).where(Photo.token == token))
         if existing:
             if existing.created_by != current_user.id or (existing.reading_id if kind == "electricity" else existing.tenancy_id) != owner.id or (kind == "electricity") != (existing.reading_id is not None):

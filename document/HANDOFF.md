@@ -4,9 +4,9 @@ Cập nhật: 2026-11-03 (Asia/Saigon).
 
 ## Phiên bản hội thoại
 
-- Phiên bản phản hồi gần nhất: V1.4.0.
-- Nội dung: Đã triển khai dev ảnh điện tùy chọn, kéo thả/preview chỉ gửi khi lưu, progress XHR, polling tự cập nhật thumbnail và Bootstrap modal. 61 tests pass; 13 test ảnh pass sau kiểm tra retry khác owner. Edge script với dữ liệu tạm đạt optional save/deferred drop/giữ hàng khác/lưu ảnh+kèm chỉ số/popup Escape/no reload/no JS errors. Không đổi schema, db check/Node/docs đạt; chưa cập nhật VPS. Giữ worker nén nền như cũ.
-- Phản hồi tiếp theo tối thiểu V1.4.1; có thể tăng minor/major theo quy tắc mới trong AGENTS.md.
+- Phiên bản phản hồi gần nhất: V1.4.2.
+- Nội dung: Một Photo mỗi ID chốt điện, thay ảnh cùng record và xóa file cũ sau nén thành công; failed giữ fallback. Phiếu tiền hiệu lực khóa thêm/thay cho Root/Admin, chốt tiền chặn ảnh pending. Migration a24d09e86c31 đã backup DB+ảnh và áp dụng dev, giữ dữ liệu nghiệp vụ. 64 tests +16 test ảnh + Edge thay ảnh/khóa UI đạt, db check/Node/docs đạt. Worker dev đã khởi động lại PID 4220; chưa cập nhật VPS.
+- Phản hồi tiếp theo tối thiểu V1.4.3; có thể tăng minor/major theo quy tắc mới trong AGENTS.md.
 - Quy tắc đầy đủ ở AGENTS.md, mục “Phiên bản ở cuối phản hồi”.
 
 ## Đã làm
@@ -31,6 +31,10 @@ Cập nhật: 2026-11-03 (Asia/Saigon).
 - Chỉ chốt tiền một đợt thuê xác định đủ tháng; thiếu điện, ngày không rõ, vào/trả giữa tháng hoặc đổi khách cùng kỳ bị chặn. Không có engine lịch giá tự động: giá trên form là gợi ý, Admin xác nhận cho từng kỳ.
 
 ## Kiểm tra
+
+- V1.4.2 (2026-11-04): 64 unittest pass (46.535s), 16 test_photos pass (9.980s) sau điều chỉnh assertion IntegrityError. Có test unique DB, migration gộp nhóm trùng giữ ready mới nhất, thay thành công/xóa cũ, lỗi giữ fallback, không thay khi pending, khóa Root/Admin sau chốt phiếu và mở khóa khi phiếu bị hủy, không cho chốt tiền khi pending. Edge dữ liệu tạm đạt luồng V1.4.0 và thêm thay ảnh chỉ còn một thumbnail, dòng có phiếu không còn input upload/no JS errors. Đã dừng worker dev PID 4532, backup DB backups/pre-single-meter-photo-20261104.sqlite3 và ảnh backups/pre-single-meter-photo-files-20261104.zip, migrate a24d09e86c31, db check/integrity đạt, toàn bộ dữ liệu bảng nghiệp vụ khớp backup. Bản ghi ảnh điện trùng được gộp; file mồ côi được worker dọn sau 1 giờ, backup vẫn giữ ảnh cũ. Worker mới PID 4220 chạy ẩn cùng log paths cũ. Chưa cập nhật VPS; khi deploy phải backup DB+uploads và dừng cả web/worker trước migrate, sau đó restart cả hai. Chưa thử thực tế hai request song song trên VPS.
+
+- V1.4.1 (2026-11-04): người dùng báo pending kéo dài ở dev. Kiểm tra job 1 pending, gốc tạm có, WebP chưa có; process-photos --once lấy được khóa và xử lý 1 job thành ready, gốc tạm đã xóa/WebP có. Đã Start-Process worker dev bằng .venv Python, WindowStyle Hidden, PID 4532; kiểm tra PID còn chạy và stderr rỗng. Log logs/photo-worker.stdout.log và photo-worker.stderr.log, ngoài Git. Không đổi code hoặc VPS; không cần chạy lại suite. Nếu worker này bị dừng/reboot, mở terminal chạy process-photos theo PHOTOS.md; không tự bật cùng Flask dev server. CIM liệt kê process bị Access denied, không dùng làm bằng chứng worker vắng; CLI lấy được khóa xác nhận không có worker giữ khóa lúc kiểm tra.
 
 - V1.4.0 (2026-11-04): `.venv/Scripts/python.exe -m unittest discover -s tests`: 61 tests OK (41.992s); chạy lại 13 test_photos sau thêm assertion token không dùng cho owner khác: OK (9.251s). Script check_meter_photo_browser.py dùng Microsoft Edge headless và DB/ảnh tạm đạt: chọn/drop chưa tạo upload, lưu không ảnh, không gửi/mất ảnh của hàng chưa nhập số, upload bổ sung và upload kèm chốt mới, pending tự thành thumbnail, modal/Escape, giữ page marker/no reload, không pageerror. Cài Playwright vào venv chỉ cho QA, không thêm runtime dependency. Node syntax cả hai file JS đạt; db check không drift, không migration. Chưa thử mạng chậm/lớn/điện thoại thật và chưa cập nhật VPS. Bước tiếp chạy dev với worker, Ctrl+F5; nếu cập nhật VPS cần đóng gói code hiện tại, không dùng ZIP V1.3.4 cũ. Không thay .env/DB/ảnh dev.
 

@@ -1,12 +1,14 @@
-# Ảnh hợp đồng và ảnh điện (V1.4.0)
+# Ảnh hợp đồng và ảnh điện (V1.4.2)
 
 ## Cách dùng
 
 - Thêm/sửa phòng đang thuê: tối đa 5 ảnh hợp đồng mỗi lần, không bắt buộc. Ảnh gắn với đợt thuê, không chuyển sang khách mới khi đổi khách.
 - Chốt/sửa số điện không bắt buộc ảnh. Có thể chọn ảnh kèm lần lưu hoặc bổ sung sau; nếu đã chọn ảnh thì máy chủ vẫn kiểm tra định dạng/kích thước. Không có ảnh vẫn lưu được số điện hợp lệ.
+- Mỗi ID chốt điện chỉ có một bản ghi ảnh. Lưu ảnh mới sẽ thay ảnh cũ: giữ bản cũ để xem trong lúc nén, chỉ xóa file cũ khi bản mới ready. Nếu nén lỗi, giữ ảnh cũ và báo lỗi cho tải lại. Không nhận thay tiếp khi job hiện tại còn pending.
+- Khi đã chốt phiếu tiền hiệu lực cho cùng phòng/kỳ, Root và Admin đều không thêm/thay ảnh được, kể cả request trực tiếp. Giao diện chỉ cho xem. Phiếu đã hủy hiệu lực không còn khóa ảnh. Không chốt phiếu khi ảnh còn pending, tránh ảnh thay sau khi phiếu đã chốt; không có ảnh vẫn chốt tiền được.
 - Ngay trong bảng Chỉ số điện: kéo file ảnh từ Explorer/Desktop hoặc chọn file, chỉ hiện preview Chưa tải lên. Bấm Lưu chỉ số mới gửi ảnh của các hàng có nhập số; ảnh chờ ở hàng khác không gửi và không bị mất. Phòng đã chốt có nút Lưu ảnh riêng, không cần sửa số hoặc chuyển trang.
 - Hiện tiến độ upload 0–100% theo byte, sau đó trạng thái đang xử lý riêng. Khi worker nén xong, polling theo lô tự hiện thumbnail trong ô, không reload trang. Click thumbnail mở modal Bootstrap; Escape/nút đóng thoát popup. Ảnh lớn là WebP đã nén, không khôi phục gốc đã xóa.
-- Màn Sửa điện cũng có vùng bổ sung ảnh trực tiếp. Chi tiết phòng chỉ bổ sung ảnh hợp đồng, lịch sử điện vẫn xem ảnh đã lưu. Giữ ảnh cũ và dữ liệu lịch sử.
+- Màn Sửa điện cũng có vùng thay ảnh trực tiếp trước khi chốt phiếu. Chi tiết phòng chỉ bổ sung ảnh hợp đồng; lịch sử điện xem ảnh hiện tại của từng lần chốt. Lịch sử chỉ số vẫn được giữ, ảnh cũ bị xóa khi thay thành công.
 - Nhận JPEG, PNG, WebP tĩnh, tối đa 10 MB và 24 megapixel/ảnh. Chưa nhận HEIC, PDF, SVG hoặc ảnh động. Mỗi request tối đa 64 MB; nhiều phòng hãy lưu từng phần. Sau lỗi form cần chọn lại file.
 - Polling khoảng 2 giây khi có pending, tối đa khoảng 60 giây rồi cho bấm kiểm tra lại; lỗi mạng không coi là ảnh hỏng. Nút bỏ ảnh chỉ bỏ file đang chọn, không xóa ảnh đã lưu. Gửi lại cùng mã upload không tạo thêm ảnh. Hết phiên/413/lỗi mạng có thông báo và giữ ảnh chờ; sau kết quả lưu không rõ cần kiểm tra trước khi gửi lại.
 - Chỉ Root/Admin đã đăng nhập và đã đổi mật khẩu bắt buộc mới xem/bổ sung ảnh. Kéo từ website/ứng dụng khác cần nguồn cung cấp File thực; nếu chỉ có URL, tải ảnh về máy rồi chọn file. Không tự tải URL từ server. Tắt JavaScript vẫn lưu form chỉ số được; bổ sung ảnh ở form thường tại Sửa điện, không có tiến độ/popup tự động.
@@ -21,7 +23,7 @@ instance/uploads/
   worker.lock   # Khóa một tiến trình worker
 ```
 
-Bảng photo chứa token, chủ sở hữu (đợt thuê hoặc lần chốt điện), người tải, thời điểm và trạng thái pending/ready/failed. Record ảnh và nghiệp vụ được commit cùng giao dịch. Nếu nghiệp vụ thất bại, rollback DB và xóa ảnh tạm của request.
+Bảng photo chứa token, previous_token dự phòng khi thay ảnh, chủ sở hữu (đợt thuê hoặc lần chốt điện), người tải, thời điểm và trạng thái pending/ready/failed. Unique reading_id chặn nhiều bản ghi ảnh điện. Record ảnh và nghiệp vụ commit cùng giao dịch. Nếu nghiệp vụ thất bại, rollback DB và xóa ảnh tạm của request.
 
 Upload dùng tên ngẫu nhiên, không dùng đường dẫn khách gửi; kiểm tra byte ảnh/kích thước trước khi vào hàng đợi. Một worker CLI xử lý nền, không chạy thread trong request/Gunicorn, không cần Redis/Celery. Hàng đợi SQLite còn nguyên khi restart. Khóa hệ điều hành ngăn hai worker cùng xử lý thư mục.
 
@@ -33,9 +35,9 @@ Sau khi trạng thái cuối được commit, xóa ảnh gốc tạm cả khi th
 
 ## Chạy dev
 
-V1.4.0 không có migration mới, tiếp tục dùng f13a98c52b70. Có script kiểm thử trình duyệt tùy chọn `python scripts/check_meter_photo_browser.py` (cài Playwright trong venv và có Microsoft Edge), tạo toàn bộ dữ liệu trong thư mục tạm; không dùng DB dev. Runtime không thêm dependency JS hoặc Python mới.
+V1.4.2 cần migration a24d09e86c31: backup DB và toàn bộ uploads, dừng web/worker rồi db upgrade. Với ID có nhiều ảnh cũ, migration giữ ảnh ready mới nhất, hoặc job mới nhất nếu chưa có ready; bỏ các record thừa. File không còn tham chiếu được worker dọn sau 1 giờ; bộ backup trước nâng cấp giữ toàn bộ ảnh cũ. Ảnh hợp đồng không giới hạn bởi unique reading_id. Có script kiểm thử browser tùy chọn `python scripts/check_meter_photo_browser.py` (Playwright và Edge), dùng DB/ảnh tạm. Runtime không thêm dependency mới.
 
-Cài requirements trong venv, backup database rồi chạy migration. Migration f13a98c52b70 chỉ thêm bảng photo, giữ dữ liệu nghiệp vụ cũ.
+Cài requirements trong venv, backup database và uploads rồi chạy migration a24d09e86c31 khi web/worker dừng. Migration này thêm cột fallback và gộp ảnh điện trùng, không đổi chỉ số/phiếu/tài khoản.
 
 ```powershell
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt

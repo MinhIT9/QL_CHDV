@@ -11,7 +11,7 @@ from flask import current_app
 from PIL import Image, ImageOps, UnidentifiedImageError
 
 from app.extensions import db
-from app.models import Photo
+from app.models import MonthlyBill, Photo, utcnow
 
 FORMATS = ("JPEG", "PNG", "WEBP")
 MAX_PIXELS = 24_000_000
@@ -32,6 +32,14 @@ def photo_path(photo, temporary=False):
     return root / folder / f"{photo.token}.webp"
 
 
+def meter_photo_locked(reading):
+    return db.session.scalar(db.select(MonthlyBill.id).where(
+        MonthlyBill.room_id == reading.room_id,
+        MonthlyBill.period == reading.period,
+        MonthlyBill.cancelled_at.is_(None),
+    )) is not None
+
+
 @contextmanager
 def upload_batch():
     """Remove staged originals if the business transaction does not commit."""
@@ -48,7 +56,14 @@ def upload_batch():
 def stage_photo(upload, user_id, staged, *, tenancy=None, reading=None, token=None):
     if upload is None or not upload.filename:
         raise ValueError("Cần chọn ảnh chốt số điện.")
-    photo = Photo(token=token or uuid.uuid4().hex, created_by=user_id, tenancy=tenancy, reading=reading)
+    existing = None
+    if reading and reading.id is not None:
+        if meter_photo_locked(reading):
+            raise ValueError("Đã chốt phiếu tiền kỳ này. Không thể thêm hoặc thay ảnh công tơ.")
+        existing = db.session.scalar(db.select(Photo).where(Photo.reading_id == reading.id))
+        if existing and existing.status == "pending":
+            raise ValueError("Ảnh công tơ đang xử lý. Hãy chờ hoàn tất trước khi thay ảnh.")
+    photo = Photo(token=token or uuid.uuid4().hex, created_by=user_id)
     staged.append(photo)
     path = photo_path(photo, temporary=True)
     # Ignore the client filename and MIME; limit bytes before parsing image data.
@@ -70,6 +85,13 @@ def stage_photo(upload, user_id, staged, *, tenancy=None, reading=None, token=No
                 image.verify()
     except (UnidentifiedImageError, OSError, SyntaxError, Image.DecompressionBombError, Image.DecompressionBombWarning) as error:
         raise ValueError("Ảnh không hợp lệ. Chỉ nhận JPEG, PNG hoặc WebP.") from error
+    if existing:
+        existing.previous_token = existing.display_token
+        existing.token = photo.token
+        existing.status = "pending"
+        existing.created_by, existing.created_at = user_id, utcnow()
+        return existing
+    photo.tenancy, photo.reading = tenancy, reading
     db.session.add(photo)
     return photo
 
@@ -98,10 +120,15 @@ def process_pending():
         except (OSError, ValueError, SyntaxError, Image.DecompressionBombError):
             photo.status = "failed"
             current_app.logger.error("Photo processing failed for job %s", photo_id)
+        previous = photo.previous_token if photo.status == "ready" else None
+        if previous:
+            photo.previous_token = None
         db.session.commit()
         # Delete original only after persisting the final state; failed jobs need reupload.
         source.unlink(missing_ok=True)
         part.unlink(missing_ok=True)
+        if previous:
+            target.with_name(f"{previous}.webp").unlink(missing_ok=True)
         db.session.remove()
     cleanup_temporary()
     return len(ids)
@@ -114,6 +141,16 @@ def cleanup_temporary():
     for path in (photo_root() / "tmp").glob("*.upload"):
         if path.stem not in pending and path.stat().st_mtime < cutoff:
             path.unlink(missing_ok=True)
+    referenced = set()
+    for token, previous in db.session.execute(db.select(Photo.token, Photo.previous_token)):
+        referenced.add(token)
+        if previous:
+            referenced.add(previous)
+    # Recover obsolete outputs after a crash between DB commit and file deletion.
+    for folder in ("contracts", "electricity"):
+        for path in (photo_root() / folder).glob("*.webp"):
+            if path.stem not in referenced and path.stat().st_mtime < cutoff:
+                path.unlink(missing_ok=True)
     db.session.remove()
 
 

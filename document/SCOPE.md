@@ -1,5 +1,7 @@
 # Phạm vi V1
 
+V1.4.2: một ảnh công tơ mỗi ID chốt điện; lưu ảnh mới thay ảnh cũ sau nén thành công. Phiếu tiền hiệu lực khóa thêm/thay ảnh cho Root/Admin, kể cả ảnh đang trống. Chờ xử lý ảnh xong mới chốt phiếu. Ảnh vẫn không bắt buộc, ảnh hợp đồng không đổi.
+
 V1.4.0 thay yêu cầu bắt buộc ảnh điện trước đây: chốt/sửa được phép không ảnh, bổ sung ngay trong bảng; kéo thả chọn trước, lưu mới upload, progress và tự hiện thumbnail/modal không reload. Giữ worker/quyền xem riêng tư, không đổi DB. Ảnh hợp đồng vẫn tùy chọn.
 
 V1.3.0: ảnh hợp đồng tùy chọn theo đợt thuê, ảnh điện bắt buộc khi chốt/sửa số mới; bổ sung ảnh lịch sử. Upload JPEG/PNG/WebP, worker nền nén WebP và xóa gốc tạm; ảnh chỉ xem qua đăng nhập. Không OCR, HEIC/PDF, xóa ảnh hoặc lưu ảnh gốc dài hạn. Worker CLI/systemd cùng project, không thêm dịch vụ hàng đợi ngoài. Xem PHOTOS.md.

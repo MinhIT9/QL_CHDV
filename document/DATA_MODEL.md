@@ -1,12 +1,14 @@
 # Mô hình dữ liệu V1
 
-Đã triển khai tại app/models/__init__.py; migration mới nhất f13a98c52b70 (ảnh riêng tư).
+Đã triển khai tại app/models/__init__.py; migration mới nhất a24d09e86c31 (một ảnh cho mỗi lần chốt điện).
 
 ## Photo — V1.3.0
 
+- V1.4.2: unique reading_id (NULL cho ảnh hợp đồng) giới hạn một bản ghi mỗi lần chốt. previous_token giữ file đang xem trong lúc thay ảnh; khi ready xóa file cũ và bỏ previous_token, khi lỗi vẫn xem ảnh cũ. Migration giữ ready mới nhất hoặc job mới nhất trong nhóm ảnh cũ trùng, không đổi dữ liệu số điện/phiếu. Active MonthlyBill cùng room_id/period khóa thay ảnh ở service; chốt tiền từ chối khi ảnh pending.
+
 - token ngẫu nhiên duy nhất; tenancy_id hoặc reading_id (CHECK đúng một chủ sở hữu), created_by/at, status pending/ready/failed (CHECK). Không lưu blob/đường dẫn từ khách vào DB. FK RESTRICT giữ liên kết lịch sử.
 - Byte gốc ở instance/uploads/tmp trong lúc chờ; file dài hạn là WebP ở contracts/electricity. Tên file theo token, không theo tên khách hoặc tên upload. Xem PHOTOS.md về worker, crash recovery và backup.
-- V1.4.0: ảnh hợp đồng và ảnh chốt/sửa điện đều tùy chọn. Không backfill, ảnh cũ không bị thay thế khi sửa số. Token có thể do client tạo theo định dạng hex32 để retry upload bổ sung không trùng, máy chủ kiểm tra token/owner/user trước tái sử dụng. Không migration mới. Ảnh có thể bổ sung, chưa có UI xóa ảnh đã lưu.
+- Ảnh hợp đồng và ảnh chốt/sửa điện đều tùy chọn. Từ V1.4.2, ảnh điện mới thay ảnh cũ trong cùng record; không lưu lịch sử byte ảnh cũ sau thay thành công. Token hex32 do client tạo cho retry, máy chủ kiểm tra token/owner/user trước tái sử dụng. Chưa có nút xóa riêng ảnh đã lưu; phiếu hiệu lực khóa mọi thay đổi ảnh điện.
 
 ## Receipt — V1.1.14
 

@@ -9,6 +9,7 @@ from app.services.contracts import local_today, parse_date
 from sqlalchemy.orm import selectinload
 from app.services.billing import bill_tenancy, bill_values, correction, lock_writes, reading_pair, reading_stamp
 from app.services.electricity import current_period, valid_period
+from app.services.photos import meter_photo_locked
 
 bp = Blueprint("billing", __name__)
 WRITE_ERRORS = (ValueError, IntegrityError, OperationalError, OSError)
@@ -35,7 +36,7 @@ def correct(reading_id):
             report(error)
             status = 400
     revisions = db.session.scalars(db.select(ReadingRevision).where(ReadingRevision.reading_id == reading.id).order_by(ReadingRevision.id.desc())).all()
-    return render_template("electricity/correct.html", reading=reading, values=values, preview=preview, revisions=revisions, previous=reading_pair(reading)[0]), status
+    return render_template("electricity/correct.html", reading=reading, values=values, preview=preview, revisions=revisions, previous=reading_pair(reading)[0], photo_locked=meter_photo_locked(reading)), status
 
 
 @bp.get("/bills")

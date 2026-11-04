@@ -6,7 +6,7 @@
   <h2>Ảnh công tơ điện · kỳ {{ reading.period }}</h2>
   <p class="text-muted small">Có thể bổ sung ảnh cho kỳ này mà không cần thay đổi chỉ số điện.</p>
   {% include 'electricity/photo_widget.html' %}
-  <noscript>{{ photo_upload('electricity', reading.id) }}</noscript>
+  {% if not photo_locked %}<noscript>{{ photo_upload('electricity', reading.id) }}</noscript>{% endif %}
 </section>
 <section class="card narrow"><form method="post" enctype="multipart/form-data" class="stack d-grid">
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="stamp" value="{{ values.get('stamp', '') }}">

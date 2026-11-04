@@ -1,12 +1,15 @@
 import os
 from datetime import datetime
 from io import BytesIO
+from pathlib import Path
 from unittest.mock import patch
 
 from PIL import Image
+from sqlalchemy.exc import IntegrityError
 
 from app.extensions import db
-from app.models import ElectricityReading, Photo, Room
+from app import create_app
+from app.models import ElectricityReading, MonthlyBill, Photo, Room
 from app.services.photos import cleanup_temporary, photo_path, photo_root, process_pending
 from app.services.billing import reading_stamp
 from test_v1 import AppTestCase
@@ -122,11 +125,13 @@ class PhotoTests(AppTestCase):
         self.assertEqual(self.client.post(path, data=data).status_code, 302)
         self.assertEqual(reading.end_value, 20)
         self.assertEqual(len(reading.photos), 1)
+        process_pending()
+        reading = db.session.get(ElectricityReading, reading.id)
         data.update(end_value="30", stamp=reading_stamp(reading))
         data["csrf_token"] = self.token()
         self.assertEqual(self.client.post(path, data={**data, "photo": self.image_upload()}).status_code, 302)
         self.assertEqual(reading.end_value, 30)
-        self.assertEqual(len(reading.photos), 2)
+        self.assertEqual(len(reading.photos), 1)
 
     def test_worker_failure_reupload_crash_recovery_and_orphan_cleanup(self):
         room = self.room()
@@ -217,7 +222,7 @@ class PhotoTests(AppTestCase):
         process_pending()
         response = self.client.get(f'/photos/status?ids={photo_id}')
         self.assertEqual(response.json['photos'][0]['status'], 'ready')
-        self.assertEqual(response.json['photos'][0]['url'], f'/photos/{photo_id}')
+        self.assertTrue(response.json['photos'][0]['url'].startswith(f'/photos/{photo_id}?v='))
         self.assertEqual(self.client.get('/photos/status?ids=bad').status_code, 400)
         self.assertEqual(self.client.get('/photos/status?ids=' + ','.join(['1'] * 101)).status_code, 400)
         self.assertEqual(self.client.get('/photos/status?ids=' + '1' * 1000).status_code, 400)
@@ -240,6 +245,103 @@ class PhotoTests(AppTestCase):
         response = self.client.post(f'/photos/electricity/{other_reading.id}', data={"photo": self.image_upload(), "upload_token": token, "csrf_token": self.token()}, headers={"X-Photo-Upload": "1"})
         self.assertEqual(response.status_code, 409)
         self.assertEqual(db.session.query(Photo).count(), 1)
+
+    def test_replacement_keeps_one_record_preserves_old_on_failure_then_deletes_it(self):
+        room = self.room()
+        self.submit_meter(room, self.image_upload())
+        process_pending()
+        photo = db.session.scalar(db.select(Photo))
+        photo_id, reading_id, old_path = photo.id, photo.reading_id, photo_path(photo)
+        path = f'/photos/electricity/{reading_id}'
+        # Invalid input does not change the old record/file.
+        self.post(path, {'photo': (BytesIO(b'bad'), 'bad.jpg')})
+        self.assertEqual(db.session.get(Photo, photo_id).status, 'ready')
+        self.assertTrue(old_path.exists())
+        self.post(path, {'photo': self.image_upload()})
+        photo = db.session.get(Photo, photo_id)
+        self.assertEqual(db.session.query(Photo).count(), 1)
+        self.assertTrue(old_path.exists())
+        response = self.client.get(f'/photos/{photo_id}')
+        self.assertEqual(response.status_code, 200)
+        response.close()
+        # A second replacement is rejected while compression is pending.
+        response = self.client.post(path, data={'photo': self.image_upload(), 'upload_token': 'd' * 32, 'csrf_token': self.token()}, headers={'X-Photo-Upload': '1'})
+        self.assertEqual(response.status_code, 400)
+        with self.assertLogs(self.app.logger, level='ERROR'), patch('PIL.Image.Image.save', side_effect=OSError('test failure')):
+            process_pending()
+        photo = db.session.get(Photo, photo_id)
+        self.assertEqual(photo.status, 'failed')
+        self.assertIsNotNone(photo.previous_token)
+        self.assertTrue(old_path.exists())
+        self.post(path, {'photo': self.image_upload()})
+        process_pending()
+        photo = db.session.get(Photo, photo_id)
+        self.assertEqual(photo.status, 'ready')
+        self.assertIsNone(photo.previous_token)
+        self.assertFalse(old_path.exists())
+        self.assertTrue(photo_path(photo).exists())
+        self.assertEqual(db.session.query(Photo).count(), 1)
+
+    def test_active_bill_freezes_photo_for_root_and_admin_and_pending_blocks_billing(self):
+        room = self.room(status='occupied', tenant_name='Test tenant')
+        self.submit_meter(room, self.image_upload())
+        reading = db.session.scalar(db.select(ElectricityReading))
+        reading_id = reading.id
+        tenant = room.current_tenancy
+        bill_data = {'action': 'confirm', 'period': reading.period, 'tenancy_id': str(tenant.id), 'tenancy_version': str(tenant.version),
+                     'stamp': reading_stamp(reading), 'rent_price': '3000000', 'water_price': '100000', 'service_price': '150000',
+                     'electricity_price': '4000', 'people_count': '1', 'payment_day': '31'}
+        self.assertEqual(self.post(f'/rooms/{room.id}/bill', bill_data).status_code, 400)
+        process_pending()
+        self.assertEqual(self.post(f'/rooms/{room.id}/bill', bill_data).status_code, 302)
+        photo = db.session.scalar(db.select(Photo))
+        token, photo_id = photo.token, photo.id
+        for username, password in (('root', 'RootTest123!'), ('manager', 'AdminTest123!')):
+            self.login(username, password)
+            response = self.client.post(f'/photos/electricity/{reading_id}', data={'photo': self.image_upload(), 'upload_token': 'e' * 32, 'csrf_token': self.token()}, headers={'X-Photo-Upload': '1'})
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(db.session.get(Photo, photo_id).token, token)
+        html = self.client.get('/electricity/?period=2026-01').get_data(as_text=True)
+        self.assertNotIn('name="photo_' + str(room.id) + '"', html)
+        self.assertIn('meter-photo-widget', html)
+        # Cancelling the effective bill unlocks the image; an ordinary receipt is not required to freeze it.
+        bill = db.session.scalar(db.select(MonthlyBill))
+        bill.cancelled_at = datetime.now()
+        db.session.commit()
+        response = self.client.post(f'/photos/electricity/{reading_id}', data={'photo': self.image_upload(), 'upload_token': 'f' * 32, 'csrf_token': self.token()}, headers={'X-Photo-Upload': '1'})
+        self.assertEqual(response.status_code, 200)
+
+    def test_migration_reduces_legacy_duplicates_and_database_enforces_single_photo(self):
+        app = create_app({'TESTING': True, 'SECRET_KEY': 'migration-test-only',
+                          'SQLALCHEMY_DATABASE_URI': 'sqlite:///' + (Path(self.temp.name) / 'old-photos.sqlite3').as_posix()})
+        with app.app_context():
+            try:
+                result = app.test_cli_runner().invoke(args=['db', 'upgrade', 'f13a98c52b70'])
+                self.assertEqual(result.exit_code, 0, result.output)
+                from app.models import User
+                user = User(username='test', password_hash='unused-test-hash')
+                room = Room(code='OLD')
+                db.session.add_all([user, room])
+                db.session.flush()
+                reading = ElectricityReading(room_id=room.id, period='2026-01', start_value=0, end_value=1, created_by=user.id)
+                db.session.add(reading)
+                db.session.flush()
+                for index, state in enumerate(('ready', 'ready', 'pending')):
+                    db.session.execute(db.text('INSERT INTO photo (token,reading_id,status,created_by,created_at) VALUES (:token,:reading,:status,:user,:created)'),
+                                       {'token': str(index) * 32, 'reading': reading.id, 'status': state, 'user': user.id, 'created': datetime.now()})
+                db.session.commit()
+                result = app.test_cli_runner().invoke(args=['db', 'upgrade'])
+                self.assertEqual(result.exit_code, 0, result.output)
+                photos = db.session.scalars(db.select(Photo)).all()
+                self.assertEqual(len(photos), 1)
+                self.assertEqual(photos[0].token, '1' * 32)
+                with self.assertRaises(IntegrityError):
+                    db.session.execute(db.text('INSERT INTO photo (token,reading_id,status,created_by,created_at) VALUES (:token,:reading,:status,:user,:created)'),
+                                       {'token': 'x' * 32, 'reading': reading.id, 'status': 'ready', 'user': user.id, 'created': datetime.now()})
+                db.session.rollback()
+            finally:
+                db.session.remove()
+                db.engine.dispose()
 
     def test_meter_photo_upload_is_available_on_electricity_page_without_changing_reading(self):
         room = self.room()

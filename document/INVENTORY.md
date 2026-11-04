@@ -105,6 +105,7 @@ migrations/env.py
 migrations/script.py.mako
 migrations/versions/0fecdf9f864b_monthly_bills_and_reading_revisions.py
 migrations/versions/41eb1b88b816_full_payment_receipts.py
+migrations/versions/a24d09e86c31_single_meter_photo.py
 migrations/versions/a65b2f9c018e_deposit_and_unified_start.py
 migrations/versions/b71c430e92ad_tenancy_rent.py
 migrations/versions/c83e4d16b2a0_tenancy_electricity_price.py
@@ -125,4 +126,4 @@ tests/test_v1.py
 wsgi.py
 ```
 
-Tổng: 116 file (bao gồm file danh mục này).
+Tổng: 117 file (bao gồm file danh mục này).

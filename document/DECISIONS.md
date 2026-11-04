@@ -1,5 +1,11 @@
 # Quyết định và vấn đề cần chốt
 
+## 2026-11-04 — Một ảnh công tơ và khóa theo phiếu (V1.4.2)
+
+- Theo yêu cầu mới, mỗi ElectricityReading có tối đa một Photo ở DB, thay ảnh dùng cùng ID; ảnh hợp đồng không đổi. Thay thế chỉ xóa file cũ khi bản mới nén thành công, lỗi giữ ảnh cũ để không mất chứng cứ hiện tại. File fallback tạm không phải ảnh thứ hai có thể sửa trong UI.
+- Phiếu tiền hiệu lực cùng phòng/kỳ khóa thêm/thay ảnh cho mọi vai trò; hủy hiệu lực phiếu theo quyền root hiện có thì có thể sửa lại. Không cần chờ ghi nhận thu đủ mới khóa. Chốt phiếu từ chối trong lúc ảnh pending để tránh nền thay ảnh sau chốt.
+- Migration unique reading_id gộp nhóm trùng: ready mới nhất, nếu chưa ready thì job mới nhất. Backup cả DB/uploads trước nâng cấp, giữ file thừa trong backup; worker dọn file không còn tham chiếu sau 1 giờ. Không xóa số điện hoặc phiếu tiền.
+
 ## 2026-11-04 — Ảnh điện tùy chọn và upload tại bảng (V1.4.0)
 
 - Theo yêu cầu mới, thay quy tắc V1.3.0: ảnh chốt/sửa điện không bắt buộc, cho bổ sung sau. File đã chọn phải hợp lệ; lưu số kèm ảnh là một giao dịch, upload bổ sung không thay chỉ số.

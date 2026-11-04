@@ -1,5 +1,7 @@
 # Kiến trúc hiện tại
 
+V1.4.2: Photo có unique reading_id và previous_token. stage_photo dùng lại record điện khi thay ảnh, kiểm tra active MonthlyBill và không thay khi pending. Worker chỉ xóa file cũ sau commit ready, fallback ảnh cũ khi failed; dọn output không còn tham chiếu sau 1 giờ để khôi phục crash. Chốt tiền và upload cùng khóa ghi SQLite; chốt phiếu bị chặn khi ảnh pending. Widget chỉ đọc khi phiếu hiệu lực, AJAX thay toàn bộ wrapper ảnh để không nhân đôi thumbnail. Migration a24d09e86c31 gộp ảnh điện trùng, giữ ảnh hợp đồng.
+
 V1.4.0: ảnh điện tùy chọn tại service chốt/sửa. meter-photos.js quản lý File/preview local, XHR upload tiến độ byte, cập nhật các hàng đã lưu từ HTML trả trong JSON và polling /photos/status theo lô. Form thường vẫn hoạt động. Token upload dùng Photo.token hiện có và khóa ghi SQLite để retry bổ sung ảnh không tạo trùng. Thumbnail dùng WebP đã nén/lazy-loading, modal Bootstrap dùng chung; CSP img-src thêm blob: cho preview. Giữ hàng chưa gửi, không đưa file hàng chưa nhập số vào request. Không đổi schema/worker.
 
 V1.3.3: ảnh công tơ được bổ sung ở màn billing.correct, tách form upload khỏi form sửa số. Route photos.add với electricity redirect về reading tương ứng; bảng điện dẫn tới mục meter-photos. Chi tiết phòng giữ xem ảnh lịch sử nhưng không còn form tải ảnh điện. Không đổi model/hàng đợi hoặc quy tắc bắt buộc ảnh khi xác nhận sửa số.

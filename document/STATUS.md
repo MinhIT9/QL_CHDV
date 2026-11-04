@@ -1,6 +1,10 @@
 # Tiến độ thực tế
 
-Cập nhật: 2026-11-04 (Asia/Saigon). Phiên bản hội thoại: V1.4.0.
+Cập nhật: 2026-11-04 (Asia/Saigon). Phiên bản hội thoại: V1.4.2.
+
+V1.4.2: giới hạn một Photo/ID chốt điện bằng unique DB; lưu ảnh mới thay cùng record, giữ fallback trong lúc nén/lỗi, xóa file cũ sau ready. Phiếu tiền hiệu lực khóa thêm/thay cho Root/Admin, ẩn upload; pending chặn chốt phiếu. 64 tests, 16 test ảnh bổ sung và Edge thay/khóa thumbnail đạt; Node/db check/integrity đạt. Đã backup DB+ảnh rồi migrate dev a24d09e86c31, dữ liệu nghiệp vụ khớp backup; ảnh trùng giữ ready mới nhất. Worker dev khởi động lại PID 4220. Chưa cập nhật VPS hoặc test đồng thời trên VPS. Inventory/diff đạt.
+
+V1.4.1: xử lý ảnh dev bị chờ do chưa có worker giữ khóa: job 1 từ pending → ready sau process-photos --once, đã có WebP và xóa gốc tạm. Khởi động worker nền ẩn dev PID 4532, kiểm tra còn chạy/stderr rỗng. Không đổi code/DB schema/VPS, không chạy lại suite; kiểm tra trực tiếp trạng thái/file và inventory/diff. Worker cần chạy lại sau khi bị dừng hoặc reboot máy.
 
 V1.4.0: đã hiện thực ảnh điện tùy chọn khi chốt/sửa; drop/chọn chỉ preview local, lưu mới upload. Bảng có Lưu ảnh cho kỳ đã chốt, tiến độ byte 0–100 tách bước nén, polling theo lô tự cập nhật thumbnail; popup Bootstrap xem ảnh, không reload/mất ảnh chờ hàng khác. Retry bổ sung cùng token không tạo trùng, giữ quyền/CSRF và worker xóa gốc tạm; form thường có fallback khi tắt JS. 61 test Python đạt, 13 test ảnh đạt sau assertion bổ sung, Edge headless với dữ liệu tạm đạt luồng chính/drop/popup/no reload. Node/db check/inventory/diff đạt. Không migration/đổi dữ liệu dev; chưa cập nhật VPS, chưa thử mạng chậm/điện thoại thật. Xem PHOTOS.md.
 

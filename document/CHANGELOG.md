@@ -2,6 +2,10 @@
 
 ## 2026-11-04
 
+- V1.4.2: mỗi ID chốt điện một ảnh, lưu ảnh mới thay cũ sau nén thành công và giữ fallback khi lỗi. Khóa ảnh theo phiếu tiền hiệu lực cho mọi vai trò, chặn chốt phiếu lúc pending; thêm unique/migration gộp ảnh cũ trùng. Backup/migrate dev và restart worker, 64 tests/Edge QA đạt; chưa cập nhật VPS.
+
+- V1.4.1: xử lý ảnh dev đang pending bằng worker, xác nhận WebP/gốc tạm; khởi động worker nền dev cho các upload tiếp theo, không thay code hoặc VPS.
+
 - V1.4.0: bỏ bắt buộc ảnh điện; thêm drop/preview chờ lưu, progress upload, polling thumbnail/modal ngay trong bảng và upload bổ sung không đổi số. Chống retry trùng ảnh, giữ hàng chưa lưu. 61 tests và Edge QA dữ liệu tạm đạt; không migration, chưa cập nhật VPS.
 
 - V1.3.13: phân tích luồng ảnh điện tùy chọn, kéo thả chờ lưu, tiến độ upload và thumbnail/modal tự cập nhật; thêm đề xuất, chưa triển khai code theo yêu cầu.

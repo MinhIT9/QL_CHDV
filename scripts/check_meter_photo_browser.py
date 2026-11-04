@@ -6,6 +6,7 @@ import sys
 import tempfile
 import threading
 from io import BytesIO
+from datetime import date
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -16,7 +17,7 @@ from werkzeug.serving import make_server
 
 from app import create_app
 from app.extensions import db
-from app.models import ElectricityReading, Photo, Room, User
+from app.models import ElectricityReading, MonthlyBill, Photo, Room, Tenancy, User
 from app.services.photos import process_pending
 
 
@@ -107,7 +108,30 @@ def main():
                     assert db.session.query(Photo).count() == 2
                     process_pending()
                 second.locator('.saved-photos img').wait_for(timeout=15000)
+                first.locator('input[type=file]').set_input_files(payload)
+                first.locator('.photo-save').click()
+                first.locator('[data-photo-pending]').wait_for()
+                assert first.locator('.saved-photos img').count() == 1
+                with app.app_context():
+                    assert db.session.query(Photo).count() == 2
+                    process_pending()
+                first.locator('[data-photo-pending]').wait_for(state='detached', timeout=15000)
+                assert first.locator('.saved-photos img').count() == 1
                 assert page.locator('#electricity-form button[type=submit]').is_disabled()
+                with app.app_context():
+                    reading = db.session.scalar(db.select(ElectricityReading).order_by(ElectricityReading.id))
+                    tenant = Tenancy(room_id=reading.room_id, tenant_name='Browser fixture')
+                    db.session.add(tenant)
+                    db.session.flush()
+                    db.session.add(MonthlyBill(room_id=reading.room_id, tenancy_id=tenant.id, period=reading.period,
+                        tenant_name=tenant.tenant_name, room_code='T101', start_value=0, end_value=10,
+                        rent_price=0, water_price=0, service_price=0, electricity_price=0, people_count=1,
+                        due_date=date(2026, 1, 31), created_by=reading.created_by))
+                    db.session.commit()
+                page.goto(base + '/electricity/?period=2026-01')
+                assert first.locator('input[type=file]').count() == 0
+                assert first.locator('.saved-photos img').count() == 1
+                assert second.locator('input[type=file]').count() == 1
                 assert not errors, errors
                 browser.close()
                 print('Browser checks passed: deferred selection/drop, optional save, preserved other row, async thumbnail, modal/Escape, no reload or JS errors.')

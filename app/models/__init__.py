@@ -166,6 +166,7 @@ class ElectricityReading(db.Model):
 class Photo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     token = db.Column(db.String(32), unique=True, nullable=False)
+    previous_token = db.Column(db.String(32))
     tenancy_id = db.Column(db.Integer, db.ForeignKey("tenancy.id", ondelete="RESTRICT"))
     reading_id = db.Column(db.Integer, db.ForeignKey("electricity_reading.id", ondelete="RESTRICT"))
     status = db.Column(db.String(16), nullable=False, default="pending")
@@ -174,9 +175,14 @@ class Photo(db.Model):
     tenancy = db.relationship("Tenancy", back_populates="photos")
     reading = db.relationship("ElectricityReading", back_populates="photos")
     __table_args__ = (
+        db.Index("uq_photo_reading", "reading_id", unique=True),
         db.CheckConstraint("(tenancy_id IS NOT NULL AND reading_id IS NULL) OR (tenancy_id IS NULL AND reading_id IS NOT NULL)", name="ck_photo_owner"),
         db.CheckConstraint("status IN ('pending', 'ready', 'failed')", name="ck_photo_status"),
     )
+
+    @property
+    def display_token(self):
+        return self.token if self.status == "ready" else self.previous_token
 
 
 class ReadingRevision(db.Model):

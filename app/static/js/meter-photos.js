@@ -57,12 +57,16 @@
     xhr.send(data);
   });
   const pending = (photo) => {
-    if (photo.status === "ready") return thumbnail(photo.url);
+    const item = document.createElement("span");
+    item.dataset.photoItem = photo.id;
+    if (photo.url) item.append(thumbnail(photo.url));
+    if (photo.status === "ready") return item;
     const span = document.createElement("span");
     span.className = `badge text-bg-${photo.status === "failed" ? "danger" : "secondary"}`;
     span.textContent = photo.status === "failed" ? "Xử lý lỗi · chọn lại ảnh để tải lại" : "Đã tải lên · đang xử lý…";
     if (photo.status === "pending") span.dataset.photoPending = photo.id;
-    return span;
+    item.append(span);
+    return item;
   };
   let polling = false;
   async function poll() {
@@ -76,7 +80,7 @@
       const result = await response.json();
       for (const node of nodes) {
         const photo = result.photos.find(item => String(item.id) === node.dataset.photoPending);
-        if (photo && photo.status !== "pending") node.replaceWith(pending(photo));
+        if (photo && photo.status !== "pending") (node.closest("[data-photo-item]") || node).replaceWith(pending(photo));
         else {
           node.dataset.pollCount = Number(node.dataset.pollCount || 0) + 1;
           if (Number(node.dataset.pollCount) >= 30) {
@@ -111,13 +115,13 @@
     if (["Enter", " "].includes(event.key) && event.target.matches("[data-photo-pending][data-paused]")) { event.preventDefault(); event.target.click(); }
   });
   window.addEventListener("beforeunload", event => {
-    if ([...document.querySelectorAll(".meter-photo-widget")].some(widget => widget.busy || widget.querySelector("input[type=file]").files.length)) {
+    if ([...document.querySelectorAll(".meter-photo-widget")].some(widget => widget.busy || widget.querySelector("input[type=file]")?.files.length)) {
       event.preventDefault(); event.returnValue = "";
     }
   });
   document.addEventListener("htmx:beforeRequest", event => {
     if (!event.detail.elt.closest("a")) return;
-    const dirty = [...document.querySelectorAll(".meter-photo-widget")].some(widget => widget.busy || widget.querySelector("input[type=file]").files.length);
+    const dirty = [...document.querySelectorAll(".meter-photo-widget")].some(widget => widget.busy || widget.querySelector("input[type=file]")?.files.length);
     if (dirty && !window.confirm("Có ảnh chưa lưu hoặc đang tải. Bạn muốn rời trang?")) event.preventDefault();
   });
   document.addEventListener("htmx:beforeCleanupElement", event => {
@@ -127,6 +131,7 @@
     document.querySelectorAll(".meter-photo-widget:not([data-bound])").forEach(widget => {
       widget.dataset.bound = "1";
       const input = widget.querySelector("input[type=file]");
+      if (!input) return;
       input.addEventListener("change", () => select(widget, input.files[0]));
       const drop = widget.querySelector(".photo-drop");
       drop.addEventListener("keydown", event => { if (event.target === drop && ["Enter", " "].includes(event.key)) { event.preventDefault(); input.click(); } });
@@ -153,7 +158,8 @@
           });
           const list = widget.querySelector(".saved-photos");
           if (!list.querySelector(".photo-open,[data-photo-pending]")) list.replaceChildren();
-          list.append(pending(result.photo)); clear(widget); message(widget, "Đã nhận ảnh."); poll();
+          list.replaceChildren(pending(result.photo)); clear(widget); message(widget, "Đã nhận ảnh."); poll();
+          widget.querySelector(".photo-save").textContent = "Lưu ảnh thay thế";
         } catch (error) { message(widget, error.message); }
         finally { widget.busy = false; input.disabled = false; bar.hidden = true; }
       });

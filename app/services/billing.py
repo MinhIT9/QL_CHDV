@@ -3,7 +3,7 @@ import hashlib
 from datetime import date
 
 from app.extensions import db
-from app.models import ElectricityReading, MonthlyBill, ReadingRevision, utcnow
+from app.models import ElectricityReading, MonthlyBill, Photo, ReadingRevision, utcnow
 from app.services.contracts import parse_integer
 from app.services.electricity import current_period, integer_reading, valid_period
 from app.services.photos import stage_photo, upload_batch
@@ -84,6 +84,8 @@ def bill_values(room, period, data, user_id, save=False):
     reading = db.session.scalar(db.select(ElectricityReading).where(ElectricityReading.room_id == room.id, ElectricityReading.period == period))
     if not reading:
         raise ValueError("Cần lưu số điện của kỳ này trước khi chốt tiền.")
+    if save and db.session.scalar(db.select(Photo.id).where(Photo.reading_id == reading.id, Photo.status == "pending")):
+        raise ValueError("Ảnh công tơ đang xử lý. Chờ hoàn tất trước khi chốt phiếu tiền.")
     if data.get("tenancy_id") != str(tenant.id) or data.get("tenancy_version") != str(tenant.version) or data.get("stamp") != reading_stamp(reading):
         raise ValueError("Thông tin khách hoặc số điện đã thay đổi. Hãy tải lại và xem trước.")
     if db.session.scalar(db.select(MonthlyBill.id).where(MonthlyBill.room_id == room.id, MonthlyBill.period == period, MonthlyBill.cancelled_at.is_(None))):
