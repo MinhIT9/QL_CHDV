@@ -1,6 +1,6 @@
 # Mô hình dữ liệu V1
 
-Đã triển khai tại app/models/__init__.py; migration mới nhất b35e10f97d42 (số tiền thu cuối cùng).
+Đã triển khai tại app/models/__init__.py; migration mới nhất c46f21a08e53 (cấu hình nhận tiền).
 
 ## Điều chỉnh tổng phiếu — V1.5.0
 
@@ -69,3 +69,7 @@ ElectricityReading.electricity_price nullable là giá chụp lúc lưu số m�
 - Partial unique index một phiếu hiệu lực/phòng/kỳ. Tổng tính từ snapshot, không từ Tenancy hiện tại; không cộng cọc. Chưa có Payment hoặc phân bổ thu tiền.
 - Điện và tiền phòng cùng tháng, chỉ một đợt thuê đủ tháng. Xác định khách qua contract_start/move_out_date, không tự lấy khách mới cho tháng cũ.
 - Ghi SQLite dùng BEGIN IMMEDIATE; kiểm tra stamp chỉ số liên quan và tenancy ID/version trước khi lưu. Hủy phiếu cần root; phiếu hiệu lực chặn sửa điện các kỳ liên quan.
+
+## PaymentSettings — V1.6.0
+
+Bản ghi chung id=1: bank_name(100), account_number(50), account_name(150), note(300), qr_token(32, nullable). Ảnh PNG riêng ở uploads/payment, không blob trong DB. Thông tin hiện tại không thay đổi giá/tổng/Receipt của phiếu cũ.

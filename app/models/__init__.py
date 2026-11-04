@@ -276,5 +276,14 @@ db.Index("uq_active_receipt", Receipt.bill_id, unique=True,
          sqlite_where=Receipt.reversed_at.is_(None), postgresql_where=Receipt.reversed_at.is_(None))
 
 
+class PaymentSettings(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    bank_name = db.Column(db.String(100), nullable=False)
+    account_number = db.Column(db.String(50), nullable=False)
+    account_name = db.Column(db.String(150), nullable=False)
+    note = db.Column(db.String(300), nullable=False)
+    qr_token = db.Column(db.String(32))
+
+
 db.Index("uq_active_bill", MonthlyBill.room_id, MonthlyBill.period, unique=True,
          sqlite_where=MonthlyBill.cancelled_at.is_(None), postgresql_where=MonthlyBill.cancelled_at.is_(None))

@@ -82,3 +82,7 @@ Restore DB/uploads tương ứng khi web/worker dừng, cấp owner chdv và quy
 
 - Pillow WebP/metadata: https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html
 - Pillow security: https://pillow.readthedocs.io/en/stable/handbook/security.html
+
+## V1.6.0 — QR nhận tiền
+
+Cấu hình /settings/payment dành cho root/Admin; service payment_settings lưu DB và ảnh riêng dưới uploads/payment. Route ảnh yêu cầu đăng nhập. Thay ảnh lưu file mới trước commit, dọn file cũ sau commit; khi lỗi commit xóa file mới. QR PNG lossless để giữ cạnh mã; không qua worker ảnh điện. Phiếu chưa thu hiển thị QR cạnh tài khoản, phiếu đã thu/hủy ẩn chuyển khoản. Không sinh QR hoặc tự xác minh dữ liệu ngân hàng từ ảnh. Backup cả DB và uploads; migration c46f21a08e53.

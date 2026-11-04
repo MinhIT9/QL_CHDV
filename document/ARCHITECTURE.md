@@ -76,3 +76,7 @@ Thiết kế chia sẻ nằm trong app/static/css/app.css và shell base.html, i
 ## Module chốt tiền V1.1.9
 
 app/services/billing.py xử lý sửa điện và snapshot phiếu; app/electricity/billing_routes.py cung cấp route correction, danh sách/tạo/hủy phiếu. Template billing/ và electricity/correct.html dùng layout hiện có. Không thêm framework/dependency; chỉ thêm 2 bảng. Nháp là form preview, chưa có state nháp dài hạn hoặc engine lịch giá.
+
+## V1.6.0 — QR nhận tiền
+
+Cấu hình /settings/payment dành cho root/Admin; service payment_settings lưu DB và ảnh riêng dưới uploads/payment. Route ảnh yêu cầu đăng nhập. Thay ảnh lưu file mới trước commit, dọn file cũ sau commit; khi lỗi commit xóa file mới. QR PNG lossless để giữ cạnh mã; không qua worker ảnh điện. Phiếu chưa thu hiển thị QR cạnh tài khoản, phiếu đã thu/hủy ẩn chuyển khoản. Không sinh QR hoặc tự xác minh dữ liệu ngân hàng từ ảnh. Backup cả DB và uploads; migration c46f21a08e53.

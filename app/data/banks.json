@@ -1,0 +1,242 @@
+[
+  {
+    "bin": "970425",
+    "name": "Ngân hàng TMCP An Bình",
+    "short_name": "ABBANK"
+  },
+  {
+    "bin": "970416",
+    "name": "Ngân hàng TMCP Á Châu",
+    "short_name": "ACB"
+  },
+  {
+    "bin": "970405",
+    "name": "Ngân hàng Nông nghiệp và Phát triển Nông thôn Việt Nam",
+    "short_name": "Agribank"
+  },
+  {
+    "bin": "970409",
+    "name": "Ngân hàng TMCP Bắc Á",
+    "short_name": "BacABank"
+  },
+  {
+    "bin": "970438",
+    "name": "Ngân hàng TMCP Bảo Việt",
+    "short_name": "BaoVietBank"
+  },
+  {
+    "bin": "970418",
+    "name": "Ngân hàng TMCP Đầu tư và Phát triển Việt Nam",
+    "short_name": "BIDV"
+  },
+  {
+    "bin": "546034",
+    "name": "TMCP Việt Nam Thịnh Vượng - Ngân hàng số CAKE by VPBank",
+    "short_name": "CAKE"
+  },
+  {
+    "bin": "970444",
+    "name": "Ngân hàng Thương mại trách nhiệm hữu hạn một thành viên Ngoại thương Công nghệ số (Vietcombank Neo Limited)",
+    "short_name": "CBBank"
+  },
+  {
+    "bin": "422589",
+    "name": "Ngân hàng TNHH MTV CIMB Việt Nam",
+    "short_name": "CIMB"
+  },
+  {
+    "bin": "970446",
+    "name": "Ngân hàng Hợp tác xã Việt Nam",
+    "short_name": "COOPBANK"
+  },
+  {
+    "bin": "970431",
+    "name": "Ngân hàng TMCP Xuất Nhập khẩu Việt Nam",
+    "short_name": "Eximbank"
+  },
+  {
+    "bin": "970437",
+    "name": "Ngân hàng TMCP Phát triển Thành phố Hồ Chí Minh",
+    "short_name": "HDBank"
+  },
+  {
+    "bin": "970434",
+    "name": "Ngân hàng TNHH Indovina",
+    "short_name": "IndovinaBank"
+  },
+  {
+    "bin": "668888",
+    "name": "Ngân hàng Đại chúng TNHH Kasikornbank",
+    "short_name": "KBank"
+  },
+  {
+    "bin": "970452",
+    "name": "Ngân hàng TMCP Kiên Long",
+    "short_name": "KienLongBank"
+  },
+  {
+    "bin": "970463",
+    "name": "Ngân hàng Kookmin - Chi nhánh Thành phố Hồ Chí Minh",
+    "short_name": "KookminHCM"
+  },
+  {
+    "bin": "970462",
+    "name": "Ngân hàng Kookmin - Chi nhánh Hà Nội",
+    "short_name": "KookminHN"
+  },
+  {
+    "bin": "970449",
+    "name": "Ngân hàng TMCP Lộc Phát Việt Nam",
+    "short_name": "LPBank"
+  },
+  {
+    "bin": "970422",
+    "name": "Ngân hàng TMCP Quân đội",
+    "short_name": "MBBank"
+  },
+  {
+    "bin": "970414",
+    "name": "Ngân hàng TNHH MTV Việt Nam Hiện Đại",
+    "short_name": "MBV"
+  },
+  {
+    "bin": "971025",
+    "name": "CTCP Dịch Vụ Di Động Trực Tuyến",
+    "short_name": "MoMo"
+  },
+  {
+    "bin": "970426",
+    "name": "Ngân hàng TMCP Hàng Hải",
+    "short_name": "MSB"
+  },
+  {
+    "bin": "971032",
+    "name": "Trung tâm Dịch vụ số Mobifone – Chi nhánh Tổng Công ty viễn thông Mobifone",
+    "short_name": "MVAS"
+  },
+  {
+    "bin": "970428",
+    "name": "Ngân hàng TMCP Nam Á",
+    "short_name": "NamABank"
+  },
+  {
+    "bin": "970419",
+    "name": "Ngân hàng TMCP Quốc Dân",
+    "short_name": "NCB"
+  },
+  {
+    "bin": "970448",
+    "name": "Ngân hàng TMCP Phương Đông",
+    "short_name": "OCB"
+  },
+  {
+    "bin": "970430",
+    "name": "Ngân hàng TMCP Thịnh vượng và Phát triển",
+    "short_name": "PGBank"
+  },
+  {
+    "bin": "970412",
+    "name": "Ngân hàng TMCP Đại Chúng Việt Nam",
+    "short_name": "PVcomBank"
+  },
+  {
+    "bin": "971133",
+    "name": "Ngân hàng số PVcomBank",
+    "short_name": "PVcomBank Pay"
+  },
+  {
+    "bin": "970403",
+    "name": "Ngân hàng TMCP Sài Gòn Tài Lộc",
+    "short_name": "Sacombank"
+  },
+  {
+    "bin": "970400",
+    "name": "Ngân hàng TMCP Sài Gòn Công Thương",
+    "short_name": "SaigonBank"
+  },
+  {
+    "bin": "970429",
+    "name": "Ngân hàng TMCP Sài Gòn",
+    "short_name": "SCB"
+  },
+  {
+    "bin": "970440",
+    "name": "Ngân hàng TMCP Đông Nam Á",
+    "short_name": "SeABank"
+  },
+  {
+    "bin": "970443",
+    "name": "Ngân hàng TMCP Sài Gòn - Hà Nội",
+    "short_name": "SHB"
+  },
+  {
+    "bin": "970424",
+    "name": "Ngân hàng TNHH MTV Shinhan Việt Nam",
+    "short_name": "ShinhanBank"
+  },
+  {
+    "bin": "970407",
+    "name": "Ngân hàng TMCP Kỹ thương Việt Nam",
+    "short_name": "Techcombank"
+  },
+  {
+    "bin": "963388",
+    "name": "Ngân hàng số Timo by Ban Viet Bank (Timo by Ban Viet Bank)",
+    "short_name": "Timo"
+  },
+  {
+    "bin": "970423",
+    "name": "Ngân hàng TMCP Tiên Phong",
+    "short_name": "TPBank"
+  },
+  {
+    "bin": "546035",
+    "name": "TMCP Việt Nam Thịnh Vượng - Ngân hàng số Ubank by VPBank",
+    "short_name": "Ubank"
+  },
+  {
+    "bin": "970441",
+    "name": "Ngân hàng TMCP Quốc tế Việt Nam",
+    "short_name": "VIB"
+  },
+  {
+    "bin": "970427",
+    "name": "Ngân hàng TMCP Việt Á",
+    "short_name": "VietABank"
+  },
+  {
+    "bin": "970433",
+    "name": "Ngân hàng TMCP Việt Nam Thương Tín",
+    "short_name": "VietBank"
+  },
+  {
+    "bin": "970454",
+    "name": "Ngân hàng TMCP Bản Việt",
+    "short_name": "VietCapitalBank"
+  },
+  {
+    "bin": "970436",
+    "name": "Ngân hàng TMCP Ngoại Thương Việt Nam",
+    "short_name": "Vietcombank"
+  },
+  {
+    "bin": "970415",
+    "name": "Ngân hàng TMCP Công thương Việt Nam",
+    "short_name": "VietinBank"
+  },
+  {
+    "bin": "970432",
+    "name": "Ngân hàng TMCP Việt Nam Thịnh Vượng",
+    "short_name": "VPBank"
+  },
+  {
+    "bin": "970457",
+    "name": "Ngân hàng TNHH MTV Woori Việt Nam",
+    "short_name": "Woori"
+  },
+  {
+    "bin": "971101",
+    "name": "Ví điện tử ZaloPay",
+    "short_name": "ZaloPay"
+  }
+]

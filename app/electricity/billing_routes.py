@@ -10,6 +10,7 @@ from sqlalchemy.orm import selectinload
 from app.services.billing import amount_in_words, bill_tenancy, bill_values, correction, lock_writes, reading_pair, reading_stamp
 from app.services.electricity import current_period, valid_period
 from app.services.photos import meter_photo_locked
+from app.services.payment_settings import payment_settings
 
 bp = Blueprint("billing", __name__)
 WRITE_ERRORS = (ValueError, IntegrityError, OperationalError, OSError)
@@ -67,7 +68,7 @@ def index():
 def detail(bill_id):
     bill = db.get_or_404(MonthlyBill, bill_id)
     return render_template("billing/detail.html", bill=bill, receipt=bill.paid_receipt,
-                           amount_words=amount_in_words(bill.total))
+                           amount_words=amount_in_words(bill.total), payment=payment_settings())
 
 
 @bp.route("/rooms/<int:room_id>/bill", methods=["GET", "POST"])

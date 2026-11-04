@@ -55,6 +55,8 @@ def create_app(test_config=None):
     from app.services.photos import register_commands
     app.register_blueprint(photos_bp)
     register_commands(app)
+    from app.payment import bp as payment_bp
+    app.register_blueprint(payment_bp)
 
     with app.app_context():
         if db.engine.dialect.name == "sqlite":

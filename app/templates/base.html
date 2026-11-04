@@ -26,6 +26,7 @@
     <a class="{{ 'selected' if request.blueprint == 'rooms' }}" {% if request.blueprint == 'rooms' %}aria-current="page"{% endif %} href="{{ url_for('rooms.index') }}">{{ icon('rooms') }} <span>Phòng</span>{{ icon('chevron', 'nav-chevron') }}</a>
     <a class="{{ 'selected' if request.blueprint == 'electricity' }}" {% if request.blueprint == 'electricity' %}aria-current="page"{% endif %} href="{{ url_for('electricity.index') }}">{{ icon('bolt') }} <span>Chỉ số điện</span>{{ icon('chevron', 'nav-chevron') }}</a>
     <a class="{{ 'selected' if request.endpoint and request.endpoint.startswith('billing.') and request.endpoint != 'billing.correct' }}" href="{{ url_for('billing.index') }}">{{ icon('calendar') }} <span>Chốt tiền</span></a>
+    <a class="{{ 'selected' if request.blueprint == 'payment' }}" href="{{ url_for('payment.settings') }}">{{ icon('building') }} <span>Nhận tiền</span></a>
   </nav>
   <div class="sidebar-note">{{ icon('building') }}<p>Mọi căn phòng.<br><strong>Trong tầm tay.</strong></p><span>CHDV MANAGER BASIC</span></div>
   {% if current_user.is_root %}

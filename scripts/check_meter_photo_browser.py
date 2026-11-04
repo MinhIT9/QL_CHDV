@@ -168,6 +168,15 @@ def main():
                 assert page.locator('[name=final_amount]').input_value() == '1234'
                 page.locator('button[name=action][value=confirm]').click()
                 page.wait_for_url('**/bills?period=2026-01')
+                page.goto(base + '/settings/payment')
+                page.locator('[name=bank_name]').fill('Fixture Bank')
+                page.locator('[name=account_number]').fill('00123456789')
+                page.locator('[name=account_name]').fill('DEMO ACCOUNT')
+                page.locator('[name=note]').fill('Ghi mã phòng và tháng thanh toán')
+                page.locator('[name=qr]').set_input_files({'name': 'qr.png', 'mimeType': 'image/png', 'buffer': image.getvalue()})
+                page.get_by_role('button', name='Lưu thông tin nhận tiền').click()
+                assert page.locator('img[alt="QR nhận tiền hiện tại"]').is_visible()
+                page.goto(base + '/bills?period=2026-01')
                 with app.app_context():
                     bill = db.session.scalar(db.select(MonthlyBill).where(MonthlyBill.room_id == room_id))
                     bill_id = bill.id
@@ -175,6 +184,7 @@ def main():
                 page.locator(f'a[href="/bills/{bill_id}"]').click()
                 page.wait_for_url(f'**/bills/{bill_id}')
                 assert page.locator('.receipt-sheet').is_visible()
+                assert page.locator('.receipt-payment img').is_visible()
                 assert page.locator('.receipt-total b').inner_text().startswith('1.234')
                 assert page.locator('#sidebar').count() == 0
                 page.set_viewport_size({'width': 1000, 'height': 1100})

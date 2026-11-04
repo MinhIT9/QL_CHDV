@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Nhận tiền · CHDV Manager{% endblock %}
+{% block content %}
+<header class="page-header"><div><p class="eyebrow">QUẢN TRỊ</p><h1>Thông tin nhận tiền</h1><p class="muted">Dùng chung cho các phiếu chưa thanh toán. Thay đổi ở đây cập nhật thông tin chuyển khoản trên phiếu.</p></div></header>
+<section class="card p-4">
+  <form method="post" enctype="multipart/form-data" hx-boost="false">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="row g-3">
+      {% for key, label, limit in [('bank_name', 'Ngân hàng', 100), ('account_number', 'Số tài khoản', 50), ('account_name', 'Tên chủ tài khoản', 150)] %}
+      <div class="col-md-4"><label class="form-label" for="{{ key }}">{{ label }}</label><input class="form-control" id="{{ key }}" name="{{ key }}" maxlength="{{ limit }}" value="{{ values[key] if values else '' }}" required></div>
+      {% endfor %}
+      <div class="col-md-8"><label class="form-label" for="note">Ghi chú chuyển khoản</label><textarea class="form-control" id="note" name="note" maxlength="300" rows="2">{{ values.note if values else '' }}</textarea><p class="form-text">Ví dụ: ghi mã phòng và tháng thanh toán trong nội dung chuyển khoản.</p></div>
+      <div class="col-md-4"><label class="form-label" for="qr">Ảnh QR nhận tiền</label><input class="form-control" type="file" id="qr" name="qr" accept="image/png,image/jpeg,image/webp"><p class="form-text">Tải QR tài khoản từ ứng dụng ngân hàng, tối đa 5 MB. Để trống để giữ ảnh hiện tại.</p></div>
+    </div>
+    {% if settings and settings.qr_token %}<div class="my-3"><img src="{{ url_for('payment.qr', token=settings.qr_token) }}" width="150" height="150" class="object-fit-contain" alt="QR nhận tiền hiện tại"><label class="form-check"><input class="form-check-input" type="checkbox" name="remove_qr" value="1"> Xóa QR hiện tại</label></div>{% endif %}
+    <button class="btn btn-primary mt-3" type="submit">Lưu thông tin nhận tiền</button>
+    <p class="form-text mt-3">QR là ảnh bạn cung cấp, hệ thống không tự đổi số tiền trong QR. Nên dùng QR tài khoản không cố định số tiền và quét thử trước khi gửi khách.</p>
+  </form>
+</section>
+{% endblock %}

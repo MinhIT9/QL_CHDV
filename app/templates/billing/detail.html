@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Phiếu #{{ bill.id }} · {{ bill.room_code }} · {{ bill.period }}</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/receipt.css', v='1.5.0') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/receipt.css', v='1.6.0') }}">
   <script src="{{ url_for('static', filename='js/receipt.js', v='1.5.0') }}" defer></script>
 </head>
 <body>
@@ -46,6 +46,12 @@
       <div><strong>{{ 'TỔNG TIỀN PHIẾU ĐÃ HỦY' if bill.cancelled_at else 'TỔNG ĐÃ THANH TOÁN' if receipt else 'TỔNG CẦN THANH TOÁN' }}</strong><b>{{ bill.total|vnd }}</b></div>
       <p>Bằng chữ: {{ amount_words }}.</p>
     </section>
+    {% if payment and not receipt and not bill.cancelled_at %}
+    <section class="receipt-payment" aria-label="Thông tin chuyển khoản">
+      {% if payment.qr_token %}<img src="{{ url_for('payment.qr', token=payment.qr_token) }}" alt="QR nhận tiền" width="144" height="144">{% endif %}
+      <div><h2>Thông tin chuyển khoản</h2><p><strong>{{ payment.bank_name }}</strong> · {{ payment.account_name }}</p><p class="receipt-account">{{ payment.account_number }}</p>{% if payment.note %}<p class="receipt-payment-note">{{ payment.note }}</p>{% endif %}</div>
+    </section>
+    {% endif %}
     {% if bill.cancelled_at %}<p class="receipt-cancel-note">Phiếu này đã hủy ngày {{ bill.cancelled_at|local_date }}. Lý do: {{ bill.cancel_reason }}. Không dùng để yêu cầu thanh toán.</p>{% endif %}
     <footer class="receipt-footer"><strong>Cảm ơn bạn đã đồng hành cùng chúng tôi!</strong><p>Phiếu tính tiền nội bộ · Không phải hóa đơn thuế</p></footer>
   </main>

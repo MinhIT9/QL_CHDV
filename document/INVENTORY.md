@@ -24,6 +24,7 @@ app/electricity/routes.py
 app/extensions.py
 app/models/.gitkeep
 app/models/__init__.py
+app/payment.py
 app/photos.py
 app/rooms/.gitkeep
 app/rooms/__init__.py
@@ -33,6 +34,7 @@ app/services/__init__.py
 app/services/billing.py
 app/services/contracts.py
 app/services/electricity.py
+app/services/payment_settings.py
 app/services/photos.py
 app/services/queries.py
 app/services/rooms.py
@@ -70,6 +72,7 @@ app/templates/partials/.gitkeep
 app/templates/partials/icons.html
 app/templates/partials/period_select.html
 app/templates/partials/photos.html
+app/templates/payment/settings.html
 app/templates/rooms/.gitkeep
 app/templates/rooms/bill_history.html
 app/templates/rooms/compact_table.html
@@ -114,6 +117,7 @@ migrations/versions/a24d09e86c31_single_meter_photo.py
 migrations/versions/a65b2f9c018e_deposit_and_unified_start.py
 migrations/versions/b35e10f97d42_bill_final_amount.py
 migrations/versions/b71c430e92ad_tenancy_rent.py
+migrations/versions/c46f21a08e53_payment_settings.py
 migrations/versions/c83e4d16b2a0_tenancy_electricity_price.py
 migrations/versions/d94f512a37b1_reading_price.py
 migrations/versions/dd7493777e83_fees_and_contracts.py
@@ -127,10 +131,11 @@ tests/.gitkeep
 tests/test_bill_documents.py
 tests/test_billing.py
 tests/test_contracts.py
+tests/test_payment_settings.py
 tests/test_photos.py
 tests/test_receipts.py
 tests/test_v1.py
 wsgi.py
 ```
 
-Tổng: 124 file (bao gồm file danh mục này).
+Tổng: 129 file (bao gồm file danh mục này).
