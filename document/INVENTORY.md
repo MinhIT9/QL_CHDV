@@ -17,6 +17,7 @@ app/__init__.py
 app/auth/.gitkeep
 app/auth/__init__.py
 app/auth/routes.py
+app/data/banks.json
 app/electricity/.gitkeep
 app/electricity/__init__.py
 app/electricity/billing_routes.py
@@ -38,6 +39,7 @@ app/services/payment_settings.py
 app/services/photos.py
 app/services/queries.py
 app/services/rooms.py
+app/services/vietqr.py
 app/static/css/.gitkeep
 app/static/css/app.css
 app/static/css/receipt.css
@@ -98,6 +100,7 @@ document/DEVELOPMENT.md
 document/FEES_CONTRACTS_PROPOSAL.md
 document/HANDOFF.md
 document/INVENTORY.md
+document/LOCAL_VIETQR.md
 document/Lệnh Hay Dùng.md
 document/METER_PHOTO_UX_PROPOSAL.md
 document/PHOTOS.md
@@ -119,6 +122,7 @@ migrations/versions/b35e10f97d42_bill_final_amount.py
 migrations/versions/b71c430e92ad_tenancy_rent.py
 migrations/versions/c46f21a08e53_payment_settings.py
 migrations/versions/c83e4d16b2a0_tenancy_electricity_price.py
+migrations/versions/d57032b19f64_local_vietqr.py
 migrations/versions/d94f512a37b1_reading_price.py
 migrations/versions/dd7493777e83_fees_and_contracts.py
 migrations/versions/e9329a770fe9_initial_schema.py
@@ -135,7 +139,8 @@ tests/test_payment_settings.py
 tests/test_photos.py
 tests/test_receipts.py
 tests/test_v1.py
+tests/test_vietqr.py
 wsgi.py
 ```
 
-Tổng: 129 file (bao gồm file danh mục này).
+Tổng: 134 file (bao gồm file danh mục này).

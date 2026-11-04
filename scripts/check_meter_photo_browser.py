@@ -1,4 +1,4 @@
-"""Optional browser check: pip install playwright; uses installed Microsoft Edge.
+"""Optional browser check: pip install playwright zxing-cpp; uses installed Edge.
 
 All records/files live in a temporary directory, never the development database.
 """
@@ -12,6 +12,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from PIL import Image
+import zxingcpp
 from playwright.sync_api import sync_playwright
 from werkzeug.serving import make_server
 
@@ -169,11 +170,10 @@ def main():
                 page.locator('button[name=action][value=confirm]').click()
                 page.wait_for_url('**/bills?period=2026-01')
                 page.goto(base + '/settings/payment')
-                page.locator('[name=bank_name]').fill('Fixture Bank')
+                page.locator('[name=bank_bin]').select_option('970436')
                 page.locator('[name=account_number]').fill('00123456789')
                 page.locator('[name=account_name]').fill('DEMO ACCOUNT')
                 page.locator('[name=note]').fill('Ghi mã phòng và tháng thanh toán')
-                page.locator('[name=qr]').set_input_files({'name': 'qr.png', 'mimeType': 'image/png', 'buffer': image.getvalue()})
                 page.get_by_role('button', name='Lưu thông tin nhận tiền').click()
                 assert page.locator('img[alt="QR nhận tiền hiện tại"]').is_visible()
                 page.goto(base + '/bills?period=2026-01')
@@ -185,6 +185,12 @@ def main():
                 page.wait_for_url(f'**/bills/{bill_id}')
                 assert page.locator('.receipt-sheet').is_visible()
                 assert page.locator('.receipt-payment img').is_visible()
+                qr_response = page.request.get(base + f'/bills/{bill_id}/qr?amount=1')
+                decoded = zxingcpp.read_barcode(Image.open(BytesIO(qr_response.body())))
+                assert decoded is not None
+                assert '54041234' in decoded.text
+                assert '011100123456789' in decoded.text
+                assert f'P{bill_id} T103 T012026' in decoded.text
                 assert page.locator('.receipt-total b').inner_text().startswith('1.234')
                 assert page.locator('#sidebar').count() == 0
                 page.set_viewport_size({'width': 1000, 'height': 1100})
@@ -193,6 +199,8 @@ def main():
                 page.screenshot(path=str(exports / 'receipt-preview-desktop.png'), full_page=True)
                 page.set_viewport_size({'width': 390, 'height': 844})
                 assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
+                qr_crop = page.locator('.receipt-payment img').screenshot()
+                assert zxingcpp.read_barcode(Image.open(BytesIO(qr_crop))) is not None
                 page.screenshot(path=str(exports / 'receipt-preview-mobile.png'), full_page=True)
                 page.emulate_media(media='print')
                 assert not page.locator('.receipt-toolbar').is_visible()

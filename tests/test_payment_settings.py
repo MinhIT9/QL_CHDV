@@ -4,7 +4,6 @@ from PIL import Image
 
 from app.extensions import db
 from app.models import PaymentSettings, ElectricityReading
-from app.services.payment_settings import qr_path
 import test_bill_documents
 from test_v1 import AppTestCase
 
@@ -22,44 +21,49 @@ class PaymentSettingsTests(AppTestCase):
         db.session.commit()
 
     def payment_data(self, **extra):
-        return dict(bank_name='Fixture bank', account_number='0012345678', account_name='FIXTURE OWNER', note='Room and month', **extra)
+        values = dict(bank_bin='970436', account_number='0012345678', account_name='FIXTURE OWNER', note='Room and month')
+        return {**values, **extra}
 
-    def qr_upload(self):
-        stream = BytesIO()
-        Image.new('RGB', (180, 180), 'white').save(stream, 'PNG')
-        stream.seek(0)
-        return stream, 'qr.png'
-
-    def test_save_replace_remove_and_receipt_visibility(self):
-        response = self.post('/settings/payment', self.payment_data(qr=self.qr_upload()))
+    def test_generated_qr_uses_final_bill_and_hides_after_payment(self):
+        response = self.post('/settings/payment', self.payment_data())
         self.assertEqual(response.status_code, 302)
         settings = db.session.get(PaymentSettings, 1)
-        old_token = settings.qr_token
-        self.assertTrue(qr_path(old_token).is_file())
-        with self.client.get('/settings/payment/qr/' + old_token) as response:
+        self.assertEqual(settings.bank_name, 'Vietcombank')
+        self.assertEqual(settings.account_number, '0012345678')
+        with self.client.get('/settings/payment/qr') as response:
             self.assertEqual(response.mimetype, 'image/png')
-        bill = self.create_bill()
+            with Image.open(BytesIO(response.data)) as image:
+                self.assertEqual(image.width, image.height)
+        bill = self.create_bill(final_amount='6231000', adjustment_reason='Round fixture')
         html = self.client.get(f'/bills/{bill.id}').get_data(as_text=True)
+        self.assertIn(f'/bills/{bill.id}/qr', html)
         self.assertIn('0012345678', html)
-        self.assertIn(old_token, html)
-        self.post('/settings/payment', self.payment_data(qr=self.qr_upload()))
-        self.assertNotEqual(settings.qr_token, old_token)
-        self.assertFalse(qr_path(old_token).exists())
-        self.assertEqual(self.client.get('/settings/payment/qr/' + old_token).status_code, 404)
+        with self.client.get(f'/bills/{bill.id}/qr?amount=1&account=wrong') as response:
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.headers['Cache-Control'], 'no-store')
         self.post(f'/bills/{bill.id}/receive', {'paid_date': '2026-01-05', 'receipt_version': '0'})
         self.assertNotIn('Thông tin chuyển khoản', self.client.get(f'/bills/{bill.id}').get_data(as_text=True))
-        self.post('/settings/payment', self.payment_data(remove_qr='1'))
-        self.assertIsNone(settings.qr_token)
+        self.assertEqual(self.client.get(f'/bills/{bill.id}/qr').status_code, 404)
 
     def test_admin_access_validation_and_csrf(self):
         self.post('/logout')
         self.assertEqual(self.client.get('/settings/payment').status_code, 302)
+        self.assertEqual(self.client.get('/settings/payment/qr').status_code, 302)
         self.login('manager', 'AdminTest123!')
         self.assertEqual(self.client.get('/settings/payment').status_code, 200)
         self.assertEqual(self.client.post('/settings/payment', data=self.payment_data()).status_code, 400)
         self.assertEqual(self.post('/settings/payment', self.payment_data()).status_code, 302)
-        self.assertEqual(self.post('/settings/payment', self.payment_data(qr=(BytesIO(b'bad'), 'qr.png'))).status_code, 400)
-        values = self.payment_data()
-        values['bank_name'] = ''
-        self.assertEqual(self.post('/settings/payment', values).status_code, 400)
-        self.assertEqual(db.session.get(PaymentSettings, 1).bank_name, 'Fixture bank')
+        for extra in ({'bank_bin':'999999'}, {'account_number':'123 456'}, {'account_number':'1'*20}, {'account_name':''}):
+            self.assertEqual(self.post('/settings/payment', self.payment_data(**extra)).status_code, 400)
+        self.assertEqual(db.session.get(PaymentSettings, 1).bank_bin, '970436')
+
+    def test_zero_cancelled_and_excessive_amount_do_not_generate_qr(self):
+        self.post('/settings/payment', self.payment_data())
+        bill = self.create_bill(final_amount='0', adjustment_reason='Waive fixture')
+        self.assertEqual(self.client.get(f'/bills/{bill.id}/qr').status_code, 404)
+        self.assertNotIn(f'/bills/{bill.id}/qr', self.client.get(f'/bills/{bill.id}').get_data(as_text=True))
+        self.post(f'/bills/{bill.id}/cancel', {'reason':'Replace fixture'})
+        self.assertEqual(self.client.get(f'/bills/{bill.id}/qr').status_code, 404)
+        replacement = self.create_bill(final_amount='10000000000000', adjustment_reason='Large fixture')
+        self.assertEqual(self.client.get(f'/bills/{replacement.id}/qr').status_code, 404)
+        self.assertEqual(self.client.get(f'/bills/{replacement.id}').status_code, 200)

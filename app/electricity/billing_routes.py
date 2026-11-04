@@ -1,4 +1,4 @@
-from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask import Blueprint, abort, flash, redirect, render_template, request, send_file, url_for
 from flask_login import current_user, login_required
 from sqlalchemy.exc import IntegrityError, OperationalError
 
@@ -11,6 +11,7 @@ from app.services.billing import amount_in_words, bill_tenancy, bill_values, cor
 from app.services.electricity import current_period, valid_period
 from app.services.photos import meter_photo_locked
 from app.services.payment_settings import payment_settings
+from app.services.vietqr import bill_qr_enabled, payload, qr_png, transfer_content
 
 bp = Blueprint("billing", __name__)
 WRITE_ERRORS = (ValueError, IntegrityError, OperationalError, OSError)
@@ -67,8 +68,21 @@ def index():
 @login_required
 def detail(bill_id):
     bill = db.get_or_404(MonthlyBill, bill_id)
+    payment = payment_settings()
     return render_template("billing/detail.html", bill=bill, receipt=bill.paid_receipt,
-                           amount_words=amount_in_words(bill.total), payment=payment_settings())
+                           amount_words=amount_in_words(bill.total), payment=payment,
+                           generated_qr=bill_qr_enabled(payment, bill), transfer_content=transfer_content(bill))
+
+
+@bp.get('/bills/<int:bill_id>/qr')
+@login_required
+def payment_qr(bill_id):
+    bill = db.get_or_404(MonthlyBill, bill_id)
+    settings = payment_settings()
+    if not bill_qr_enabled(settings, bill):
+        abort(404)
+    value = payload(settings.bank_bin, settings.account_number, bill.total, transfer_content(bill))
+    return send_file(qr_png(value), mimetype='image/png', max_age=0)
 
 
 @bp.route("/rooms/<int:room_id>/bill", methods=["GET", "POST"])

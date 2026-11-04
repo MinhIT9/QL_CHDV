@@ -1,6 +1,6 @@
 # Mô hình dữ liệu V1
 
-Đã triển khai tại app/models/__init__.py; migration mới nhất c46f21a08e53 (cấu hình nhận tiền).
+Đã triển khai tại app/models/__init__.py; migration mới nhất d57032b19f64 (BIN ngân hàng cho QR cục bộ).
 
 ## Điều chỉnh tổng phiếu — V1.5.0
 
@@ -73,3 +73,7 @@ ElectricityReading.electricity_price nullable là giá chụp lúc lưu số m�
 ## PaymentSettings — V1.6.0
 
 Bản ghi chung id=1: bank_name(100), account_number(50), account_name(150), note(300), qr_token(32, nullable). Ảnh PNG riêng ở uploads/payment, không blob trong DB. Thông tin hiện tại không thay đổi giá/tổng/Receipt của phiếu cũ.
+
+## V1.7.0 — BIN ngân hàng
+
+PaymentSettings.bank_bin String(6), nullable legacy; lưu mã từ danh sách ngân hàng nội bộ. Không thay đổi tổng/Receipt hoặc xóa qr_token/file cũ. QR mới tạo theo phiếu trong bộ nhớ, không thêm blob hoặc bảng ảnh.
