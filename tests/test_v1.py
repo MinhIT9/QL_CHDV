@@ -62,13 +62,6 @@ class AppTestCase(unittest.TestCase):
     def post(self, path, data=None, client=None, page="/", follow=False):
         client = client or self.client
         data = dict(data or {})
-        # Existing business tests submit the now-required meter evidence.
-        if path == "/electricity/":
-            for key, value in list(data.items()):
-                if key.startswith("end_") and value:
-                    data.setdefault("photo_" + key[4:], self.image_upload())
-        if path.startswith("/electricity/") and path.endswith("/correct") and data.get("action") == "confirm":
-            data.setdefault("photo", self.image_upload())
         return client.post(path, data={**data, "csrf_token": self.token(client, page)}, follow_redirects=follow)
 
     def image_upload(self, size=(100, 80)):

@@ -1,5 +1,11 @@
 # Quyết định và vấn đề cần chốt
 
+## 2026-11-04 — Ảnh điện tùy chọn và upload tại bảng (V1.4.0)
+
+- Theo yêu cầu mới, thay quy tắc V1.3.0: ảnh chốt/sửa điện không bắt buộc, cho bổ sung sau. File đã chọn phải hợp lệ; lưu số kèm ảnh là một giao dịch, upload bổ sung không thay chỉ số.
+- Chọn/kéo thả chỉ giữ File và Object URL ở trình duyệt; bấm Lưu chỉ số/Lưu ảnh mới upload. Hiện phần trăm truyền byte riêng với bước nén, polling theo lô hữu hạn cập nhật thumbnail; không reload trang hoặc làm mất hàng khác. Preview hỗ trợ CSP blob:, ảnh server vẫn cần đăng nhập.
+- Tái sử dụng Photo.token cho mã retry upload ảnh và BEGIN IMMEDIATE SQLite; không thêm migration/hạ tầng. Chốt điện vẫn unique phòng/kỳ, không tự gửi lại khi kết quả lưu chưa rõ. Bootstrap modal dùng chung xem bản WebP đã nén; thumbnail dùng cùng WebP với lazy-loading, chưa tạo file thumbnail riêng.
+
 ## 2026-11-03 — Ảnh hợp đồng/điện và nén nền (V1.3.0)
 
 - Người dùng yêu cầu hợp đồng tùy chọn, ảnh chốt điện bắt buộc, lưu thư mục riêng và chỉ giữ ảnh nén dài hạn. Gắn ảnh hợp đồng theo đợt thuê, ảnh điện theo lần chốt; dữ liệu cũ giữ nguyên và có thể bổ sung. Chốt mới/sửa điện yêu cầu ảnh ở máy chủ, ảnh cũ không bị ghi đè.

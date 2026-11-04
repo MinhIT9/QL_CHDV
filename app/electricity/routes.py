@@ -1,4 +1,4 @@
-from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask import Blueprint, flash, jsonify, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 from sqlalchemy.exc import IntegrityError, OperationalError
 
@@ -18,16 +18,20 @@ def index():
         flash("Kỳ tháng không hợp lệ.", "danger")
         return redirect(url_for("electricity.index"))
     status = 200
+    ajax = request.headers.get("X-Meter-Save") == "1"
     if request.method == "POST":
         try:
             count = save_readings(period, request.form, current_user.id, request.files)
         except (ValueError, IntegrityError, OperationalError, OSError) as error:
             db.session.rollback()
+            if ajax:
+                return jsonify(error=str(error) if isinstance(error, ValueError) else "Dữ liệu vừa thay đổi. Hãy kiểm tra lại trước khi lưu."), 400
             flash(str(error) if isinstance(error, ValueError) else "Dữ liệu vừa được cập nhật hoặc đang bận. Hãy tải lại trước khi lưu.", "danger")
             status = 400
         else:
-            flash(f"Đã chốt điện cho {count} phòng, kỳ {period}.", "success")
-            return redirect(url_for("electricity.index", period=period))
+            if not ajax:
+                flash(f"Đã chốt điện cho {count} phòng, kỳ {period}.", "success")
+                return redirect(url_for("electricity.index", period=period))
     rooms = db.session.scalars(room_query().where(Room.active.is_(True))).all()
     contexts = [reading_context(room, period) for room in rooms]
     bills = {bill.room_id: bill for bill in db.session.scalars(active_bill_query().where(MonthlyBill.period == period))}
@@ -37,6 +41,7 @@ def index():
         bill = bills.get(row["room"].id)
         row.update(reading_cost(reading, bill, tenant.electricity_price if tenant else None))
         row["updated_at"] = updated.get(reading.id) if reading else None
-    return render_template("electricity/index.html", contexts=contexts, period=period,
+    html = render_template("electricity/index.html", contexts=contexts, period=period,
                            done=sum(bool(item["existing"]) for item in contexts),
-                           values=request.form if request.method == "POST" else {}), status
+                           values=request.form if request.method == "POST" else {})
+    return jsonify(html=html) if ajax else (html, status)

@@ -1,5 +1,7 @@
 # Hướng dẫn phát triển và vận hành local
 
+V1.4.0: ảnh điện tùy chọn, upload AJAX có tiến độ và thumbnail/modal tự cập nhật. Không migration mới; worker process-photos vẫn cần chạy để nén. Kiểm tra browser tùy chọn: cài Playwright trong .venv rồi chạy `.venv\Scripts\python.exe scripts/check_meter_photo_browser.py` với Microsoft Edge đã cài. Script dùng DB/ảnh tạm, không dữ liệu dev. Runtime không phụ thuộc Playwright. Kiểm tra server bằng unittest như trước.
+
 V1.3.0: dùng Python >=3.11 và requirements có Pillow 13.0.0. Khi chạy dev mở thêm terminal `.venv\Scripts\python.exe -m flask --app wsgi process-photos`; upload sẽ chờ nếu worker không chạy. Migration f13a98c52b70 đã backup/upgrade local, thêm bảng photo. Chi tiết giới hạn ảnh, worker, cập nhật VPS và backup DB/ảnh ở PHOTOS.md. Không copy ảnh thử/dữ liệu thật vào Git.
 
 V1.1.14: migration 41eb1b88b816 đã backup/upgrade local. Menu Chốt tiền → Thu tiền → xác nhận đã nhận đủ, chọn ngày/ghi chú; phiếu xuống nhóm Đã thu. Nếu ghi nhầm, root mở Thông tin thu → hoàn tác với lý do. Không hủy phiếu đã thu trước khi hoàn tác, không coi hoàn tác là hoàn tiền thật. Chưa nhận từng phần. Bảng Phòng chọn lọc thu/kỳ hoặc Cột hiển thị Đầy đủ rồi bấm Xem. Khởi động lại Flask và Ctrl+F5.

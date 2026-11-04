@@ -43,6 +43,7 @@ app/static/images/favicon.svg
 app/static/images/residence.svg
 app/static/js/.gitkeep
 app/static/js/app.js
+app/static/js/meter-photos.js
 app/static/js/sidebar-state.js
 app/static/vendor/.gitkeep
 app/static/vendor/HTMX-LICENSE.txt
@@ -59,6 +60,7 @@ app/templates/electricity/.gitkeep
 app/templates/electricity/correct.html
 app/templates/electricity/index.html
 app/templates/electricity/photo_cell.html
+app/templates/electricity/photo_widget.html
 app/templates/electricity/reading_meta.html
 app/templates/error.html
 app/templates/partials/.gitkeep
@@ -89,6 +91,7 @@ document/FEES_CONTRACTS_PROPOSAL.md
 document/HANDOFF.md
 document/INVENTORY.md
 document/Lệnh Hay Dùng.md
+document/METER_PHOTO_UX_PROPOSAL.md
 document/PHOTOS.md
 document/README.md
 document/SCOPE.md
@@ -111,6 +114,7 @@ migrations/versions/e9329a770fe9_initial_schema.py
 migrations/versions/f13a98c52b70_private_photos.py
 requirements-dev.txt
 requirements.txt
+scripts/check_meter_photo_browser.py
 scripts/update_docs.py
 tests/.gitkeep
 tests/test_billing.py
@@ -121,4 +125,4 @@ tests/test_v1.py
 wsgi.py
 ```
 
-Tổng: 112 file (bao gồm file danh mục này).
+Tổng: 116 file (bao gồm file danh mục này).

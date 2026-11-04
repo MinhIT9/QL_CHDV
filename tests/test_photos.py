@@ -24,14 +24,14 @@ class PhotoTests(AppTestCase):
             data[f"photo_{room.id}"] = photo
         return self.client.post("/electricity/", data=data)
 
-    def test_new_reading_requires_photo_and_rollback_cleans_staged_files(self):
+    def test_new_reading_allows_no_photo_and_invalid_photo_rolls_back_batch(self):
         one, two = self.room(), self.room("P102")
         result = self.submit_meter(one)
+        self.assertEqual(result.status_code, 302)
+        self.assertEqual(db.session.query(ElectricityReading).count(), 1)
+        result = self.submit_meter(one, self.image_upload(), period="2026-02", **{f"start_{two.id}": "0", f"end_{two.id}": "20", f"photo_{two.id}": (BytesIO(b"fake"), "fake.jpg")})
         self.assertEqual(result.status_code, 400)
-        self.assertEqual(db.session.query(ElectricityReading).count(), 0)
-        result = self.submit_meter(one, self.image_upload(), **{f"start_{two.id}": "0", f"end_{two.id}": "20"})
-        self.assertEqual(result.status_code, 400)
-        self.assertEqual(db.session.query(ElectricityReading).count(), 0)
+        self.assertEqual(db.session.query(ElectricityReading).count(), 1)
         self.assertEqual(db.session.query(Photo).count(), 0)
         self.assertEqual(list((photo_root() / "tmp").iterdir()), [])
 
@@ -112,18 +112,20 @@ class PhotoTests(AppTestCase):
         fresh = self.room("P103", status="occupied", tenant_name="New tenant", contract_photos=self.image_upload())
         self.assertEqual(len(fresh.current_tenancy.photos), 1)
 
-    def test_correction_requires_new_photo_and_keeps_original_evidence(self):
+    def test_correction_allows_no_photo_and_keeps_original_evidence(self):
         room = self.room()
         self.assertEqual(self.submit_meter(room, self.image_upload()).status_code, 302)
         reading = db.session.scalar(db.select(ElectricityReading))
         data = {"action": "confirm", "start_value": "0", "end_value": "20", "reason": "New evidence",
                 "stamp": reading_stamp(reading), "csrf_token": self.token()}
         path = f"/electricity/{reading.id}/correct"
-        self.assertEqual(self.client.post(path, data=data).status_code, 400)
-        self.assertEqual(reading.end_value, 10)
+        self.assertEqual(self.client.post(path, data=data).status_code, 302)
+        self.assertEqual(reading.end_value, 20)
+        self.assertEqual(len(reading.photos), 1)
+        data.update(end_value="30", stamp=reading_stamp(reading))
         data["csrf_token"] = self.token()
         self.assertEqual(self.client.post(path, data={**data, "photo": self.image_upload()}).status_code, 302)
-        self.assertEqual(reading.end_value, 20)
+        self.assertEqual(reading.end_value, 30)
         self.assertEqual(len(reading.photos), 2)
 
     def test_worker_failure_reupload_crash_recovery_and_orphan_cleanup(self):
@@ -186,6 +188,59 @@ class PhotoTests(AppTestCase):
             self.assertNotEqual(result.exit_code, 0)
             self.assertIn("already running", result.output)
 
+    def test_ajax_meter_save_without_photo_and_validation_preserve_other_rows(self):
+        one, two = self.room(), self.room("P102")
+        response = self.client.post('/electricity/', data={"period": "2026-01", f"start_{one.id}": "0", f"end_{one.id}": "10", "csrf_token": self.token()}, headers={"X-Meter-Save": "1"})
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('data-room-id=', response.json['html'])
+        self.assertEqual(db.session.query(ElectricityReading).count(), 1)
+        response = self.client.post('/electricity/', data={"period": "2026-01", f"start_{two.id}": "10", f"end_{two.id}": "0", "csrf_token": self.token()}, headers={"X-Meter-Save": "1"})
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('error', response.json)
+        self.assertEqual(db.session.query(ElectricityReading).count(), 1)
+
+    def test_ajax_photo_retry_is_idempotent_and_status_is_private(self):
+        room = self.room()
+        self.assertEqual(self.submit_meter(room).status_code, 302)
+        reading = db.session.scalar(db.select(ElectricityReading))
+        path = f'/photos/electricity/{reading.id}'
+        token = 'a' * 32
+        for _ in range(2):
+            response = self.client.post(path, data={"photo": self.image_upload(), "upload_token": token, "csrf_token": self.token()}, headers={"X-Photo-Upload": "1"})
+            self.assertEqual(response.status_code, 200, response.get_data(as_text=True))
+            self.assertEqual(response.json['photo']['status'], 'pending')
+        self.assertEqual(db.session.query(Photo).count(), 1)
+        photo_id = response.json['photo']['id']
+        self.assertEqual(self.app.test_client().get(f'/photos/status?ids={photo_id}').status_code, 302)
+        response = self.client.get(f'/photos/status?ids={photo_id}')
+        self.assertIsNone(response.json['photos'][0]['url'])
+        process_pending()
+        response = self.client.get(f'/photos/status?ids={photo_id}')
+        self.assertEqual(response.json['photos'][0]['status'], 'ready')
+        self.assertEqual(response.json['photos'][0]['url'], f'/photos/{photo_id}')
+        self.assertEqual(self.client.get('/photos/status?ids=bad').status_code, 400)
+        self.assertEqual(self.client.get('/photos/status?ids=' + ','.join(['1'] * 101)).status_code, 400)
+        self.assertEqual(self.client.get('/photos/status?ids=' + '1' * 1000).status_code, 400)
+
+    def test_ajax_invalid_photo_cleans_temp_and_token_cannot_cross_owner(self):
+        room = self.room()
+        self.submit_meter(room)
+        reading = db.session.scalar(db.select(ElectricityReading))
+        path = f'/photos/electricity/{reading.id}'
+        response = self.client.post(path, data={"photo": (BytesIO(b'bad'), 'bad.jpg'), "upload_token": 'b' * 32, "csrf_token": self.token()}, headers={"X-Photo-Upload": "1"})
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('error', response.json)
+        self.assertEqual(list((photo_root() / 'tmp').iterdir()), [])
+        token = 'c' * 32
+        response = self.client.post(path, data={"photo": self.image_upload(), "upload_token": token, "csrf_token": self.token()}, headers={"X-Photo-Upload": "1"})
+        self.assertEqual(response.status_code, 200)
+        other_room = self.room('P102')
+        self.submit_meter(other_room)
+        other_reading = db.session.scalar(db.select(ElectricityReading).where(ElectricityReading.room_id == other_room.id))
+        response = self.client.post(f'/photos/electricity/{other_reading.id}', data={"photo": self.image_upload(), "upload_token": token, "csrf_token": self.token()}, headers={"X-Photo-Upload": "1"})
+        self.assertEqual(response.status_code, 409)
+        self.assertEqual(db.session.query(Photo).count(), 1)
+
     def test_meter_photo_upload_is_available_on_electricity_page_without_changing_reading(self):
         room = self.room()
         reading = ElectricityReading(room_id=room.id, period="2026-01", start_value=10, end_value=20, created_by=self.root_id)
@@ -195,7 +250,7 @@ class PhotoTests(AppTestCase):
         html = self.client.get(path).get_data(as_text=True)
         upload_path = f"/photos/electricity/{reading.id}"
         self.assertIn('id="meter-photos"', html)
-        self.assertIn(f'action="{upload_path}"', html)
+        self.assertIn(f'data-upload-url="{upload_path}"', html)
         self.assertIn('type="file"', html)
         response = self.post(upload_path, {"photo": self.image_upload()})
         self.assertEqual(response.status_code, 302)
@@ -203,6 +258,6 @@ class PhotoTests(AppTestCase):
         self.assertEqual((reading.start_value, reading.end_value), (10, 20))
         self.assertEqual(len(reading.photos), 1)
         html = self.client.get('/electricity/?period=2026-01').get_data(as_text=True)
-        self.assertIn(path + '#meter-photos', html)
+        self.assertIn(f'data-upload-url="{upload_path}"', html)
         room_html = self.client.get(f'/rooms/{room.id}').get_data(as_text=True)
         self.assertNotIn(f'action="{upload_path}"', room_html)

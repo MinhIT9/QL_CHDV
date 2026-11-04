@@ -52,7 +52,8 @@ def correction(reading, data, user_id, save=False, upload=None):
     preview = [{"period": r.period, "old_start": r.start_value, "old_end": r.end_value, "new_start": a, "new_end": b} for r, a, b in changes]
     if save:
         with upload_batch() as staged:
-            stage_photo(upload, user_id, staged, reading=reading)
+            if upload and upload.filename:
+                stage_photo(upload, user_id, staged, reading=reading)
             for r, a, b in changes:
                 db.session.add(ReadingRevision(reading_id=r.id, old_start=r.start_value, old_end=r.end_value, new_start=a, new_end=b, reason=reason, created_by=user_id))
                 r.start_value, r.end_value = a, b

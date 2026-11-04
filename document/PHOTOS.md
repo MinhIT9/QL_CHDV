@@ -1,13 +1,15 @@
-# Ảnh hợp đồng và ảnh điện (V1.3.0)
+# Ảnh hợp đồng và ảnh điện (V1.4.0)
 
 ## Cách dùng
 
 - Thêm/sửa phòng đang thuê: tối đa 5 ảnh hợp đồng mỗi lần, không bắt buộc. Ảnh gắn với đợt thuê, không chuyển sang khách mới khi đổi khách.
-- Chốt số điện: mỗi phòng có nhập cuối kỳ phải chọn một ảnh. Phòng không nhập số được bỏ qua. Kiểm tra bắt buộc ở máy chủ.
-- Sửa số điện: sau xem trước, chọn ảnh đối chiếu mới rồi xác nhận. Giữ ảnh cũ và lịch sử; kỳ sau được cập nhật đầu kỳ tự động không yêu cầu chụp lại cuối kỳ.
-- Màn Sửa điện: mục Ảnh công tơ điện xuất hiện ngay khi mở trang, cho xem/bổ sung ảnh vào kỳ cũ mà không cần đổi số; bảng Chỉ số điện dẫn bổ sung ảnh tới đây. Upload xong quay lại đúng màn điện/kỳ. Chi tiết phòng chỉ bổ sung ảnh hợp đồng, lịch sử điện vẫn xem ảnh đã lưu. Không ép dữ liệu cũ phải có ảnh khi migration.
+- Chốt/sửa số điện không bắt buộc ảnh. Có thể chọn ảnh kèm lần lưu hoặc bổ sung sau; nếu đã chọn ảnh thì máy chủ vẫn kiểm tra định dạng/kích thước. Không có ảnh vẫn lưu được số điện hợp lệ.
+- Ngay trong bảng Chỉ số điện: kéo file ảnh từ Explorer/Desktop hoặc chọn file, chỉ hiện preview Chưa tải lên. Bấm Lưu chỉ số mới gửi ảnh của các hàng có nhập số; ảnh chờ ở hàng khác không gửi và không bị mất. Phòng đã chốt có nút Lưu ảnh riêng, không cần sửa số hoặc chuyển trang.
+- Hiện tiến độ upload 0–100% theo byte, sau đó trạng thái đang xử lý riêng. Khi worker nén xong, polling theo lô tự hiện thumbnail trong ô, không reload trang. Click thumbnail mở modal Bootstrap; Escape/nút đóng thoát popup. Ảnh lớn là WebP đã nén, không khôi phục gốc đã xóa.
+- Màn Sửa điện cũng có vùng bổ sung ảnh trực tiếp. Chi tiết phòng chỉ bổ sung ảnh hợp đồng, lịch sử điện vẫn xem ảnh đã lưu. Giữ ảnh cũ và dữ liệu lịch sử.
 - Nhận JPEG, PNG, WebP tĩnh, tối đa 10 MB và 24 megapixel/ảnh. Chưa nhận HEIC, PDF, SVG hoặc ảnh động. Mỗi request tối đa 64 MB; nhiều phòng hãy lưu từng phần. Sau lỗi form cần chọn lại file.
-- Hiện trạng thái đang xử lý/lỗi; tải lại trang sau vài giây để xem liên kết ảnh. Chỉ Root/Admin đã đăng nhập và đã đổi mật khẩu bắt buộc mới xem/bổ sung ảnh, cùng phạm vi quyền phòng hiện tại.
+- Polling khoảng 2 giây khi có pending, tối đa khoảng 60 giây rồi cho bấm kiểm tra lại; lỗi mạng không coi là ảnh hỏng. Nút bỏ ảnh chỉ bỏ file đang chọn, không xóa ảnh đã lưu. Gửi lại cùng mã upload không tạo thêm ảnh. Hết phiên/413/lỗi mạng có thông báo và giữ ảnh chờ; sau kết quả lưu không rõ cần kiểm tra trước khi gửi lại.
+- Chỉ Root/Admin đã đăng nhập và đã đổi mật khẩu bắt buộc mới xem/bổ sung ảnh. Kéo từ website/ứng dụng khác cần nguồn cung cấp File thực; nếu chỉ có URL, tải ảnh về máy rồi chọn file. Không tự tải URL từ server. Tắt JavaScript vẫn lưu form chỉ số được; bổ sung ảnh ở form thường tại Sửa điện, không có tiến độ/popup tự động.
 
 ## Lưu trữ và hàng đợi
 
@@ -30,6 +32,8 @@ Sau khi trạng thái cuối được commit, xóa ảnh gốc tạm cả khi th
 Ảnh chỉ trả qua /photos/<id> với xác thực, Cache-Control no-store. Không thêm Nginx alias hoặc đặt uploads vào static. Log lỗi worker chỉ chứa ID job, không chứa tên khách/ảnh hoặc nội dung lỗi decoder.
 
 ## Chạy dev
+
+V1.4.0 không có migration mới, tiếp tục dùng f13a98c52b70. Có script kiểm thử trình duyệt tùy chọn `python scripts/check_meter_photo_browser.py` (cài Playwright trong venv và có Microsoft Edge), tạo toàn bộ dữ liệu trong thư mục tạm; không dùng DB dev. Runtime không thêm dependency JS hoặc Python mới.
 
 Cài requirements trong venv, backup database rồi chạy migration. Migration f13a98c52b70 chỉ thêm bảng photo, giữ dữ liệu nghiệp vụ cũ.
 

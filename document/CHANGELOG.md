@@ -1,6 +1,30 @@
 # Lịch sử thay đổi
 
+## 2026-11-04
+
+- V1.4.0: bỏ bắt buộc ảnh điện; thêm drop/preview chờ lưu, progress upload, polling thumbnail/modal ngay trong bảng và upload bổ sung không đổi số. Chống retry trùng ảnh, giữ hàng chưa lưu. 61 tests và Edge QA dữ liệu tạm đạt; không migration, chưa cập nhật VPS.
+
+- V1.3.13: phân tích luồng ảnh điện tùy chọn, kéo thả chờ lưu, tiến độ upload và thumbnail/modal tự cập nhật; thêm đề xuất, chưa triển khai code theo yêu cầu.
+
+- V1.3.12: hướng dẫn dọn ZIP triển khai đã dùng, giữ bản backup trước nâng cấp và dữ liệu runtime.
+
+- V1.3.11: xác nhận web/worker VPS chạy và HTTPS 200 từ log; hướng dẫn xác minh upload/nén ảnh thực tế trước chốt kiểm tra tính năng.
+
+- V1.3.10: xác nhận 58 test VPS đạt từ log, giải thích cảnh báo datetime và hướng dẫn mở lại web/worker để kiểm tra HTTPS.
+
+- V1.3.9: xác nhận Nginx syntax đạt; hướng dẫn kiểm thử VPS, khởi động web/worker và kiểm tra HTTPS, chờ kết quả.
+
+- V1.3.8: xác nhận cập nhật dependencies/schema VPS đạt từ log; hướng dẫn cài worker ảnh và sửa giới hạn upload Nginx, chưa mở web.
+
+- V1.3.7: ghi nhận backup VPS trước cập nhật hoàn tất từ log; hướng dẫn triển khai code/thư viện/migration, chưa xác nhận thực thi.
+
+- V1.3.6: ghi nhận gói ZIP VPS kiểm tra đạt; hướng dẫn dừng web và backup database, project cùng cấu hình trước khi triển khai.
+
+- V1.3.5: xác định ZIP upload vào /opt/chdv qua ảnh, sửa hướng dẫn kiểm tra đường dẫn; chưa giải nén hoặc cập nhật VPS.
+
 ## 2026-11-03
+
+- V1.3.4: chuẩn bị/kiểm tra gói ZIP cập nhật code ảnh cho VPS, loại trừ cấu hình bí mật và runtime; hướng dẫn chuyển bằng MobaXterm, chưa triển khai production.
 
 - V1.3.3: chuyển form bổ sung ảnh công tơ sang màn điện, hiển thị ngay khi mở Sửa điện; upload giữ nguyên chỉ số và quay lại đúng kỳ, bỏ form ảnh điện khỏi chi tiết phòng.
 

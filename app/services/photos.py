@@ -45,10 +45,10 @@ def upload_batch():
         raise
 
 
-def stage_photo(upload, user_id, staged, *, tenancy=None, reading=None):
+def stage_photo(upload, user_id, staged, *, tenancy=None, reading=None, token=None):
     if upload is None or not upload.filename:
         raise ValueError("Cần chọn ảnh chốt số điện.")
-    photo = Photo(token=uuid.uuid4().hex, created_by=user_id, tenancy=tenancy, reading=reading)
+    photo = Photo(token=token or uuid.uuid4().hex, created_by=user_id, tenancy=tenancy, reading=reading)
     staged.append(photo)
     path = photo_path(photo, temporary=True)
     # Ignore the client filename and MIME; limit bytes before parsing image data.

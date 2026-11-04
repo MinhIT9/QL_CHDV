@@ -1,6 +1,28 @@
 # Tiến độ thực tế
 
-Cập nhật: 2026-11-03 (Asia/Saigon). Phiên bản hội thoại: V1.3.3.
+Cập nhật: 2026-11-04 (Asia/Saigon). Phiên bản hội thoại: V1.4.0.
+
+V1.4.0: đã hiện thực ảnh điện tùy chọn khi chốt/sửa; drop/chọn chỉ preview local, lưu mới upload. Bảng có Lưu ảnh cho kỳ đã chốt, tiến độ byte 0–100 tách bước nén, polling theo lô tự cập nhật thumbnail; popup Bootstrap xem ảnh, không reload/mất ảnh chờ hàng khác. Retry bổ sung cùng token không tạo trùng, giữ quyền/CSRF và worker xóa gốc tạm; form thường có fallback khi tắt JS. 61 test Python đạt, 13 test ảnh đạt sau assertion bổ sung, Edge headless với dữ liệu tạm đạt luồng chính/drop/popup/no reload. Node/db check/inventory/diff đạt. Không migration/đổi dữ liệu dev; chưa cập nhật VPS, chưa thử mạng chậm/điện thoại thật. Xem PHOTOS.md.
+
+V1.3.13: chỉ phân tích yêu cầu ảnh điện tùy chọn, thumbnail/modal, kéo thả chờ lưu, tiến độ upload và cập nhật bảng không reload; ghi METER_PHOTO_UX_PROPOSAL.md. App/VPS hiện vẫn có kiểm tra bắt buộc ảnh theo bản cũ, chưa sửa code/schema hoặc chạy test nghiệp vụ. Đối chiếu source/MDN, inventory/diff đạt.
+
+V1.3.12: hướng dẫn xóa riêng ZIP triển khai /opt/chdv/chdv-v1.3.4.zip vì đã giải nén, giữ backup quay lui và runtime. Chưa thao tác xóa trên VPS; chưa có kết quả upload ảnh thực tế. Chỉ cập nhật tài liệu, inventory/diff đạt.
+
+V1.3.11: log VPS xác nhận web/worker ảnh enabled và active; HTTPS /login trả 200, cookie Secure. Dịch vụ đã mở lại sau cập nhật; chưa có bằng chứng upload/nén/xóa gốc trên browser thật. Hướng dẫn bổ sung ảnh công tơ đúng kỳ không đổi số rồi kiểm tra ảnh nén/tmp. Chỉ sửa tài liệu, inventory/diff đạt; không tự thao tác dữ liệu VPS.
+
+V1.3.10: người dùng gửi kết quả VPS 58 tests OK trong 41.727s. Cảnh báo datetime.utcnow tại auth/routes.py:43 không làm test lỗi; chưa sửa trong lượt triển khai. Hướng dẫn mở lại dịch vụ và kiểm tra HTTPS, chưa nhận kết quả status/upload ảnh. Chỉ sửa tài liệu, inventory/diff đạt; không tự chạy lệnh VPS.
+
+V1.3.9: log nginx -t trên VPS đạt sau chỉnh site. Hướng dẫn test suite rồi mới mở lại web/worker và kiểm tra HTTPS. Nhắc cài worker nếu chưa làm vì chưa có log bước đó. Chưa có bằng chứng test hoặc start services/upload ảnh. Chỉ sửa tài liệu, inventory/diff đạt; không tự chạy lệnh VPS.
+
+V1.3.8: log người dùng xác nhận code VPS đã giải nén/cấp quyền, Pillow 13.0.0 cài thành công, migration f13a98c52b70 và db check đạt. Hướng dẫn cài service worker, tạo uploads và Nginx 64m; chưa nhận kết quả, web vẫn dừng. Chưa test suite VPS hoặc upload thực tế. Chỉ sửa tài liệu, inventory/diff đạt; không tự chạy lệnh VPS.
+
+V1.3.7: log VPS xác nhận web đã dừng và backup đầy đủ tại /root/chdv-before-update-OREUjaIO (DB/project/systemd/Nginx). Hướng dẫn giải nén code, quyền truy cập, cài thư viện và migration; chưa có kết quả cập nhật, web chưa mở lại. Chỉ sửa tài liệu, inventory/diff đạt; không tự chạy lệnh VPS.
+
+V1.3.6: người dùng xác nhận ZIP VPS kiểm tra đạt Done testing. Hướng dẫn dừng web và backup DB/code/runtime/cấu hình vào thư mục riêng dưới /root trước khi cập nhật; chưa nhận bằng chứng backup, chưa thay code/schema VPS. Chỉ sửa tài liệu, kiểm tra inventory/diff; không chạy lệnh VPS.
+
+V1.3.5: ảnh VPS cho thấy ZIP đã upload tại /opt/chdv/chdv-v1.3.4.zip, khác đường dẫn kiểm tra /root/chdv-upload dẫn đến FileNotFoundError. Hướng dẫn kiểm tra lại đúng chỗ; chưa có kết quả tính toàn vẹn hoặc triển khai. Chỉ sửa tài liệu, kiểm tra inventory/diff; không chạy lệnh VPS.
+
+V1.3.4: đã chuẩn bị exports/chdv-v1.3.4.zip cho cập nhật VPS, kiểm tra ZIP và danh sách không chứa .env/runtime; code từ HEAD sạch. SSH trực tiếp không có host key tin cậy/phiên xác thực chia sẻ, hướng dẫn upload ZIP bằng MobaXterm. Chưa nhận bằng chứng upload hoặc thay đổi VPS; chưa dừng dịch vụ hay migrate production. Kiểm tra inventory/diff; không chạy lại test vì chỉ đóng gói code đã kiểm thử.
 
 V1.3.3: bổ sung/xem ảnh công tơ ngay trên màn Sửa điện; form ảnh riêng không yêu cầu đổi số. Link từ bảng điện và redirect upload về đúng kỳ điện, bỏ form ảnh điện bên phòng (giữ xem lịch sử). Kiểm tra 10 test ảnh và 12 test billing đạt, inventory/diff đạt. Không đổi DB/nén; chưa browser QA/VPS.
 

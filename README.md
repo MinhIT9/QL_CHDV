@@ -24,7 +24,7 @@ Giá điện có trong thông tin phòng cùng tiền phòng/nước. Thay giá 
 
 ## Chạy local trên Windows
 
-V1.3.0: ảnh hợp đồng tùy chọn, ảnh điện bắt buộc khi chốt/sửa số. Cần chạy worker nén ảnh trong terminal riêng; xem [hướng dẫn ảnh](document/PHOTOS.md). Backup phải lưu thêm thư mục ảnh, không chỉ database.
+V1.4.0: ảnh hợp đồng/điện đều tùy chọn. Kéo thả ảnh điện vào bảng để xem trước, bấm lưu mới upload; có tiến độ và thumbnail/popup tự cập nhật sau nén. Cần chạy worker trong terminal riêng; xem [hướng dẫn ảnh](document/PHOTOS.md). Backup phải lưu thêm thư mục ảnh, không chỉ database.
 
 Máy hiện tại đã có .env, database và root được khởi tạo. Mật khẩu bootstrap theo yêu cầu được giữ ở .env ngoài Git; đăng nhập lần đầu phải đổi mật khẩu.
 

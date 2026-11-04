@@ -23,6 +23,7 @@ window.addEventListener("resize", repositionPaymentPanels);
 window.addEventListener("scroll", repositionPaymentPanels, true);
 
 function enhancePage() {
+window.enhanceMeterPhotos?.();
 const sidebar = document.querySelector("#sidebar");
 const sidebarToggle = document.querySelector(".sidebar-toggle");
 if (sidebar && sidebarToggle && !sidebarToggle.dataset.bound) {
@@ -109,7 +110,7 @@ if (meterForm && !meterForm.dataset.bound) {
       const startRaw = start.dataset.value ?? start.value;
       const endRaw = end.value;
       const photo = row.querySelector(".meter-photo");
-      if (photo) photo.required = endRaw !== "";
+      if (photo) photo.required = false;
       end.setCustomValidity("");
       if (start.tagName === "INPUT") start.required = endRaw !== "";
       if (amount) amount.textContent = "—";

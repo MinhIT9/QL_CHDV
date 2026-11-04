@@ -4,9 +4,9 @@ Cập nhật: 2026-11-03 (Asia/Saigon).
 
 ## Phiên bản hội thoại
 
-- Phiên bản phản hồi gần nhất: V1.3.3.
-- Nội dung: Chuyển bổ sung ảnh công tơ sang màn Sửa điện, hiển thị ngay khi mở trang, upload không cần sửa số và redirect về đúng kỳ. Bảng điện dẫn tới mục ảnh màn điện; phòng chỉ còn form ảnh hợp đồng, lịch sử điện vẫn xem ảnh. 10 test ảnh và 12 test billing đạt, không đổi schema/nén; chưa browser QA/VPS.
-- Phản hồi tiếp theo tối thiểu V1.3.4; có thể tăng minor/major theo quy tắc mới trong AGENTS.md.
+- Phiên bản phản hồi gần nhất: V1.4.0.
+- Nội dung: Đã triển khai dev ảnh điện tùy chọn, kéo thả/preview chỉ gửi khi lưu, progress XHR, polling tự cập nhật thumbnail và Bootstrap modal. 61 tests pass; 13 test ảnh pass sau kiểm tra retry khác owner. Edge script với dữ liệu tạm đạt optional save/deferred drop/giữ hàng khác/lưu ảnh+kèm chỉ số/popup Escape/no reload/no JS errors. Không đổi schema, db check/Node/docs đạt; chưa cập nhật VPS. Giữ worker nén nền như cũ.
+- Phản hồi tiếp theo tối thiểu V1.4.1; có thể tăng minor/major theo quy tắc mới trong AGENTS.md.
 - Quy tắc đầy đủ ở AGENTS.md, mục “Phiên bản ở cuối phản hồi”.
 
 ## Đã làm
@@ -31,6 +31,26 @@ Cập nhật: 2026-11-03 (Asia/Saigon).
 - Chỉ chốt tiền một đợt thuê xác định đủ tháng; thiếu điện, ngày không rõ, vào/trả giữa tháng hoặc đổi khách cùng kỳ bị chặn. Không có engine lịch giá tự động: giá trên form là gợi ý, Admin xác nhận cho từng kỳ.
 
 ## Kiểm tra
+
+- V1.4.0 (2026-11-04): `.venv/Scripts/python.exe -m unittest discover -s tests`: 61 tests OK (41.992s); chạy lại 13 test_photos sau thêm assertion token không dùng cho owner khác: OK (9.251s). Script check_meter_photo_browser.py dùng Microsoft Edge headless và DB/ảnh tạm đạt: chọn/drop chưa tạo upload, lưu không ảnh, không gửi/mất ảnh của hàng chưa nhập số, upload bổ sung và upload kèm chốt mới, pending tự thành thumbnail, modal/Escape, giữ page marker/no reload, không pageerror. Cài Playwright vào venv chỉ cho QA, không thêm runtime dependency. Node syntax cả hai file JS đạt; db check không drift, không migration. Chưa thử mạng chậm/lớn/điện thoại thật và chưa cập nhật VPS. Bước tiếp chạy dev với worker, Ctrl+F5; nếu cập nhật VPS cần đóng gói code hiện tại, không dùng ZIP V1.3.4 cũ. Không thay .env/DB/ảnh dev.
+
+- V1.3.13 (2026-11-04): chỉ phân tích theo yêu cầu chưa code, ghi METER_PHOTO_UX_PROPOSAL.md. Đề xuất bỏ bắt buộc ảnh chốt/sửa điện, preview kéo thả chưa upload, Lưu chỉ số kèm ảnh hoặc Lưu ảnh cho kỳ đã chốt, tiến độ byte 0–100 rồi polling job, thumbnail/modal trong bảng không reload. Đối chiếu code và MDN; chưa sửa app/test/VPS, chưa triển khai đề xuất. Inventory/diff đạt. Bước tiếp khi được yêu cầu triển khai: xử lý save/status AJAX, chống gửi trùng/phiên hết hạn, giữ worker/quyền riêng tư và kiểm thử luồng bất đồng bộ.
+
+- V1.3.12 (2026-11-04): xác nhận có thể xóa riêng /opt/chdv/chdv-v1.3.4.zip sau khi giải nén/cập nhật, ứng dụng/worker không cần ZIP. Hướng dẫn rm -i đúng file, giữ /root/chdv-before-update-OREUjaIO và runtime; chưa có bằng chứng người dùng đã xóa, chưa nhận kiểm tra upload ảnh thực tế.
+
+- V1.3.11 (2026-11-04): log VPS xác nhận chdv và chdv-photos enabled/active sau cập nhật, HTTPS /login 200 qua Nginx, cookie Secure. Hướng dẫn tải ảnh công tơ thực tế ở kỳ đã có, không đổi số; kiểm tra pending → Xem ảnh và tmp không còn .upload khi hàng đợi xong. Chưa nhận kết quả upload/nén hoặc xem ảnh; backup/restore DB+ảnh vẫn cần vận hành theo PHOTOS.md. Backup trước nâng cấp /root/chdv-before-update-OREUjaIO.
+
+- V1.3.10 (2026-11-04): log VPS xác nhận 58 tests OK trong 41.727s, có DeprecationWarning datetime.utcnow tại app/auth/routes.py:43, chưa sửa ngoài phạm vi triển khai. Hướng dẫn cài/start worker, reload Nginx, start chdv và kiểm tra status/HTTPS. Chưa có log start dịch vụ hoặc upload thực tế sau cập nhật; backup quay lui /root/chdv-before-update-OREUjaIO.
+
+- V1.3.9 (2026-11-04): người dùng gửi nginx -t syntax/test successful sau chỉnh site. Chưa có log cài worker từ đợt trước, nên nhắc install service/tạo uploads/daemon-reload trước enable. Hướng dẫn unittest trên VPS, nếu OK thì reload Nginx, enable/start worker và start chdv, kiểm tra status/curl HTTPS. Chưa nhận kết quả test/start/upload; không đánh dấu hoàn tất triển khai.
+
+- V1.3.8 (2026-11-04): log VPS xác nhận giải nén/cấp quyền code, Pillow 13.0.0 cài thành công, upgrade 41eb1b88b816 → f13a98c52b70 và db check không drift. Hướng dẫn install worker service với mode 644 (shell còn umask 077), tạo uploads owner chdv, sửa Nginx 256k → 64m và nginx -t. Chưa start worker/web; chờ kết quả trước test/mở lại. Backup quay lui /root/chdv-before-update-OREUjaIO.
+
+- V1.3.7 (2026-11-04): log xác nhận chdv đã stop, backup /root/chdv-before-update-OREUjaIO gồm database.sqlite3, project.tar.gz, chdv.service, nginx-chdv.conf. Hướng dẫn giải nén ZIP code, chown/chmod code vì shell umask 077, pip requirements, db upgrade/check; chưa nhận kết quả. Sau đó cần test VPS, Nginx 64m, worker service và mở lại web; chưa đánh dấu triển khai hoàn tất.
+
+- V1.3.6 (2026-11-04): người dùng gửi zipfile -t /opt/chdv/chdv-v1.3.4.zip: Done testing. Hướng dẫn dừng chdv, tạo thư mục backup riêng dưới /root bằng mktemp, backup-db và tar toàn bộ project (loại .venv/cache/backups/ZIP) cùng systemd/Nginx. Chưa nhận kết quả backup; chưa giải nén/migrate. Web dự kiến tạm không truy cập sau stop; nếu lỗi phải dừng bước tiếp và gửi kết quả.
+
+- V1.3.5 (2026-11-04): ảnh SFTP xác nhận ZIP nằm /opt/chdv/chdv-v1.3.4.zip; lệnh kiểm tra dùng /root/chdv-upload nên FileNotFoundError, chưa chứng minh ZIP hỏng. Hướng dẫn kiểm tra đúng đường dẫn; chưa giải nén hoặc cập nhật VPS. cls không có trên Ubuntu, dùng clear nếu cần. Chờ kết quả ZIP trước backup/cập nhật.
 
 - V1.3.2: đọc log người dùng và DB local xác nhận no such table: photo, schema 41eb1b88b816. Backup trước upgrade rồi kiểm tra schema không drift, integrity ok, toàn bộ dòng/cột các bảng cũ khớp backup; smoke GET /electricity/ có phiên xác thực trả 200, không chỉnh user. Inventory/diff đạt; không chạy lại suite vì không đổi code. Không chứng minh bản copy live từ VPS có đầy đủ WAL, chỉ xác nhận dữ liệu bản nhập được giữ khi migrate.
 

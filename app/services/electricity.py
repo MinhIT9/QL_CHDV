@@ -86,12 +86,10 @@ def save_readings(period, data, user_id, files):
     if not submitted:
         raise ValueError("Hãy nhập chỉ số cuối cho ít nhất một phòng chưa chốt.")
     with upload_batch() as staged:
-        codes = {room.id: room.code for room in rooms}
         for reading in submitted:
             upload = files.get(f"photo_{reading.room_id}")
-            if upload is None or not upload.filename:
-                raise ValueError(f"Phòng {codes[reading.room_id]}: bắt buộc có ảnh chốt số điện.")
-            stage_photo(upload, user_id, staged, reading=reading)
+            if upload and upload.filename:
+                stage_photo(upload, user_id, staged, reading=reading)
         db.session.add_all(submitted)
         db.session.commit()
     return len(submitted)

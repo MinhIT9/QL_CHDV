@@ -1,8 +1,6 @@
 <td>
-  {% if reading %}
-    {{ photo_list(reading.photos) }}
-    <a class="small" href="{{ url_for('billing.correct', reading_id=reading.id, _anchor='meter-photos') }}">Bổ sung ảnh</a>
-  {% elif not row.error %}
-    <input class="form-control form-control-sm meter-photo" type="file" name="photo_{{ room.id }}" accept="image/jpeg,image/png,image/webp" aria-label="Ảnh chốt điện phòng {{ room.code }}">
+  {% if reading or not row.error %}
+    {% include 'electricity/photo_widget.html' %}
+    {% if reading %}<noscript><a href="{{ url_for('billing.correct', reading_id=reading.id) }}">Bổ sung ảnh</a></noscript>{% endif %}
   {% else %}—{% endif %}
 </td>

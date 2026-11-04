@@ -2,9 +2,9 @@
 <div class="d-flex flex-wrap gap-2 my-2">
   {% for photo in photos %}
     {% if photo.status == 'ready' %}
-      <a class="btn btn-sm btn-outline-primary" href="{{ url_for('photos.view', photo_id=photo.id) }}" target="_blank" rel="noopener" title="Tải lên {{ photo.created_at|local_datetime }}">Xem ảnh {{ loop.index }}</a>
+      <a href="{{ url_for('photos.view', photo_id=photo.id) }}" hx-boost="false" class="photo-open" title="Xem ảnh {{ loop.index }}"><img class="photo-thumb rounded border" src="{{ url_for('photos.view', photo_id=photo.id) }}" width="72" height="72" loading="lazy" alt="Ảnh {{ loop.index }}"></a>
     {% elif photo.status == 'pending' %}
-      <span class="badge text-bg-secondary">Ảnh {{ loop.index }} đang xử lý · tải lại để xem</span>
+      <span class="badge text-bg-secondary" data-photo-pending="{{ photo.id }}">Đang xử lý ảnh…</span>
     {% else %}
       <span class="badge text-bg-danger">Ảnh {{ loop.index }} xử lý lỗi · vui lòng tải lại ảnh</span>
     {% endif %}

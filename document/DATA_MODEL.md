@@ -6,7 +6,7 @@
 
 - token ngẫu nhiên duy nhất; tenancy_id hoặc reading_id (CHECK đúng một chủ sở hữu), created_by/at, status pending/ready/failed (CHECK). Không lưu blob/đường dẫn từ khách vào DB. FK RESTRICT giữ liên kết lịch sử.
 - Byte gốc ở instance/uploads/tmp trong lúc chờ; file dài hạn là WebP ở contracts/electricity. Tên file theo token, không theo tên khách hoặc tên upload. Xem PHOTOS.md về worker, crash recovery và backup.
-- Ảnh hợp đồng tùy chọn theo đợt thuê; chốt/sửa điện mới phải có ảnh ở service. Không backfill hay yêu cầu dữ liệu cũ có ảnh, ảnh cũ không bị thay thế khi sửa số. Ảnh có thể bổ sung, chưa có UI xóa.
+- V1.4.0: ảnh hợp đồng và ảnh chốt/sửa điện đều tùy chọn. Không backfill, ảnh cũ không bị thay thế khi sửa số. Token có thể do client tạo theo định dạng hex32 để retry upload bổ sung không trùng, máy chủ kiểm tra token/owner/user trước tái sử dụng. Không migration mới. Ảnh có thể bổ sung, chưa có UI xóa ảnh đã lưu.
 
 ## Receipt — V1.1.14
 
