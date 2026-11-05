@@ -1,5 +1,19 @@
 # Bàn giao
 
+V1.10.8 (2026-11-05): Người dùng cung cấp log cập nhật patch STK V1.10.7 trên VPS: ZIP Done testing, chdv và chdv-photos active, HTTPS /login HTTP 200. Ghi nhận triển khai theo log; chưa xác minh trực tiếp nhãn STK trên trang phiếu hoặc ảnh xuất. Bước tiếp mở phiếu và Ctrl+F5 để kiểm tra. Không backup theo yêu cầu, không đổi code trong lượt này.
+
+V1.10.7 (2026-11-05): Xuất exports/chdv-v1.10.7.zip chỉ chứa app/templates/billing/detail.html thêm nhãn STK, dành cho VPS đã cập nhật V1.10.0. Đã kiểm tra CRC, danh sách file và nội dung nhãn. Hướng dẫn upload vào /opt/chdv rồi giải nén đúng đường dẫn, đặt quyền và restart web; không backup theo yêu cầu, không đổi DB/dependencies và không cần dừng worker ảnh. Chưa thực thi trên VPS.
+
+V1.10.6 (2026-11-05): Thêm nhãn STK: trước số tài khoản trong phiếu tiền phòng, áp dụng cả bản in và ảnh xuất từ phiếu. Chỉ đổi nội dung template; chưa triển khai VPS. Kiểm tra tài liệu bằng update_docs.py và --check; không chạy lại unittest cho thay đổi nhãn hiển thị.
+
+V1.10.5 (2026-11-05 Asia/Saigon): Người dùng xác nhận triển khai patch V1.10.0 trên VPS: ZIP Done testing, 6 test_bill_documents OK trong 4.635s, chdv/chdv-photos đều active, HTTPS /login HTTP 200 và cookie Secure. Cập nhật code/dịch vụ đạt theo log; chưa có bằng chứng thử nút xuất ảnh trên trình duyệt VPS/album điện thoại thật. DeprecationWarning datetime.utcnow ở auth/routes.py:43 không gây thất bại, chưa sửa ngoài phạm vi. Lần cập nhật này không backup theo yêu cầu; bộ backup V1.9.3 /root/chdv-before-v193-Vh5xOts7 vẫn là mốc trước đó. Bước tiếp Ctrl+F5, mở phiếu và thử Lưu ảnh phiếu/tải/chia sẻ.
+
+V1.10.4 (2026-11-05 Asia/Saigon): Người dùng xác nhận ls -lb có /opt/chdv/chdv-v1.10.0.zip đúng 58861 byte và hostname -I=103.167.88.214. Đường dẫn/tên ZIP đã được xác nhận qua terminal, không kết luận nguyên nhân lần thiếu file trước. Hướng dẫn chạy lại khối test ZIP/stop web/extract/chown/chmod/test_bill_documents/start/status/HTTPS, không backup theo yêu cầu. Chưa có kết quả kiểm tra CRC hay triển khai mới trên VPS.
+
+V1.10.2: VPS báo FileNotFoundError /opt/chdv/chdv-v1.10.0.zip ngay bước test ZIP. Vì set -e trong subshell, chưa chạy stop web/thay code/tests/start; lỗi apport /opt/chdv/-m là lỗi phụ khi báo exception. Chưa biết vị trí ZIP thực tế, không đoán là /root. Hướng dẫn find trong /root và /opt/chdv, hoặc upload bằng khung SFTP vào /opt/chdv, rồi test đúng đường dẫn trước khi chạy lại khối cập nhật. Giữ yêu cầu không backup. Không thao tác VPS hoặc sửa code.
+
+V1.10.1: Theo yêu cầu chuẩn bị gói patch exports/chdv-v1.10.0.zip để upload /opt/chdv/, không backup lần này. Gói 7 file gồm route phiếu, receipt CSS/JS/template, html2canvas + LICENSE và test_bill_documents.py; dành cho VPS đã cập nhật V1.9.3 như phiên trước. Không có .env/DB/uploads/migration/requirements. Chỉ dừng web khi thay file, worker có thể giữ chạy; chạy bộ test phiếu rồi mở lại dịch vụ/kiểm tra HTTPS. Không cần pip hoặc db upgrade cho patch này. Chưa thao tác VPS hoặc xác nhận cập nhật; dùng kết quả 88 tests/Edge V1.10.0 đã ghi, không chạy lại chỉ vì đóng gói.
+
 ## 2026-11-04 — Lưu ảnh phiếu tại client
 
 V1.10.0: Thêm nút Lưu ảnh phiếu trên trang phiếu. Dùng html2canvas 1.4.1 vendored (MIT, kèm LICENSE) tạo PNG rộng 1600 px hoàn toàn trong trình duyệt; chỉ chụp card, không toolbar/modal/nhật ký. Chờ font và ảnh QR decode, đưa pixel QR đã tải vào bản clone để tránh lấy lại QR khác với tài khoản đang hiển thị. Không thêm endpoint upload, không lưu file trên server/localStorage. Blob URL được thu hồi khi tạo ảnh mới/rời trang.
@@ -98,9 +112,9 @@ Cập nhật: 2026-11-04 (Asia/Saigon).
 
 ## Phiên bản hội thoại
 
-- Phiên bản phản hồi gần nhất: V1.10.0.
+- Phiên bản phản hồi gần nhất: V1.10.5.
 - Nội dung: Xuất ảnh phiếu tại client với xem trước/tải/chia sẻ, trạng thái gọn và tổng một dòng bỏ tiền bằng chữ. DEV đã kiểm tra Edge, chưa mobile thật/VPS.
-- Phản hồi tiếp theo tối thiểu V1.10.1; có thể tăng minor/major theo quy tắc mới trong AGENTS.md.
+- Phản hồi tiếp theo tối thiểu V1.10.6; có thể tăng minor/major theo quy tắc mới trong AGENTS.md.
 - Quy tắc đầy đủ ở AGENTS.md, mục “Phiên bản ở cuối phản hồi”.
 
 ## Đã làm
@@ -270,3 +284,5 @@ V1.9.1: Giải thích luồng sửa chỉ số điện hiện có: nếu có phi
 Kiểm tra V1.9.2: 88 unittest OK (50.854s), đăng nhập tách root/Admin để kiểm tra quyền thực tế. Admin bị chặn sửa điện/ảnh khi còn phiếu, hủy có lý do và audit đúng Admin rồi sửa được; phiếu đã thu không hủy được, reverse vẫn 403 cho Admin. Edge đạt widget vẫn hiện, thử lưu khi khóa nhận lỗi, ảnh đã lưu không đổi; regression QR/form/nhật ký đạt. Không thay schema hoặc thao tác VPS.
 
 V1.10.0 — Kiểm tra cuối Edge: xuất PNG desktop/mobile thành công, QR đọc lại được; nhánh canShare=false vẫn có tải ảnh, hủy share không báo lỗi, lỗi decode QR hiện thông báo và nút lưu dùng lại được. Không pageerror, không POST/upload trong xuất ảnh; đã xem trực tiếp PNG và screenshot mobile. Chưa kiểm tra album native trên điện thoại thật.
+
+V1.10.3: Ảnh SFTP /opt/chdv có ZIP khoảng 57KB nhưng SSH vẫn FileNotFoundError cùng đường dẫn dự kiến. Chưa kết luận tên file/kết nối lệch từ ảnh; yêu cầu ls -lb /opt/chdv/*.zip và hostname -I để đối chiếu tên thật/ký tự ẩn và VPS. Khối set -e vẫn dừng ở test ZIP, chưa cập nhật. Không thao tác VPS/code.
