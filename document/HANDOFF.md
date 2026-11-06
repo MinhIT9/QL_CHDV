@@ -1,5 +1,15 @@
 # Bàn giao
 
+V1.10.14 (2026-11-06): Triển khai bảng chỉ số điện mobile <=680px: gom đầu/cuối, tiêu thụ/đơn giá, tiền thành ba dòng; mã phòng/trạng thái/sửa điện bên trái, ảnh nhỏ 44px và chọn ảnh bên phải. Hai cột Ngày chốt và Sửa đổi gần nhất vuốt ngang để xem, ngày/giờ hai dòng theo giờ Việt Nam hiện có. Giữ một bộ input/widget và bảng desktop, không đổi JS nghiệp vụ/DB/quyền. 16 test_photos và 17 test_v1 đạt; Edge chạy các assertion mobile 375/430px và desktop1280px, upload/thay ảnh/modal/lưu số điện/khóa phiếu đạt, không pageerror; đã xem ảnh exports/meter-mobile-layout.png. Lượt browser in thông báo passed nhưng runner trả exit1, không có traceback trong log stderr, nên chưa coi trạng thái thoát của runner là sạch. DB check không phát sinh migration; Node syntax, docs check và diff check đạt. Chưa triển khai VPS. Ghi nhận V1.10.13 ở lượt trước là yêu cầu thêm hai cột ngày, chưa được ghi vào HANDOFF khi đó.
+
+V1.10.12 (2026-11-06): Phác thảo ảnh bảng chỉ số điện mobile theo yêu cầu, mỗi phòng 2–3 dòng, gom đầu/cuối kỳ, tiêu thụ/tiền và ảnh/thao tác; giữ hình thức bảng, dữ liệu minh họa. Chỉ tạo mockup, chưa sửa code hoặc triển khai.
+
+V1.10.11 (2026-11-06): Theo yêu cầu giữ bảng như /bills, bỏ ghim ngang mã phòng/thao tác trên mobile <=680px cho cả bảng phòng gọn và đầy đủ, giữ ghim tiêu đề dọc và hành vi desktop. Bộ lọc phòng dùng lưới hai cột, tìm kiếm cả hàng; tăng phiên bản CSS tránh cache. Không đổi nghiệp vụ/DB. 17 test_v1 OK; kiểm tra CSS bằng Edge với cấu trúc bảng/bộ lọc ở 375/430/1280px đạt cuộn ngang, độ rộng bộ lọc và sticky desktop. Chưa kiểm tra trực quan trang thật có Bootstrap/CDN; lần thử render trang qua test client chưa đạt, không tính là kiểm tra trang thực hoàn thành. Chưa triển khai VPS.
+
+V1.10.10 (2026-11-06): Tạo mockup ảnh xem trước danh sách phòng mobile bằng imagegen theo yêu cầu; bố cục thẻ phòng và bộ lọc gọn, dữ liệu minh họa. Chưa sửa code hoặc triển khai giao diện.
+
+V1.10.9 (2026-11-06): Phân tích ảnh danh sách phòng trên mobile, chưa code. Đề xuất mobile dùng thẻ phòng với mã/trạng thái, khách, tiền phòng và điện kỳ đang xem, chi tiết mở rộng; desktop giữ bảng. Bộ lọc xếp lại đủ chiều rộng, tùy chọn phụ thu gọn, thống kê gọn hơn. Đây là đề xuất chưa được triển khai hoặc kiểm tra giao diện.
+
 V1.10.8 (2026-11-05): Người dùng cung cấp log cập nhật patch STK V1.10.7 trên VPS: ZIP Done testing, chdv và chdv-photos active, HTTPS /login HTTP 200. Ghi nhận triển khai theo log; chưa xác minh trực tiếp nhãn STK trên trang phiếu hoặc ảnh xuất. Bước tiếp mở phiếu và Ctrl+F5 để kiểm tra. Không backup theo yêu cầu, không đổi code trong lượt này.
 
 V1.10.7 (2026-11-05): Xuất exports/chdv-v1.10.7.zip chỉ chứa app/templates/billing/detail.html thêm nhãn STK, dành cho VPS đã cập nhật V1.10.0. Đã kiểm tra CRC, danh sách file và nội dung nhãn. Hướng dẫn upload vào /opt/chdv rồi giải nén đúng đường dẫn, đặt quyền và restart web; không backup theo yêu cầu, không đổi DB/dependencies và không cần dừng worker ảnh. Chưa thực thi trên VPS.

@@ -1,4 +1,4 @@
-<td class="number text-end text-nowrap">{{ row.price|vnd }}</td>
-<td class="number text-end text-nowrap"><strong class="reading-amount">{{ row.amount|vnd if reading else '—' }}</strong>{% if reading %}<small>{{ ('Tạm tính · giá hiện tại' if row.current_price else 'Dự tính theo giá lúc lưu điện') if row.estimated else 'Đã chốt tiền' }}</small>{% endif %}</td>
-<td>{{ reading.created_at|local_datetime if reading else '—' }}</td>
-<td>{{ row.updated_at|local_datetime if row.updated_at else '—' }}</td>
+<td class="meter-price number text-end text-nowrap">{{ row.price|vnd }}</td>
+<td class="meter-amount number text-end text-nowrap"><strong class="reading-amount">{{ row.amount|vnd if reading else '—' }}</strong>{% if reading %}<small>{{ ('Tạm tính · giá hiện tại' if row.current_price else 'Dự tính theo giá lúc lưu điện') if row.estimated else 'Đã chốt tiền' }}</small>{% endif %}</td>
+<td class="meter-created">{% if reading %}{{ (reading.created_at|local_datetime).replace(' ', '\n') }}{% else %}—{% endif %}</td>
+<td class="meter-updated">{{ (row.updated_at|local_datetime).replace(' ', '\n') if row.updated_at else '—' }}</td>

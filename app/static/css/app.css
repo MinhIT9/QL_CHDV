@@ -458,3 +458,90 @@ footer { display: flex; justify-content: space-between; align-items: center; gap
 
 .photo-thumb { object-fit: cover; }
 #meter-photo-modal .modal-body img { max-height: 80vh; object-fit: contain; }
+
+/* Mobile room tables scroll as a whole, like the billing table. */
+@media (max-width: 680px) {
+  .room-table th:nth-child(2), .room-table th:last-child {
+    left: auto;
+    right: auto;
+    z-index: 3;
+    box-shadow: none;
+  }
+  .room-table td:nth-child(2), .room-table td:last-child {
+    position: static;
+    box-shadow: none;
+  }
+  .room-toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .room-toolbar > label { min-width: 0; }
+  .room-toolbar .search { grid-column: 1 / -1; }
+  .room-toolbar input, .room-toolbar select { width: 100%; }
+}
+
+.meter-mobile-label { display: none; }
+@media (max-width: 680px) {
+  .meter-table { min-width: 576px; }
+  .meter-table thead { position: sticky; top: 0; z-index: 3; }
+  .meter-table tr {
+    display: grid;
+    grid-template-columns: 52px 88px 88px 100px 124px 124px;
+    grid-template-areas:
+      "room start end photo created updated"
+      "status consumption price photo created updated"
+      "status amount amount photo created updated";
+    border-bottom: 1px solid var(--line);
+  }
+  .meter-table thead tr {
+    grid-template-areas: "room start start photo created updated";
+  }
+  .meter-table th, .meter-table td {
+    min-width: 0;
+    padding: 6px;
+    border: 0;
+    text-align: left !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+  }
+  .meter-table th { position: static; align-content: center; padding-block: 12px; }
+  .meter-table td { align-content: start; }
+  .meter-table .meter-order,
+  .meter-table th.meter-end,
+  .meter-table th.meter-consumption,
+  .meter-table th.meter-status,
+  .meter-table th.meter-price,
+  .meter-table th.meter-amount,
+  .meter-table .meter-desktop-label { display: none; }
+  .meter-table .meter-mobile-label, #electricity-form > .meter-mobile-label { display: inline; }
+  .meter-table .meter-room { grid-area: room; }
+  .meter-table .meter-start { grid-area: start; }
+  .meter-table .meter-end { grid-area: end; }
+  .meter-table .meter-consumption { grid-area: consumption; }
+  .meter-table .meter-status { grid-area: status; }
+  .meter-table .meter-price { grid-area: price; }
+  .meter-table .meter-amount { grid-area: amount; }
+  .meter-table .meter-photo-cell { grid-area: photo; }
+  .meter-table .meter-created { grid-area: created; white-space: pre-line !important; }
+  .meter-table .meter-updated { grid-area: updated; white-space: pre-line !important; }
+  .meter-table td.meter-start, .meter-table td.meter-end { font-weight: 650; }
+  .meter-table td.meter-start::after { content: " →"; color: var(--muted); }
+  .meter-table .meter-input { min-width: 0 !important; width: 100%; padding: 5px; font-size: 11px; }
+  .meter-table .meter-status .badge { font-size: 8px; padding: 2px; gap: 2px; }
+  .meter-table .meter-status a { display: block; font-size: 10px; margin-top: 4px; }
+  .meter-table .meter-amount small { font-size: 9px; }
+  .meter-table .meter-photo-cell .photo-thumb { width: 44px; height: 44px; object-fit: cover; }
+  .meter-table .photo-drop { position: relative; cursor: pointer; text-align: center; }
+  .meter-table .photo-drop-text { display: none; }
+  .meter-table .photo-drop input[type=file] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    padding: 0;
+  }
+  .meter-table .photo-drop:focus-within { outline: 2px solid var(--blue); }
+  .meter-table .meter-photo-cell .btn { white-space: normal; font-size: 10px; }
+  .meter-table .meter-photo-cell .photo-preview { flex-wrap: wrap; }
+  .meter-table .empty { grid-column: 1 / -1; }
+}

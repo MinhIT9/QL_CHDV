@@ -5,7 +5,7 @@
     <span class="small text-warning">Cần hủy phiếu chưa thu trước khi sửa ảnh công tơ.</span>
   {% endif %}
   <label class="photo-drop border rounded p-2 d-block small text-muted" tabindex="0">
-    Kéo ảnh vào đây hoặc chọn ảnh
+    <span class="photo-drop-text">Kéo ảnh vào đây hoặc chọn ảnh</span><span class="meter-mobile-label">Chọn ảnh</span>
     <input class="form-control form-control-sm meter-photo" type="file" name="{{ 'photo_' ~ room.id if room is defined else 'photo' }}" accept="image/jpeg,image/png,image/webp">
   </label>
   <div class="photo-preview d-flex align-items-center gap-2 my-2"></div>

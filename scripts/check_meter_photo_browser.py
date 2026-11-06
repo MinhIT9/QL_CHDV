@@ -62,6 +62,21 @@ def main():
                 page.locator('button[type=submit]').click()
                 page.goto(base + '/electricity/?period=2026-01')
                 expect(page.locator('#electricity-form')).to_have_attribute('data-photo-bound', '1')
+                for width in (375, 430):
+                    page.set_viewport_size({'width': width, 'height': 844})
+                    row = page.locator('.reading-row').first
+                    assert row.evaluate('(e) => getComputedStyle(e).display') == 'grid'
+                    scroll = page.locator('#electricity-form .table-scroll')
+                    scroll.evaluate('(e) => e.scrollLeft = 0')
+                    photo = row.locator('.meter-photo-cell').bounding_box()
+                    created = row.locator('.meter-created').bounding_box()
+                    assert photo['x'] < created['x']
+                    assert row.locator('.end-value').is_visible()
+                    scroll.evaluate('(e) => e.scrollLeft = e.scrollWidth')
+                    assert row.locator('.meter-updated').bounding_box()['x'] < width
+                    scroll.evaluate('(e) => e.scrollLeft = 0')
+                page.set_viewport_size({'width': 1280, 'height': 900})
+                assert page.locator('.reading-row').first.evaluate('(e) => getComputedStyle(e).display') == 'table-row'
                 page.evaluate('window.testPageMarker = 123')
                 save_requests = []
                 page.on('request', lambda request: save_requests.append(request.post_data_buffer) if request.method == 'POST' and '/electricity/?' in request.url else None)
@@ -129,6 +144,15 @@ def main():
                 first.locator('[data-photo-pending]').wait_for(state='detached', timeout=15000)
                 assert first.locator('.saved-photos img').count() == 1
                 assert page.locator('#electricity-form button[type=submit]').is_disabled()
+                page.set_viewport_size({'width': 390, 'height': 844})
+                page.locator('#electricity-form .table-scroll').evaluate('(e) => e.scrollLeft = 0')
+                mobile_row = page.locator('.reading-row').first
+                assert mobile_row.locator('.photo-thumb').bounding_box()['width'] == 44
+                assert mobile_row.bounding_box()['height'] < 260
+                Path('exports').mkdir(exist_ok=True)
+                page.screenshot(path='exports/meter-mobile-layout.png', full_page=True)
+                page.set_viewport_size({'width': 1280, 'height': 900})
+
                 with app.app_context():
                     reading = db.session.scalar(db.select(ElectricityReading).order_by(ElectricityReading.id))
                     tenant = Tenancy(room_id=reading.room_id, tenant_name='Browser fixture')
