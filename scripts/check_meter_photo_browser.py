@@ -81,8 +81,10 @@ def main():
                 save_requests = []
                 page.on('request', lambda request: save_requests.append(request.post_data_buffer) if request.method == 'POST' and '/electricity/?' in request.url else None)
                 payload = {"name": 'meter.jpg', "mimeType": 'image/jpeg', "buffer": image.getvalue()}
-                first = page.locator('.reading-row').nth(0)
-                second = page.locator('.reading-row').nth(1)
+                first_id = page.locator('.reading-row').nth(0).get_attribute('data-room-id')
+                first = page.locator(f'.reading-row[data-room-id="{first_id}"]')
+                second_id = page.locator('.reading-row').nth(1).get_attribute('data-room-id')
+                second = page.locator(f'.reading-row[data-room-id="{second_id}"]')
                 second.locator('input[type=file]').set_input_files(payload)
                 assert second.locator('.photo-preview img').count() == 1
                 with app.app_context():

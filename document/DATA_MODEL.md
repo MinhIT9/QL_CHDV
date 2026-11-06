@@ -1,6 +1,11 @@
 # Mô hình dữ liệu V1
 
-Đã triển khai tại app/models/__init__.py; migration mới nhất f79254d31b86 (nhật ký thay đổi phiếu).
+## Ảnh trước khi chốt — V1.11.0
+
+Migration mới nhất 08a365e42c97 thêm Photo.room_id (FK Room, RESTRICT), period nullable và unique(room_id, period). CHECK ck_photo_owner yêu cầu đúng một chủ: tenancy; reading; hoặc room + period. Hai cột mới phải NULL ở ảnh hợp đồng/reading. Khi chốt, cùng Photo được gắn reading_id và xóa room_id/period, không đổi ảnh hoặc thông tin chỉ số cũ. Các bản ghi cũ giữ nguyên. Phòng có ảnh này được archive khi ngừng dùng. Downgrade bị chặn nếu còn ảnh phòng/kỳ chưa gắn reading.
+
+
+Đã triển khai tại app/models/__init__.py; migration mới nhất 08a365e42c97 (ảnh trước chỉ số điện).
 
 ## Điều chỉnh tổng phiếu — V1.5.0
 

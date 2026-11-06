@@ -1,5 +1,8 @@
 # Kiến trúc hiện tại
 
+V1.11.0: Ảnh công tơ có thể lưu trước chỉ số, gắn với room_id/period của Photo. Khi lưu reading thật, service electricity gắn lại cùng Photo trong một giao dịch và xóa room_id/period; không tạo reading giả hoặc nhân đôi file. Unique cho reading_id và room_id/period; route photos.add kind=meter xử lý upload độc lập, retry cùng token không tạo trùng, khóa ghi SQLite. Worker/file private dùng chung, không đổi cơ chế nén. CSDL mới cần migration 08a365e42c97. Phòng có ảnh trước chốt được ngừng sử dụng thay vì xóa để giữ ảnh.
+
+
 V1.5.0: service billing kiểm tra số thu cuối cùng/lý do, giữ tổng tính từ snapshot riêng. JS dùng số nguyên BigInt để xem tổng ngay trên form; máy chủ tính và kiểm tra lại. GET /bills/<id> yêu cầu đăng nhập, trình bày phiếu riêng với CSS in, trạng thái Receipt/hủy và tiền bằng chữ. bill_history_query trả cả phiếu hiệu lực/hủy của phòng; template dùng các subtotal từ model. Không thêm framework/dependency hoặc dịch vụ mới.
 
 V1.4.13: bộ chọn phòng lập phiếu là form GET gửi room_id/period/action về billing.index, máy chủ redirect đúng billing.create; bỏ liên kết mặc định phòng đầu và JS đổi href để tránh phụ thuộc HTMX/JavaScript. Dropdown giữ mọi mã phòng, phiếu hiệu lực trong kỳ được đánh dấu/disabled, đề xuất phòng chưa có phiếu. Lỗi mở form lập phiếu giữ room_id khi quay về danh sách. GET tạo phiếu cũng chặn phòng đã có phiếu hiệu lực; POST vẫn giữ kiểm tra giao dịch hiện có. Không đổi schema.

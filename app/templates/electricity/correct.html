@@ -9,14 +9,24 @@
   {% include 'electricity/photo_widget.html' %}
   <noscript>{{ photo_upload('electricity', reading.id) }}</noscript>
 </section>
-<section class="card narrow"><form method="post" enctype="multipart/form-data" class="stack d-grid">
-<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="stamp" value="{{ values.get('stamp', '') }}">
-<label>Chỉ số đầu<input class="form-control" type="number" name="start_value" min="0" max="2147483647" required value="{{ values.get('start_value', '') }}" {{ 'readonly' if previous or preview }}><small>Chỉ được sửa đầu kỳ nếu là lần ghi đầu tiên.</small></label>
-<label>Chỉ số cuối mới<input class="form-control" type="number" name="end_value" min="0" max="2147483647" required value="{{ values.get('end_value', '') }}" {{ 'readonly' if preview }}></label>
-<label>Lý do điều chỉnh<textarea class="form-control" name="reason" required maxlength="500" {{ 'readonly' if preview }}>{{ values.get('reason', '') }}</textarea></label>
-{% if preview %}<label>Ảnh đối chiếu số điện (tùy chọn)<input class="form-control" type="file" name="photo" accept="image/jpeg,image/png,image/webp"><small>Có thể bổ sung ảnh sau khi lưu.</small></label>{% endif %}
-{% if preview %}<div class="notice">{% for item in preview %}<p><strong>{{ item.period|period_label }}</strong>: {{ item.old_start }} → {{ item.old_end }} ({{ item.old_end - item.old_start }} kWh)<br>Thành {{ item.new_start }} → {{ item.new_end }} ({{ item.new_end - item.new_start }} kWh)</p>{% endfor %}</div><div class="actions d-flex gap-2 align-items-center flex-wrap"><a class="button secondary btn btn-outline-secondary" href="{{ url_for('billing.correct', reading_id=reading.id) }}">Nhập lại</a><button class="button primary btn btn-primary" name="action" value="confirm" type="submit">Xác nhận sửa</button></div>
-{% else %}<button class="button primary btn btn-primary" name="action" value="preview" type="submit">Xem trước thay đổi</button>{% endif %}
-</form></section>
+<section class="card narrow">
+  <form method="post" class="stack d-grid" id="meter-correction-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="stamp" value="{{ values.get('stamp', '') }}">
+    <div class="row g-3">
+      <label class="col-6">Chỉ số đầu
+        <input class="form-control" type="number" name="start_value" min="0" max="2147483647" required value="{{ values.get('start_value', '') }}" {{ 'readonly' if previous }}>
+      </label>
+      <label class="col-6">Chỉ số cuối mới
+        <input class="form-control" type="number" name="end_value" min="0" max="2147483647" required value="{{ values.get('end_value', '') }}">
+      </label>
+      <small class="col-12 text-muted">Chỉ được sửa đầu kỳ nếu là lần ghi đầu tiên.</small>
+    </div>
+    <label>Lý do điều chỉnh<textarea class="form-control" name="reason" required maxlength="500">{{ values.get('reason', '') }}</textarea></label>
+    <div class="alert alert-danger correction-error mb-0" role="alert" hidden></div>
+    <button class="button primary btn btn-primary" name="action" value="preview" type="submit">Xem trước thay đổi</button>
+  </form>
+</section>
+{% if preview %}{% include 'electricity/correction_preview.html' %}{% endif %}
 <section class="card table-card"><div class="section-heading"><h2>Lịch sử điều chỉnh kỳ {{ reading.period|period_label }}</h2></div><div class="table-scroll"><table class="table table-striped table-hover align-middle mb-0"><thead><tr><th>Trước</th><th>Sau</th><th>Lý do</th><th>Admin</th><th>Ngày</th></tr></thead><tbody>{% for item in revisions %}<tr><td>{{ item.old_start }} → {{ item.old_end }}</td><td>{{ item.new_start }} → {{ item.new_end }}</td><td>{{ item.reason }}</td><td>{{ item.author.username }}</td><td>{{ item.created_at|local_date }}</td></tr>{% else %}<tr><td colspan="5" class="empty">Chưa có điều chỉnh.</td></tr>{% endfor %}</tbody></table></div></section>
 {% endblock %}

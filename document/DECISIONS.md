@@ -1,5 +1,10 @@
 # Quyết định và vấn đề cần chốt
 
+## 2026-11-06 — Lưu ảnh trước chỉ số (V1.11.0)
+
+Không tạo bản ghi số điện 0 hoặc số tạm khi chỉ tải ảnh. Photo có chủ sở hữu thứ ba: phòng/kỳ tháng, một ảnh mỗi cặp. Khi chốt số điện, chuyển quyền sở hữu sang reading trong cùng giao dịch; giữ ID/token/trạng thái nén để worker và polling tiếp tục. Các cột room_id/period chỉ dùng trước khi có reading, không trộn với chủ hợp đồng/reading; CHECK và unique kiểm soát mô hình. Giữ nguyên khóa ảnh khi phiếu còn hiệu lực, chặn thay khi job pending. Cho phép ảnh tháng hợp lệ trước khi chuỗi chỉ số đủ điều kiện; ảnh không làm kỳ được tính là đã chốt. Downgrade từ chối khi còn ảnh phòng/kỳ chưa gắn reading, không tự xóa ảnh.
+
+
 ## 2026-11-04 — QR tạo cục bộ V1.7.0
 
 V1.7.0: Đã hiện thực QR chuyển khoản tạo cục bộ bằng qrcode 8.2, TLV NAPAS/QRIBFTTA, CRC16-CCITT. Không gọi dịch vụ bên ngoài hoặc lưu ảnh cho từng phiếu. Dropdown 48 ngân hàng từ snapshot API Banks ngày 2026-11-04 ở app/data/banks.json; không có tác vụ mạng runtime. Admin chọn BIN và điền STK (giữ số 0 đầu, 1–19 ký tự ASCII chữ/số), tên chủ tài khoản, ghi chú. Máy chủ lấy ngân hàng từ allowlist, không tin tên ngân hàng gửi từ form. Ghi chú chỉ hiển thị trên phiếu, nội dung QR tự tạo theo P{id} {room} T{mmyyyy}; tiền dùng bill.total sau điều chỉnh, không nhận override từ query string.

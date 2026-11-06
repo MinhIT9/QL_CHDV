@@ -1,12 +1,22 @@
-# Ảnh hợp đồng và ảnh điện (V1.4.2)
+# Ảnh hợp đồng và ảnh điện (V1.11.0)
+
+## Lưu ảnh trước số điện — V1.11.0
+
+- Trong bảng điện, chọn/kéo ảnh rồi bấm **Lưu ảnh**, không cần nhập đầu/cuối kỳ. Preview chưa bấm lưu vẫn chỉ ở client.
+- Ảnh lưu theo phòng và kỳ tháng; reload vẫn thấy thumbnail/trạng thái nén. Chỉ một ảnh mỗi phòng/kỳ, thay mới giữ ảnh cũ đến khi nén xong.
+- Khi bấm Lưu chỉ số, ảnh đã lưu được tự gắn vào reading thật; không cần upload lại. Ảnh pending vẫn tiếp tục nén; chốt phiếu tiền vẫn chờ job hoàn tất. Có thể chọn ảnh mới kèm Lưu chỉ số như trước.
+- Upload trước số điện không chốt kỳ, không tạo reading/số điện giả, không thay thống kê tiêu thụ. Phòng active/kỳ không tương lai được kiểm tra máy chủ; phiếu tiền còn hiệu lực vẫn khóa sửa ảnh.
+- Backup CSDL và toàn bộ uploads, dừng web/worker rồi chạy `python -m flask --app wsgi db upgrade` tới 08a365e42c97 trước khi chạy bản mới. Không có dependency mới. Dữ liệu/file cũ được giữ nguyên.
+
+
 
 ## Cách dùng
 
 - Thêm/sửa phòng đang thuê: tối đa 5 ảnh hợp đồng mỗi lần, không bắt buộc. Ảnh gắn với đợt thuê, không chuyển sang khách mới khi đổi khách.
 - Chốt/sửa số điện không bắt buộc ảnh. Có thể chọn ảnh kèm lần lưu hoặc bổ sung sau; nếu đã chọn ảnh thì máy chủ vẫn kiểm tra định dạng/kích thước. Không có ảnh vẫn lưu được số điện hợp lệ.
 - Mỗi ID chốt điện chỉ có một bản ghi ảnh. Lưu ảnh mới sẽ thay ảnh cũ: giữ bản cũ để xem trong lúc nén, chỉ xóa file cũ khi bản mới ready. Nếu nén lỗi, giữ ảnh cũ và báo lỗi cho tải lại. Không nhận thay tiếp khi job hiện tại còn pending.
-- Khi đã chốt phiếu tiền hiệu lực cho cùng phòng/kỳ, Root và Admin đều không thêm/thay ảnh được, kể cả request trực tiếp. Giao diện chỉ cho xem. Phiếu đã hủy hiệu lực không còn khóa ảnh. Không chốt phiếu khi ảnh còn pending, tránh ảnh thay sau khi phiếu đã chốt; không có ảnh vẫn chốt tiền được.
-- Ngay trong bảng Chỉ số điện: kéo file ảnh từ Explorer/Desktop hoặc chọn file, chỉ hiện preview Chưa tải lên. Bấm Lưu chỉ số mới gửi ảnh của các hàng có nhập số; ảnh chờ ở hàng khác không gửi và không bị mất. Phòng đã chốt có nút Lưu ảnh riêng, không cần sửa số hoặc chuyển trang.
+- Khi đã chốt phiếu tiền hiệu lực cho cùng phòng/kỳ, Root và Admin đều không thêm/thay ảnh được, kể cả request trực tiếp. Giao diện hiện nút vàng để xem thông báo khóa; không mở chọn file. Phiếu đã hủy hiệu lực không còn khóa ảnh. Không chốt phiếu khi ảnh còn pending, tránh ảnh thay sau khi phiếu đã chốt; không có ảnh vẫn chốt tiền được.
+- Ngay trong bảng Chỉ số điện: kéo file ảnh từ Explorer/Desktop hoặc chọn file, chỉ hiện preview Chưa tải lên. Bấm Lưu chỉ số mới gửi ảnh của các hàng có nhập số; ảnh chờ ở hàng khác không gửi và không bị mất. Cả phòng chưa chốt và đã chốt đều có nút Lưu ảnh riêng, không cần nhập/sửa số hoặc chuyển trang.
 - Hiện tiến độ upload 0–100% theo byte, sau đó trạng thái đang xử lý riêng. Khi worker nén xong, polling theo lô tự hiện thumbnail trong ô, không reload trang. Click thumbnail mở modal Bootstrap; Escape/nút đóng thoát popup. Ảnh lớn là WebP đã nén, không khôi phục gốc đã xóa.
 - Màn Sửa điện cũng có vùng thay ảnh trực tiếp trước khi chốt phiếu. Chi tiết phòng chỉ bổ sung ảnh hợp đồng; lịch sử điện xem ảnh hiện tại của từng lần chốt. Lịch sử chỉ số vẫn được giữ, ảnh cũ bị xóa khi thay thành công.
 - Nhận JPEG, PNG, WebP tĩnh, tối đa 10 MB và 24 megapixel/ảnh. Chưa nhận HEIC, PDF, SVG hoặc ảnh động. Mỗi request tối đa 64 MB; nhiều phòng hãy lưu từng phần. Sau lỗi form cần chọn lại file.

@@ -481,6 +481,7 @@ footer { display: flex; justify-content: space-between; align-items: center; gap
 }
 
 .meter-mobile-label { display: none; }
+.meter-table tbody tr:not(:last-child) > td { border-bottom: 2px solid #c4cfdd; }
 @media (max-width: 680px) {
   .meter-table { min-width: 576px; }
   .meter-table thead { position: sticky; top: 0; z-index: 3; }
@@ -491,8 +492,9 @@ footer { display: flex; justify-content: space-between; align-items: center; gap
       "room start end photo created updated"
       "status consumption price photo created updated"
       "status amount amount photo created updated";
-    border-bottom: 1px solid var(--line);
+    border-bottom: 2px solid #c4cfdd;
   }
+  .meter-table tbody tr:not(:last-child) > td { border-bottom: 0; }
   .meter-table thead tr {
     grid-template-areas: "room start start photo created updated";
   }
@@ -545,3 +547,6 @@ footer { display: flex; justify-content: space-between; align-items: center; gap
   .meter-table .meter-photo-cell .photo-preview { flex-wrap: wrap; }
   .meter-table .empty { grid-column: 1 / -1; }
 }
+
+.correction-dialog { width: min(560px, calc(100vw - 24px)); max-height: 90dvh; margin: auto; overflow-y: auto; border: 1px solid var(--line); color: var(--ink); }
+.correction-dialog::backdrop { background: #102a3666; }

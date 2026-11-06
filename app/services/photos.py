@@ -53,7 +53,16 @@ def upload_batch():
         raise
 
 
-def stage_photo(upload, user_id, staged, *, tenancy=None, reading=None, token=None):
+def attach_meter_photo(reading):
+    """Move the room/month image to its real reading in the same transaction."""
+    photo = db.session.scalar(db.select(Photo).where(
+        Photo.room_id == reading.room_id, Photo.period == reading.period))
+    if photo:
+        photo.room_id, photo.period = None, None
+        photo.reading = reading
+
+
+def stage_photo(upload, user_id, staged, *, tenancy=None, reading=None, room=None, period=None, token=None):
     if upload is None or not upload.filename:
         raise ValueError("Cần chọn ảnh chốt số điện.")
     existing = None
@@ -61,8 +70,13 @@ def stage_photo(upload, user_id, staged, *, tenancy=None, reading=None, token=No
         if meter_photo_locked(reading):
             raise ValueError("Phiếu tiền kỳ này còn hiệu lực. Hãy hủy phiếu chưa thu trước khi sửa ảnh công tơ; phiếu đã thu cần root xử lý.")
         existing = db.session.scalar(db.select(Photo).where(Photo.reading_id == reading.id))
-        if existing and existing.status == "pending":
-            raise ValueError("Ảnh công tơ đang xử lý. Hãy chờ hoàn tất trước khi thay ảnh.")
+    elif room:
+        if db.session.scalar(db.select(MonthlyBill.id).where(
+                MonthlyBill.room_id == room.id, MonthlyBill.period == period, MonthlyBill.cancelled_at.is_(None))):
+            raise ValueError("Cần hủy phiếu chưa thu trước khi sửa ảnh công tơ; phiếu đã thu cần root xử lý.")
+        existing = db.session.scalar(db.select(Photo).where(Photo.room_id == room.id, Photo.period == period))
+    if existing and existing.status == "pending":
+        raise ValueError("Ảnh công tơ đang xử lý. Hãy chờ hoàn tất trước khi thay ảnh.")
     photo = Photo(token=token or uuid.uuid4().hex, created_by=user_id)
     staged.append(photo)
     path = photo_path(photo, temporary=True)
@@ -92,6 +106,8 @@ def stage_photo(upload, user_id, staged, *, tenancy=None, reading=None, token=No
         existing.created_by, existing.created_at = user_id, utcnow()
         return existing
     photo.tenancy, photo.reading = tenancy, reading
+    if room:
+        photo.room_id, photo.period = room.id, period
     db.session.add(photo)
     return photo
 

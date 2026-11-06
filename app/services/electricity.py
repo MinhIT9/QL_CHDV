@@ -3,7 +3,7 @@ from app.utils.formatting import local_today, period_label
 
 from app.extensions import db
 from app.models import ElectricityReading, Room
-from app.services.photos import stage_photo, upload_batch
+from app.services.photos import attach_meter_photo, stage_photo, upload_batch
 
 MAX_READING = 2_147_483_647
 
@@ -86,10 +86,13 @@ def save_readings(period, data, user_id, files):
     if not submitted:
         raise ValueError("Hãy nhập chỉ số cuối cho ít nhất một phòng chưa chốt.")
     with upload_batch() as staged:
+        db.session.add_all(submitted)
+        db.session.flush()
         for reading in submitted:
+            attach_meter_photo(reading)
+            db.session.flush()
             upload = files.get(f"photo_{reading.room_id}")
             if upload and upload.filename:
                 stage_photo(upload, user_id, staged, reading=reading)
-        db.session.add_all(submitted)
         db.session.commit()
     return len(submitted)

@@ -104,7 +104,10 @@ class BillingTests(AppTestCase):
     def test_correction_updates_next_start_and_audits_both(self):
         data = self.correction_data(action="preview")
         path = f"/electricity/{self.first.id}/correct"
-        self.assertEqual(self.post(path, data).status_code, 200)
+        preview = self.post(path, data)
+        self.assertEqual(preview.status_code, 200)
+        self.assertIn('id="meter-correction-preview"', preview.get_data(as_text=True))
+        self.assertIn('name="action" value="confirm"', preview.get_data(as_text=True))
         self.assertEqual(self.first.end_value, 1350)
         self.assertEqual(self.post(path, {**data, "action": "confirm"}).status_code, 302)
         self.assertEqual((self.first.consumption, self.next.consumption), (50, 100))
@@ -193,14 +196,14 @@ class BillingTests(AppTestCase):
     def test_reading_dates_and_amount_follow_correction_and_bill(self):
         page = self.client.get('/electricity/?period=2026-01').get_data(as_text=True)
         self.assertIn('Ngày chốt', page)
-        self.assertIn('Cập nhật lần cuối', page)
+        self.assertIn('Sửa đổi gần nhất', page)
         self.assertIn('400.000 đ', page)
         self.assertEqual(self.post(f'/electricity/{self.first.id}/correct', self.correction_data()).status_code, 302)
         page = self.client.get('/electricity/?period=2026-01').get_data(as_text=True)
         self.assertIn('200.000 đ', page)
         self.assertIn('Tạm tính', page)
         revision = db.session.scalar(db.select(ReadingRevision).where(ReadingRevision.reading_id == self.first.id))
-        self.assertIn(self.app.jinja_env.filters['local_datetime'](revision.created_at), page)
+        self.assertIn(self.app.jinja_env.filters['local_datetime'](revision.created_at).replace(' ', '\n'), page)
         self.post(f'/rooms/{self.room_obj.id}/bill', self.bill_data(electricity_price='5000'))
         page = self.client.get('/electricity/?period=2026-01').get_data(as_text=True)
         self.assertIn('250.000 đ', page)

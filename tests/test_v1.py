@@ -180,6 +180,10 @@ class V1Tests(AppTestCase):
         data = {"period": "2026-01", f"start_{room.id}": "100", f"end_{room.id}": "150"}
         self.assertEqual(self.post("/electricity/", data).status_code, 302)
         self.assertEqual(len(room2.readings), 0)
+        for headers in ({}, {"X-Meter-Save": "1"}):
+            page = self.client.get("/electricity/?period=2026-01", headers=headers)
+            html = page.get_json()["html"] if headers else page.get_data(as_text=True)
+            self.assertEqual(re.findall(r'data-room-id="(\d+)"', html), [str(room2.id), str(room.id)])
         self.assertEqual(self.post("/electricity/", data).status_code, 400)
         result = self.post("/electricity/", {"period": "2026-02", f"start_{room.id}": "0", f"end_{room.id}": "180"})
         self.assertEqual(result.status_code, 302)
@@ -255,7 +259,7 @@ class V1Tests(AppTestCase):
             result = migrated.test_cli_runner().invoke(args=["db", "upgrade"])
             self.assertEqual(result.exit_code, 0, f"{result.output}\n{result.exception}")
             self.assertEqual(db.session.scalar(db.select(db.func.count()).select_from(Room)), 0)
-            self.assertEqual(db.session.execute(db.text("SELECT version_num FROM alembic_version")).scalar(), "f79254d31b86")
+            self.assertEqual(db.session.execute(db.text("SELECT version_num FROM alembic_version")).scalar(), "08a365e42c97")
             db.session.remove()
             db.engine.dispose()
 

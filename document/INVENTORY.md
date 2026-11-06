@@ -69,6 +69,7 @@ app/templates/billing/index.html
 app/templates/billing/payment.html
 app/templates/electricity/.gitkeep
 app/templates/electricity/correct.html
+app/templates/electricity/correction_preview.html
 app/templates/electricity/index.html
 app/templates/electricity/photo_cell.html
 app/templates/electricity/photo_widget.html
@@ -122,6 +123,7 @@ migrations/README
 migrations/alembic.ini
 migrations/env.py
 migrations/script.py.mako
+migrations/versions/08a365e42c97_photos_before_readings.py
 migrations/versions/0fecdf9f864b_monthly_bills_and_reading_revisions.py
 migrations/versions/41eb1b88b816_full_payment_receipts.py
 migrations/versions/a24d09e86c31_single_meter_photo.py
@@ -139,6 +141,7 @@ migrations/versions/f13a98c52b70_private_photos.py
 migrations/versions/f79254d31b86_bill_change_log.py
 requirements-dev.txt
 requirements.txt
+scripts/check_correction_browser.py
 scripts/check_meter_photo_browser.py
 scripts/update_docs.py
 tests/.gitkeep
@@ -154,4 +157,4 @@ tests/test_vietqr.py
 wsgi.py
 ```
 
-Tổng: 145 file (bao gồm file danh mục này).
+Tổng: 148 file (bao gồm file danh mục này).

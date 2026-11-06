@@ -5,6 +5,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from PIL import Image
+from sqlalchemy import inspect
 from sqlalchemy.exc import IntegrityError
 
 from app.extensions import db
@@ -26,6 +27,101 @@ class PhotoTests(AppTestCase):
         if photo is not None:
             data[f"photo_{room.id}"] = photo
         return self.client.post("/electricity/", data=data)
+
+    def upload_room_photo(self, room, period="2026-01", token="a" * 32):
+        room_id = inspect(room).identity[0]
+        return self.client.post(f"/photos/meter/{room_id}?period={period}", data={
+            "photo": self.image_upload(), "csrf_token": self.token(), "upload_token": token,
+        }, headers={"X-Photo-Upload": "1"})
+
+    def test_photo_before_reading_compresses_and_attaches_without_duplicate(self):
+        room = self.room()
+        response = self.upload_room_photo(room)
+        self.assertEqual(response.status_code, 200)
+        photo_id = response.json["photo"]["id"]
+        self.assertEqual(db.session.query(ElectricityReading).count(), 0)
+        photo = db.session.get(Photo, photo_id)
+        self.assertEqual((photo.room_id, photo.period, photo.reading_id), (room.id, "2026-01", None))
+        self.assertEqual(self.upload_room_photo(room).json["photo"]["id"], photo_id)
+        self.assertIn(f'data-photo-pending="{photo_id}"', self.client.get('/electricity/?period=2026-01').get_data(as_text=True))
+        source = photo_path(photo, True)
+        self.assertEqual(process_pending(), 1)
+        self.assertFalse(source.exists())
+        with self.client.get(f'/photos/{photo_id}') as response:
+            self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.submit_meter(room).status_code, 302)
+        photo = db.session.get(Photo, photo_id)
+        self.assertIsNone(photo.room_id)
+        self.assertIsNone(photo.period)
+        reading = db.session.scalar(db.select(ElectricityReading))
+        self.assertEqual(photo.reading_id, reading.id)
+        self.assertEqual(len(reading.photos), 1)
+        self.assertEqual(db.session.query(Photo).count(), 1)
+        self.assertEqual(self.upload_room_photo(room).json['photo']['id'], photo_id)
+
+    def test_pending_room_photo_survives_failed_reading_and_attaches_while_pending(self):
+        room = self.room()
+        self.assertEqual(self.upload_room_photo(room).status_code, 200)
+        self.assertEqual(self.upload_room_photo(room, token='b' * 32).status_code, 400)
+        self.assertEqual(self.submit_meter(room, **{f'end_{room.id}': '-1'}).status_code, 400)
+        photo = db.session.scalar(db.select(Photo))
+        self.assertEqual(photo.room_id, room.id)
+        self.assertTrue(photo_path(photo, True).exists())
+        # A failed combined replacement must roll back the ownership transfer too.
+        self.assertEqual(self.submit_meter(room, self.image_upload()).status_code, 400)
+        self.assertEqual(db.session.query(ElectricityReading).count(), 0)
+        self.assertEqual(db.session.scalar(db.select(Photo)).room_id, room.id)
+        self.assertEqual(self.submit_meter(room).status_code, 302)
+        photo = db.session.scalar(db.select(Photo))
+        self.assertIsNotNone(photo.reading_id)
+        self.assertEqual(process_pending(), 1)
+        self.assertEqual(db.session.get(Photo, photo.id).status, 'ready')
+
+    def test_room_photo_replacement_keeps_fallback_and_rejects_other_owner_retry(self):
+        room, other = self.room(), self.room('P102')
+        other_id = other.id
+        self.upload_room_photo(room)
+        process_pending()
+        photo = db.session.scalar(db.select(Photo))
+        old_path = photo_path(photo)
+        self.assertEqual(self.upload_room_photo(db.session.get(Room, other_id)).status_code, 409)
+        self.assertEqual(self.upload_room_photo(room, token='b' * 32).status_code, 200)
+        self.assertTrue(old_path.exists())
+        process_pending()
+        self.assertFalse(old_path.exists())
+        self.assertEqual(db.session.query(Photo).count(), 1)
+
+    def test_room_photo_validates_period_activity_and_retains_history_on_remove(self):
+        room = Room(code='PHOTO_ONLY')
+        db.session.add(room)
+        db.session.commit()
+        for period in ('bad', '2026-13', '2999-01'):
+            self.assertEqual(self.upload_room_photo(room, period=period).status_code, 400)
+        self.assertEqual(self.upload_room_photo(room).status_code, 200)
+        page = self.client.get(f'/rooms/{room.id}/remove').get_data(as_text=True)
+        self.assertIn('Ngừng sử dụng', page)
+        self.assertEqual(self.post(f'/rooms/{room.id}/remove').status_code, 302)
+        self.assertFalse(db.session.get(Room, room.id).active)
+        self.assertEqual(db.session.query(Photo).count(), 1)
+        self.assertEqual(self.upload_room_photo(room, token='b' * 32).status_code, 400)
+
+    def test_room_photo_database_enforces_unique_room_period(self):
+        room = self.room()
+        self.upload_room_photo(room)
+        with self.assertRaises(IntegrityError):
+            db.session.add(Photo(token='b' * 32, room_id=room.id, period='2026-01', created_by=self.root_id))
+            db.session.flush()
+        db.session.rollback()
+
+    def test_room_photos_attach_only_to_the_matching_month(self):
+        room = self.room()
+        self.assertEqual(self.upload_room_photo(room).status_code, 200)
+        self.assertEqual(self.upload_room_photo(room, period='2026-02', token='b' * 32).status_code, 200)
+        self.assertEqual(self.submit_meter(room).status_code, 302)
+        january = db.session.scalar(db.select(Photo).where(Photo.token == 'a' * 32))
+        february = db.session.scalar(db.select(Photo).where(Photo.token == 'b' * 32))
+        self.assertIsNotNone(january.reading_id)
+        self.assertEqual((february.room_id, february.period, february.reading_id), (room.id, '2026-02', None))
 
     def test_new_reading_allows_no_photo_and_invalid_photo_rolls_back_batch(self):
         one, two = self.room(), self.room("P102")
@@ -302,6 +398,7 @@ class PhotoTests(AppTestCase):
             response = self.client.post(f'/photos/electricity/{reading_id}', data={'photo': self.image_upload(), 'upload_token': 'e' * 32, 'csrf_token': self.token()}, headers={'X-Photo-Upload': '1'})
             self.assertEqual(response.status_code, 400)
             self.assertEqual(db.session.get(Photo, photo_id).token, token)
+            self.assertEqual(self.upload_room_photo(room, token='d' * 32).status_code, 400)
         html = self.client.get('/electricity/?period=2026-01').get_data(as_text=True)
         self.assertNotIn('name="photo_' + str(room.id) + '"', html)
         self.assertIn('popovertarget="photo-lock-' + str(reading.id) + '"', html)
@@ -344,6 +441,13 @@ class PhotoTests(AppTestCase):
                     db.session.execute(db.text('INSERT INTO photo (token,reading_id,status,created_by,created_at) VALUES (:token,:reading,:status,:user,:created)'),
                                        {'token': 'x' * 32, 'reading': reading.id, 'status': 'ready', 'user': user.id, 'created': datetime.now()})
                 db.session.rollback()
+                db.session.add(Photo(token='d' * 32, room_id=room.id, period='2026-02', created_by=user.id))
+                db.session.commit()
+                result = app.test_cli_runner().invoke(args=['db', 'check'])
+                self.assertEqual(result.exit_code, 0, result.output)
+                result = app.test_cli_runner().invoke(args=['db', 'downgrade', 'f79254d31b86'])
+                self.assertNotEqual(result.exit_code, 0)
+                self.assertEqual(db.session.query(Photo).count(), 2)
             finally:
                 db.session.remove()
                 db.engine.dispose()

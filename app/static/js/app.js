@@ -25,6 +25,50 @@ window.addEventListener("scroll", repositionPaymentPanels, true);
 function enhancePage() {
 window.AppFormat.enhance();
 window.enhanceMeterPhotos?.();
+const openCorrectionPreview = (dialog) => {
+  if (dialog.open) dialog.close();
+  dialog.querySelectorAll("[data-close-dialog]").forEach(button => {
+    button.addEventListener("click", () => dialog.close());
+  });
+  dialog.showModal();
+};
+document.querySelectorAll("#meter-correction-preview[data-auto-open]").forEach(dialog => {
+  dialog.removeAttribute("data-auto-open");
+  openCorrectionPreview(dialog);
+});
+const correctionForm = document.querySelector("#meter-correction-form");
+if (correctionForm && !correctionForm.dataset.bound) {
+  correctionForm.dataset.bound = "1";
+  correctionForm.addEventListener("submit", async event => {
+    event.preventDefault();
+    if (correctionForm.dataset.busy) return;
+    correctionForm.dataset.busy = "1";
+    const button = correctionForm.querySelector("button[type=submit]");
+    const error = correctionForm.querySelector(".correction-error");
+    error.hidden = true;
+    button.disabled = true;
+    try {
+      const data = new FormData(correctionForm);
+      data.set("action", "preview");
+      const response = await fetch(correctionForm.getAttribute("action") || location.href, { method: "POST", body: data });
+      const page = new DOMParser().parseFromString(await response.text(), "text/html");
+      const dialog = page.querySelector("#meter-correction-preview");
+      if (!response.ok || !dialog) {
+        throw new Error(page.querySelector(".alert-danger")?.textContent.trim() || "Không xem trước được. Hãy kiểm tra phiên đăng nhập và thử lại.");
+      }
+      document.querySelector("#meter-correction-preview")?.remove();
+      dialog.removeAttribute("data-auto-open");
+      document.querySelector("main").append(dialog);
+      openCorrectionPreview(dialog);
+    } catch (failure) {
+      error.textContent = failure.message;
+      error.hidden = false;
+    } finally {
+      delete correctionForm.dataset.busy;
+      button.disabled = false;
+    }
+  });
+}
 const amountForm = document.querySelector("#bill-amount-form");
 if (amountForm && !amountForm.dataset.amountBound) {
   amountForm.dataset.amountBound = "1";

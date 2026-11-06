@@ -1,6 +1,4 @@
 <td class="meter-photo-cell">
-  {% if reading or not row.error %}
     {% include 'electricity/photo_widget.html' %}
     {% if reading %}<noscript><a href="{{ url_for('billing.correct', reading_id=reading.id) }}">Bổ sung ảnh</a></noscript>{% endif %}
-  {% else %}—{% endif %}
 </td>

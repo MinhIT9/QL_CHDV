@@ -36,7 +36,7 @@
     widget.previewURL = URL.createObjectURL(file);
     widget.querySelector(".photo-preview").append(thumbnail(widget.previewURL));
     widget.querySelectorAll(".photo-save,.photo-clear").forEach(button => { button.hidden = false; });
-    message(widget, "Chưa tải lên · bấm Lưu ảnh hoặc Lưu chỉ số.");
+    message(widget, widget.dataset.uploadUrl ? "Chưa tải lên · bấm Lưu ảnh." : "Chưa tải lên · bấm Lưu chỉ số.");
   };
   const request = (url, data, header, progress) => new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
@@ -182,7 +182,7 @@
         if (!input.files.length || !rows.includes(input.closest(".reading-row"))) data.delete(input.name);
       });
       // Existing readings have their own explicit Save photo button.
-      form.querySelectorAll(".meter-photo-widget[data-upload-url]:not([data-upload-url='']) input[type=file]").forEach(input => data.delete(input.name));
+      form.querySelectorAll(".meter-photo-widget[data-reading-saved='1'] input[type=file]").forEach(input => data.delete(input.name));
       form.dataset.saving = "1";
       const button = event.submitter;
       if (button) button.disabled = true;
@@ -199,6 +199,12 @@
           const fresh = page.querySelector(`.reading-row[data-room-id='${row.dataset.roomId}']`);
           if (fresh) { const widget = row.querySelector(".meter-photo-widget"); if (widget) clear(widget); row.replaceWith(fresh); }
         });
+        const body = form.querySelector(".meter-table tbody");
+        page.querySelectorAll(".reading-row").forEach(fresh => {
+          const current = body.querySelector(`.reading-row[data-room-id='${fresh.dataset.roomId}']`);
+          if (current) body.append(current);
+        });
+        body.querySelectorAll(".meter-order").forEach((cell, index) => { cell.textContent = index + 1; });
         const badge = document.querySelector(".section-heading .badge");
         if (badge) badge.textContent = page.querySelector(".section-heading .badge").textContent;
         feedback.textContent = "Đã lưu chỉ số. Ảnh đã nhận sẽ tự hiển thị sau khi xử lý.";

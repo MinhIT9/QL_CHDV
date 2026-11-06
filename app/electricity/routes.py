@@ -3,7 +3,7 @@ from flask_login import current_user, login_required
 from sqlalchemy.exc import IntegrityError, OperationalError
 
 from app.extensions import db
-from app.models import ElectricityReading, MonthlyBill, ReadingRevision, Room
+from app.models import ElectricityReading, MonthlyBill, Photo, ReadingRevision, Room
 from app.services.queries import active_bill_query, room_query
 from app.services.electricity import current_period, reading_context, reading_cost, save_readings, valid_period
 
@@ -34,6 +34,8 @@ def index():
                 return redirect(url_for("electricity.index", period=period))
     rooms = db.session.scalars(room_query().where(Room.active.is_(True))).all()
     contexts = [reading_context(room, period) for room in rooms]
+    contexts.sort(key=lambda row: row["existing"] is not None)
+    draft_photos = {photo.room_id: photo for photo in db.session.scalars(db.select(Photo).where(Photo.period == period, Photo.room_id.is_not(None)))}
     bills = {bill.room_id: bill for bill in db.session.scalars(active_bill_query().where(MonthlyBill.period == period))}
     updated = dict(db.session.execute(db.select(ReadingRevision.reading_id, db.func.max(ReadingRevision.created_at)).join(ElectricityReading, ReadingRevision.reading_id == ElectricityReading.id).where(ElectricityReading.period == period).group_by(ReadingRevision.reading_id)).all())
     for row in contexts:
@@ -42,6 +44,7 @@ def index():
         row.update(reading_cost(reading, bill, tenant.electricity_price if tenant else None))
         row["updated_at"] = updated.get(reading.id) if reading else None
         row["photo_locked"] = bill is not None
+        row["meter_photos"] = reading.photos if reading else [draft_photos[row["room"].id]] if row["room"].id in draft_photos else []
     html = render_template("electricity/index.html", contexts=contexts, period=period,
                            done=sum(bool(item["existing"]) for item in contexts),
                            values=request.form if request.method == "POST" else {})

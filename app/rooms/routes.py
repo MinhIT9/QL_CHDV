@@ -105,7 +105,7 @@ def remove(room_id):
             end_tenancy(room.current_tenancy, request.form.get("move_out_date", ""))
         elif request.form.get("tenancy_id"):
             raise ValueError("Đợt thuê đã thay đổi. Hãy tải lại trang.")
-        if room.readings or room.tenancies:
+        if room.readings or room.tenancies or room.meter_photos:
             room.active = False
             flash("Đã ngừng sử dụng phòng và giữ nguyên lịch sử.", "success")
         else:

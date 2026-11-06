@@ -45,6 +45,7 @@ class Room(db.Model):
     note = db.Column(db.Text, nullable=False, default="")
     tenancies = db.relationship("Tenancy", back_populates="room", order_by="Tenancy.id")
     readings = db.relationship("ElectricityReading", back_populates="room", order_by="ElectricityReading.period")
+    meter_photos = db.relationship("Photo", foreign_keys="Photo.room_id", passive_deletes="all")
 
     @property
     def current_tenancy(self):
@@ -169,6 +170,8 @@ class Photo(db.Model):
     previous_token = db.Column(db.String(32))
     tenancy_id = db.Column(db.Integer, db.ForeignKey("tenancy.id", ondelete="RESTRICT"))
     reading_id = db.Column(db.Integer, db.ForeignKey("electricity_reading.id", ondelete="RESTRICT"))
+    room_id = db.Column(db.Integer, db.ForeignKey("room.id", ondelete="RESTRICT"))
+    period = db.Column(db.String(7))
     status = db.Column(db.String(16), nullable=False, default="pending")
     created_by = db.Column(db.Integer, db.ForeignKey("user.id", ondelete="RESTRICT"), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=utcnow)
@@ -176,7 +179,8 @@ class Photo(db.Model):
     reading = db.relationship("ElectricityReading", back_populates="photos")
     __table_args__ = (
         db.Index("uq_photo_reading", "reading_id", unique=True),
-        db.CheckConstraint("(tenancy_id IS NOT NULL AND reading_id IS NULL) OR (tenancy_id IS NULL AND reading_id IS NOT NULL)", name="ck_photo_owner"),
+        db.Index("uq_photo_room_period", "room_id", "period", unique=True),
+        db.CheckConstraint("(tenancy_id IS NOT NULL AND reading_id IS NULL AND room_id IS NULL AND period IS NULL) OR (tenancy_id IS NULL AND reading_id IS NOT NULL AND room_id IS NULL AND period IS NULL) OR (tenancy_id IS NULL AND reading_id IS NULL AND room_id IS NOT NULL AND period IS NOT NULL)", name="ck_photo_owner"),
         db.CheckConstraint("status IN ('pending', 'ready', 'failed')", name="ck_photo_status"),
     )
 
