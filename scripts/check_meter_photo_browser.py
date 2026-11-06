@@ -164,11 +164,21 @@ def main():
                         due_date=date(2026, 1, 31), created_by=reading.created_by))
                     db.session.commit()
                 page.goto(base + '/electricity/?period=2026-01')
-                assert first.locator('input[type=file]').count() == 1
-                first.locator('input[type=file]').set_input_files({'name': 'blocked.jpg', 'mimeType': 'image/jpeg', 'buffer': image.getvalue()})
-                first.locator('.photo-save').click()
-                expect(first.locator('.photo-message')).to_contain_text('hủy phiếu chưa thu')
-                first.locator('.photo-clear').click()
+                assert first.locator('input[type=file]').count() == 0
+                page.set_viewport_size({'width': 390, 'height': 844})
+                locked_button = first.locator('button[popovertarget]').first
+                panel = first.locator('[popover]')
+                expect(panel).not_to_be_visible()
+                height = first.bounding_box()['height']
+                locked_button.click()
+                expect(panel).to_be_visible()
+                expect(panel).to_contain_text('hủy phiếu chưa thu')
+                assert first.bounding_box()['height'] == height
+                assert panel.bounding_box()['x'] >= 0
+                assert panel.bounding_box()['x'] + panel.bounding_box()['width'] <= 390
+                page.keyboard.press('Escape')
+                expect(panel).not_to_be_visible()
+                page.set_viewport_size({'width': 1280, 'height': 900})
                 assert first.locator('.saved-photos img').count() == 1
                 assert second.locator('input[type=file]').count() == 1
                 with app.app_context():
